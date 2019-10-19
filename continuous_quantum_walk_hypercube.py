@@ -4,33 +4,15 @@ from scipy.stats import binom
 from scipy import linalg
 import math
 
-def hypercube(ndim, diagonal=False):
-    """Recursively construct the edge-connectivity of a hypercube
 
-    Parameters
-    ----------
-    ndim : int
-        Dimension of the hypercube
-    diagonal : bool
-        Value of the diagonal
-        If True, vertices are considered connected to themselves
+def hypercube(ndim):
+    sigma_x = np.array([0, 1],
+                       [1, 0])
 
-    Returns
-    -------
-    ndarray, [2**ndim, 2**ndim], bool
-        connectivity pattern of the hypercube
-    """
-    if ndim == 0:
-        return np.array([[diagonal]])
-    else:
-        D = hypercube(ndim-1, diagonal)
-        I = np.eye(len(D), dtype=D.dtype)
-        return np.block([
-            [D, I],
-            [I, D],
-        ])
+def sigma_i(sigma_x, i, n):
 
-print hypercube(2)
+
+print(hypercube(2))
 
 '''
 N = 60         # number of random steps
