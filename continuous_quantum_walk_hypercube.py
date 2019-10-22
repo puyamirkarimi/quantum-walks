@@ -5,52 +5,78 @@ from scipy import linalg
 import math
 
 
-def hypercube(ndim):
-    sigma_x = np.array([0, 1],
-                       [1, 0])
+def hypercube(n_dim):
+    n = n_dim - 1
+    sigma_x = np.array([[0, 1],
+                        [1, 0]])
+    A = sigma_i(sigma_x, 0, n)
+
+    for i in range(1, n_dim):
+        A += sigma_i(sigma_x, i, n)
+    return -1 * A
+
 
 def sigma_i(sigma_x, i, n):
-
-
-print(hypercube(2))
-
-'''
-N = 60         # number of random steps
-timesteps = 40
-P = 2*N+1       # number of positions
-gamma = 0.5     # hopping rate
-positions = np.arange(-N, N+1)
-
-A = np.zeros((P, P))
-j = 0
-for i in range(P):
-    A[j, i-1] = 1
-    if i==P-1:
-        A[j, 0] = 1
+    if i > 0:
+        out = np.eye(2)
+        for j_before in range(i-1):
+            out = np.kron(out, np.eye(2))
+        out = np.kron(out, sigma_x)
     else:
-        A[j, i+1] = 1
-    j += 1
+        out = sigma_x
+    for j_after in range(n-i):
+        out = np.kron(out, np.eye(2))
+    return out
 
-print A
+def quantum_walk_hypercube(N, timesteps):
+    P = 2**N         # number of positions
+    gamma = 0.5     # hopping rate
 
-U = linalg.expm(-(1j)*gamma*A)          # walk operator
+    A = hypercube(N)
 
-posn0 = np.zeros(P)
-posn0[N] = 1                                              # array indexing starts from 0, so index N is the central posn
-#psi0 = np.kron(posn0,(coin0+coin1*1j)/np.sqrt(2.))        # initial state
-psi0 = posn0
+    #U = linalg.expm(-(1j)*gamma*A)          # walk operator
+    U = linalg.expm(-(1j) * gamma * timesteps * A)  # walk operator
 
-psiN = np.linalg.matrix_power(U, timesteps).dot(psi0)
+    posn0 = np.zeros(P)
+    posn0[0] = 1
+    psi0 = posn0
 
-prob = np.real(np.conj(psiN) * psiN)
-print prob
+    psiN = U.dot(psi0)
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
+    prob = np.real(np.conj(psiN) * psiN)
 
-plt.plot(positions, prob)
-# plt.xticks(range(-N, N+1, int(0.2*N)))
-ax.set_xlabel("Position, x")
-ax.set_ylabel("Probability, P(x)")
-plt.show()
-'''
+    result = np.zeros(N+1)
+    for i, probability in enumerate(prob):
+        binary_i = bin(i)
+        i_ones = [ones for ones in binary_i[2:] if ones=='1']
+        num_ones = len(i_ones)
+        result[num_ones] += probability
+    print(result)
+    return result
+
+def run_walks_check_furthest_qubit(N, time_limit):
+    output = np.zeros(time_limit+1)
+    for timesteps in range(1, time_limit + 1):
+        output[timesteps] = quantum_walk_hypercube(N, timesteps)[-1]
+    return output
+
+if __name__ == '__main__':
+    N = 9           # number of dimensions of hypercube
+    timesteps = 20
+
+    data = run_walks_check_furthest_qubit(N, timesteps)
+    plt.figure()
+    plt.plot(range(timesteps+1), data)
+    plt.show()
+
+
+
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+#
+# plt.plot(positions, prob)
+# # plt.xticks(range(-N, N+1, int(0.2*N)))
+# ax.set_xlabel("Position, x")
+# ax.set_ylabel("Probability, P(x)")
+# plt.show()
+
