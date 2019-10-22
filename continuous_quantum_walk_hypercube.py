@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from scipy.stats import binom
 from scipy import linalg
 import math
@@ -51,32 +52,43 @@ def quantum_walk_hypercube(N, timesteps):
         i_ones = [ones for ones in binary_i[2:] if ones=='1']
         num_ones = len(i_ones)
         result[num_ones] += probability
-    print(result)
     return result
 
-def run_walks_check_furthest_qubit(N, time_limit):
-    output = np.zeros(time_limit+1)
-    for timesteps in range(1, time_limit + 1):
-        output[timesteps] = quantum_walk_hypercube(N, timesteps)[-1]
+def run_many_walks(N, time_limit):
+    output = np.zeros((time_limit+1, N+1))
+    for timesteps in range(0, time_limit + 1):
+        output[timesteps] = quantum_walk_hypercube(N, timesteps)
+        print(sum(output[timesteps]))
     return output
 
-if __name__ == '__main__':
-    N = 9           # number of dimensions of hypercube
-    timesteps = 20
-
-    data = run_walks_check_furthest_qubit(N, timesteps)
+def plot_furthest_qubit_prob(timesteps, data):
     plt.figure()
-    plt.plot(range(timesteps+1), data)
+    plt.plot(range(timesteps + 1), data[:, -1])
+    plt.xlim(0, timesteps)
+    plt.xticks(range(0, timesteps + 1, 5))
+    plt.ylim(0, 1)
+    plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
     plt.show()
 
+def plot_prob_heatmap(data, N, timesteps):
+    fig, ax = plt.subplots()
+    im = ax.imshow(data, interpolation="gaussian", cmap=plt.get_cmap('plasma'))
+    ax.set_xlabel("Steps away from origin, x")
+    ax.set_ylabel("Time, t", rotation=0, labelpad=18)
+    plt.xticks(range(0, N + 1, 2))
+    plt.yticks(range(0, timesteps + 1, 3))
+    ax.invert_yaxis()
 
+    cb = fig.colorbar(cm.ScalarMappable(cmap=plt.get_cmap('plasma')))
+    cb.set_label('Probability, P(x, t)')
 
-# fig = plt.figure()
-# ax = fig.add_subplot(111)
-#
-# plt.plot(positions, prob)
-# # plt.xticks(range(-N, N+1, int(0.2*N)))
-# ax.set_xlabel("Position, x")
-# ax.set_ylabel("Probability, P(x)")
-# plt.show()
+    plt.show()
 
+if __name__ == '__main__':
+    N = 4           # number of dimensions of hypercube
+    timesteps = 15
+
+    data = run_many_walks(N, timesteps)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+
+    plot_furthest_qubit_prob(timesteps, data)
+    plot_prob_heatmap(data, N, timesteps)
