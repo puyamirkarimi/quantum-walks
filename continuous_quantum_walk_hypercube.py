@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.stats import binom
 from scipy import linalg
+from scipy.sparse.linalg import expm_multiply
+from scipy.sparse import csc_matrix
 import math
 
 
@@ -20,46 +22,47 @@ def hypercube(n_dim):
 def sigma_i(sigma_x, i, n):
     if i > 0:
         out = np.eye(2)
-        for j_before in range(i-1):
+        for j_before in range(i - 1):
             out = np.kron(out, np.eye(2))
         out = np.kron(out, sigma_x)
     else:
         out = sigma_x
-    for j_after in range(n-i):
+    for j_after in range(n - i):
         out = np.kron(out, np.eye(2))
     return out
 
+
 def quantum_walk_hypercube(N, timesteps):
-    P = 2**N         # number of positions
-    gamma = 0.5     # hopping rate
+    P = 2**N  # number of positions
+    gamma = 0.5  # hopping rate
 
     A = hypercube(N)
-
-    #U = linalg.expm(-(1j)*gamma*A)          # walk operator
-    U = linalg.expm(-(1j) * gamma * timesteps * A)  # walk operator
+    H = gamma * (A - N * np.eye(2 ** N))
 
     posn0 = np.zeros(P)
     posn0[0] = 1
     psi0 = posn0
 
-    psiN = U.dot(psi0)
+    psiN = expm_multiply(-(1j) * timesteps * H, psi0)
 
     prob = np.real(np.conj(psiN) * psiN)
 
-    result = np.zeros(N+1)
+    result = np.zeros(N + 1)
     for i, probability in enumerate(prob):
         binary_i = bin(i)
-        i_ones = [ones for ones in binary_i[2:] if ones=='1']
+        i_ones = [ones for ones in binary_i[2:] if ones == '1']
         num_ones = len(i_ones)
         result[num_ones] += probability
     return result
 
+
 def run_many_walks(N, time_limit):
-    output = np.zeros((time_limit+1, N+1))
+    output = np.zeros((time_limit + 1, N + 1))
     for timesteps in range(0, time_limit + 1):
         output[timesteps] = quantum_walk_hypercube(N, timesteps)
         print(sum(output[timesteps]))
     return output
+
 
 def plot_furthest_qubit_prob(timesteps, data):
     plt.figure()
@@ -69,6 +72,7 @@ def plot_furthest_qubit_prob(timesteps, data):
     plt.ylim(0, 1)
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
     plt.show()
+
 
 def plot_prob_heatmap(data, N, timesteps):
     fig, ax = plt.subplots()
@@ -84,11 +88,12 @@ def plot_prob_heatmap(data, N, timesteps):
 
     plt.show()
 
+
 if __name__ == '__main__':
-    N = 4           # number of dimensions of hypercube
+    N = 10  # number of dimensions of hypercube
     timesteps = 15
 
     data = run_many_walks(N, timesteps)  # 2D array of [timesteps_run, probability_at_distance_of_index]
 
-    plot_furthest_qubit_prob(timesteps, data)
+    #plot_furthest_qubit_prob(timesteps, data)
     plot_prob_heatmap(data, N, timesteps)
