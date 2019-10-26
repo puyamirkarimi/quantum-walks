@@ -33,7 +33,7 @@ def sigma_i(sigma_x, i, n):
     return out
 
 
-def quantum_walk_hypercube(N, timesteps, gamma):
+def quantum_walk_hypercube(N, timesteps, gamma, normalise):
     P = 2**N  # number of positions
 
     A = hypercube(N)
@@ -48,18 +48,26 @@ def quantum_walk_hypercube(N, timesteps, gamma):
     prob = np.real(np.conj(psiN) * psiN)
 
     result = np.zeros(N + 1)
+    normalise_array = np.zeros(N+1)
+
     for i, probability in enumerate(prob):
         binary_i = bin(i)
         i_ones = [ones for ones in binary_i[2:] if ones == '1']
         num_ones = len(i_ones)
         result[num_ones] += probability
+        if normalise:
+            normalise_array[num_ones] += 1
+
+    if normalise:
+        result = result/normalise_array
+
     return result
 
 
-def run_many_walks(N, time_limit, gamma):
+def run_many_walks(N, time_limit, gamma, normalise=True):
     output = np.zeros((time_limit + 1, N + 1))
     for timesteps in range(0, time_limit + 1):
-        output[timesteps] = quantum_walk_hypercube(N, timesteps, gamma)
+        output[timesteps] = quantum_walk_hypercube(N, timesteps, gamma, normalise)
         print(sum(output[timesteps]))
     return output
 
