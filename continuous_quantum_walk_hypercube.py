@@ -6,6 +6,7 @@ from scipy import linalg
 from scipy.sparse.linalg import expm_multiply
 from scipy.sparse import csc_matrix
 import math
+import timeit
 
 
 def hypercube(n_dim):
@@ -90,10 +91,15 @@ def plot_prob_heatmap(data, N, timesteps):
 
 
 if __name__ == '__main__':
+    time_start = timeit.timeit()
+
     N = 10  # number of dimensions of hypercube
     timesteps = 15
 
     data = run_many_walks(N, timesteps)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+
+    time_end = timeit.timeit()
+    print("runtime:", time_end - time_start)
 
     #plot_furthest_qubit_prob(timesteps, data)
     plot_prob_heatmap(data, N, timesteps)

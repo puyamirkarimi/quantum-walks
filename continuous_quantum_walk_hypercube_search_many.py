@@ -56,7 +56,7 @@ def quantum_walk_hypercube(N, H, psi0, timesteps, normalise):
     return result
 
 
-def run_many_walks(N, time_limit, gamma, normalise=False):
+def run_walks(N, time_limit, gamma, normalise=False):
     P = 2 ** N  # number of positions
     A = hypercube(N)
     marked_state = np.zeros((2 ** N, 2 ** N))
@@ -80,6 +80,7 @@ def plot_furthest_qubit_prob(timesteps, data):
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
     plt.show()
 
+
 def plot_nearest_qubit_prob(timesteps, data):
     plt.figure()
     plt.plot(range(timesteps + 1), data[:, 0])
@@ -93,14 +94,14 @@ def plot_nearest_qubit_prob(timesteps, data):
 def plot_prob_heatmap(data, N, timesteps):
     fig, ax = plt.subplots()
     im = ax.imshow(data, interpolation="gaussian", cmap=plt.get_cmap('plasma'))
-    ax.set_xlabel("Hamming distance, d")
-    ax.set_ylabel("Time, t", rotation=0, labelpad=25)
+    ax.set_xlabel("Steps away from origin, x")
+    ax.set_ylabel("Time, t", rotation=0, labelpad=18)
     plt.xticks(range(0, N + 1, 2))
-    plt.yticks(range(0, timesteps + 1, 5))
+    plt.yticks(range(0, timesteps + 1, 3))
     ax.invert_yaxis()
 
     cb = fig.colorbar(cm.ScalarMappable(cmap=plt.get_cmap('plasma')))
-    cb.set_label('Normalised probability, P(d, t)')
+    cb.set_label('Probability, P(x, t)')
 
     plt.show()
 
@@ -114,19 +115,57 @@ def optimal_gamma(n):
     return gam
 
 
+def first_max_index(array):
+    index = len(array) - 1
+    previous_value = array[0] - 1
+    for i in range(len(array)):
+        if array[i] < previous_value:
+            index = i - 1
+            break
+        previous_value = array[i]
+    return index, np.max(array)
+
+
 if __name__ == '__main__':
     time_start = time.time()
+    max_timesteps = [10, 10, 10, 20, 20, 20, 30, 40, 50, 60]
+    data = []
+    num_dims = 10
 
-    n = 4  # number of dimensions of hypercube
-    timesteps = 30
-    gamma = optimal_gamma(n)    # hopping rate
-    print("gamma:", gamma)
-
-    data = run_many_walks(n, timesteps, gamma, normalise=True)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+    for n in range(1, num_dims+1):
+        gamma = optimal_gamma(n)    # hopping rate
+        print("gamma:", gamma)
+        print("n:", n)
+        data.append(run_walks(n, max_timesteps[n-1], gamma))  # 2D array of probability with dims [time, distance]
 
     time_end = time.time()
     print("runtime:", time_end - time_start)
 
-    #plot_furthest_qubit_prob(timesteps, data)
-    plot_nearest_qubit_prob(timesteps, data)
-    plot_prob_heatmap(data, n, timesteps)
+    peak_times = np.zeros(num_dims)
+    peak_probs = np.zeros(num_dims)
+    for i in range(num_dims):
+        peak_times[i] = first_max_index(data[i][:, 0])[0]
+        peak_probs[i] = first_max_index(data[i][:, 0])[1]
+
+    plt.figure()
+
+    # plt.plot(np.arange(num_dims)+1, peak_probs)
+    # plt.xlim(1, num_dims)
+    # plt.xlabel("Number of qubits, n")
+    # plt.ylabel("Maximum probability of marked state, $P_{max}(n)$")
+
+    n_array = np.arange(float(num_dims)) + 1
+    for index, num in enumerate(n_array):
+        n_array[index] = np.sqrt(2**num)
+
+
+    plt.plot(n_array, peak_times)
+    plt.scatter(n_array, peak_times)
+    #plt.xlim(0, n_array[-1])
+    # plt.xticks(range(0, timesteps + 1, 5))
+    plt.xlabel("$\sqrt{2^{n}}$")
+    plt.ylim(0, max_timesteps[-1])
+    # plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    plt.ylabel("Time until first probability maximum of marked state")
+
+    plt.show()
