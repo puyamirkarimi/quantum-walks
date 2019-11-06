@@ -56,17 +56,17 @@ def quantum_walk_hypercube(N, H, psi0, timesteps, normalise):
     return result
 
 
-def run_many_walks(N, time_limit, gamma, normalise=False):
-    P = 2 ** N  # number of positions
-    A = hypercube(N)
-    marked_state = np.zeros((2 ** N, 2 ** N))
+def run_many_walks(n, time_limit, gamma, normalise=False):
+    P = 2 ** n  # number of positions
+    A = hypercube(n)
+    marked_state = np.zeros((2 ** n, 2 ** n))
     marked_state[0, 0] = 1
-    H = gamma * (A - N * np.eye(2 ** N)) - marked_state  # not sure if marked_node should also be multiplied by gamma
+    H = gamma * (A - n * np.eye(2 ** n)) - marked_state  # not sure if marked_node should also be multiplied by gamma
 
-    psi0 = np.ones(P) * (1 / np.sqrt(2 ** N))
-    output = np.zeros((time_limit + 1, N + 1))
+    psi0 = np.ones(P) * (1 / np.sqrt(2 ** n))
+    output = np.zeros((time_limit + 1, n + 1))
     for timesteps in range(0, time_limit + 1):
-        output[timesteps] = quantum_walk_hypercube(N, H, psi0, timesteps, normalise=normalise)
+        output[timesteps] = quantum_walk_hypercube(n, H, psi0, timesteps, normalise=normalise)
         print(sum(output[timesteps]))
     return output
 
@@ -79,6 +79,7 @@ def plot_furthest_qubit_prob(timesteps, data):
     plt.ylim(0, 1)
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
     plt.show()
+
 
 def plot_nearest_qubit_prob(timesteps, data):
     plt.figure()
