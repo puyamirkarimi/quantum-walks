@@ -32,9 +32,9 @@ def sigma_i(sigma_x, i, n):
     return out
 
 
-def quantum_walk(n, T, M, normalise=True):
+def quantum_walk(n, T, M, H_driver, H_problem, normalise=True):
     psi0 = np.ones(2**n) * (1 / np.sqrt(2 ** n))
-    psiN = adiabatic(psi0, T, M)
+    psiN = adiabatic(psi0, T, M, H_driver, H_problem)
     prob = np.real(np.conj(psiN) * psiN)
 
     result = np.zeros(n + 1)
@@ -74,26 +74,15 @@ def problem_hamiltonian(n):
     return marked_state
 
 
-def evolution_operator(H_driver, H_problem, T, M):
-    H = H_driver
-    U = expm((-1j*T/M) * H)
-    for i in range(1, M):
-        t = i * (T/M)
-        H = (1 - t/T)*H_driver + (t/T)*H_problem
-        U = np.matmul(U, expm((-1.0j*T/M) * H))
-    print("found U")
-    return U
-
-
-def hamiltonian(t, T):
+def hamiltonian(t, T, H_driver, H_problem):
     return (1 - t/T)*H_driver + (t/T)*H_problem
 
 
-def adiabatic(psi0, T, M):
+def adiabatic(psi0, T, M, H_driver, H_problem):
     psiN = psi0
     for i in range(1, M+1):
         t = i * (T / M)
-        H = hamiltonian(t, T)
+        H = hamiltonian(t, T, H_driver, H_problem)
         U = expm(-1j * (T / M) * H)
         psiN = np.dot(U, psiN)
     return psiN
@@ -104,14 +93,14 @@ if __name__ == '__main__':
     M = 100     # number of slices
 
     t_finish = 100
-    n = 3  # number of dimensions of hypercube
+    n = 5  # number of dimensions of hypercube
     gamma = optimal_gamma(n)    # hopping rate
     print("gamma:", gamma)
 
     H_driver = driver_hamiltonian(n, gamma)
     H_problem = problem_hamiltonian(n)
 
-    probs = quantum_walk(n, t_finish, M)
+    probs = quantum_walk(n, t_finish, M, H_driver, H_problem)
 
     time_end = time.time()
     print("runtime:", time_end - time_start)
@@ -121,6 +110,7 @@ if __name__ == '__main__':
     plt.xlabel("Hamming distance, d")
     plt.xticks(range(n+1))
     plt.xlim(0, n)
+    plt.ylim(0, 1)
     plt.ylabel("Normalised probability of states, P(d)")
     plt.show()
 
