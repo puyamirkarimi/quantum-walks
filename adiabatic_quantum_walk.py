@@ -33,25 +33,41 @@ def sigma_i(sigma_x, i, n):
 
 
 def quantum_walk(n, T, M, H_driver, H_problem, normalise=True):
-    psi0 = np.ones(2**n) * (1 / np.sqrt(2 ** n))
-    psiN = adiabatic(psi0, T, M, H_driver, H_problem)
-    prob = np.real(np.conj(psiN) * psiN)
+    N = 2**n
+    psi0 = np.ones(N) * (1 / np.sqrt(N))
+    psiN = psi0
+    H = H_driver
 
-    result = np.zeros(n + 1)
-    normalise_array = np.zeros(n + 1)
+    prob_ground_H = np.zeros(M+1)
+    prob_ground_H[0] = np.abs(np.dot(first_eigv(H), psiN))**2
 
-    for i, probability in enumerate(prob):
-        binary_i = bin(i)
-        i_ones = [ones for ones in binary_i[2:] if ones == '1']
-        num_ones = len(i_ones)
-        result[num_ones] += probability
-        if normalise:
-            normalise_array[num_ones] += 1
+    prob_ground_H_driv = np.zeros(M + 1)
+    ground_state_driv = first_eigv(H_driver)
+    prob_ground_H_driv[0] = np.abs(np.dot(np.conjugate(ground_state_driv), psiN))**2
 
-    if normalise:
-        result = result / normalise_array
+    prob_ground_H_prob = np.zeros(M + 1)
+    ground_state_prob = first_eigv(H_problem)
+    prob_ground_H_prob[0] = np.abs(np.dot(np.conjugate(ground_state_prob), psiN)) ** 2
 
-    return result
+    for i in range(1, M + 1):
+        t = i * (T / M)
+        H = hamiltonian(t, T, H_driver, H_problem)
+        U = expm(-1j * (T / M) * H)
+        psiN = np.dot(U, psiN)
+        prob_ground_H[i] = np.abs(np.dot(np.conjugate(first_eigv(H)), psiN))**2
+        prob_ground_H_driv[i] = np.abs(np.dot(np.conjugate(ground_state_driv), psiN))**2
+        prob_ground_H_prob[i] = np.abs(np.dot(np.conjugate(ground_state_prob), psiN)) ** 2
+
+    return prob_ground_H, prob_ground_H_driv, prob_ground_H_prob
+
+
+def hamiltonian(t, T, H_driver, H_problem):
+    print("t/T:", t/T)
+    return (1 - t/T)*H_driver + (t/T)*H_problem
+
+
+def first_eigv(A):
+    return np.linalg.eigh(A)[1][:, 0]
 
 
 def optimal_gamma(n):
@@ -65,52 +81,41 @@ def optimal_gamma(n):
 
 def driver_hamiltonian(n, gamma):
     A = hypercube(n)
-    return gamma * (A - n * np.eye(2 ** n))
+    return (A + n * np.eye(2 ** n))/2      # plus or minus??? keep the half?
 
 
 def problem_hamiltonian(n):
-    marked_state = np.zeros((2 ** n, 2 ** n))
-    marked_state[0, 0] = -1
+    marked_state = np.eye(2 ** n)
+    marked_state[0, 0] = 0
     return marked_state
-
-
-def hamiltonian(t, T, H_driver, H_problem):
-    return (1 - t/T)*H_driver + (t/T)*H_problem
-
-
-def adiabatic(psi0, T, M, H_driver, H_problem):
-    psiN = psi0
-    for i in range(1, M+1):
-        t = i * (T / M)
-        H = hamiltonian(t, T, H_driver, H_problem)
-        U = expm(-1j * (T / M) * H)
-        psiN = np.dot(U, psiN)
-    return psiN
 
 
 if __name__ == '__main__':
     time_start = time.time()
-    M = 100     # number of slices
+    M = 300     # number of slices
+    t_finish = 300
+    timestep = t_finish / M
 
-    t_finish = 100
-    n = 5  # number of dimensions of hypercube
+    n = 4  # number of dimensions of hypercube
     gamma = optimal_gamma(n)    # hopping rate
     print("gamma:", gamma)
 
     H_driver = driver_hamiltonian(n, gamma)
     H_problem = problem_hamiltonian(n)
 
-    probs = quantum_walk(n, t_finish, M, H_driver, H_problem)
+    prob_H_total, prob_H_driv, prob_H_prob = quantum_walk(n, t_finish, M, H_driver, H_problem)
 
     time_end = time.time()
     print("runtime:", time_end - time_start)
 
     plt.figure()
-    plt.plot(np.arange(n+1), probs)
-    plt.xlabel("Hamming distance, d")
-    plt.xticks(range(n+1))
-    plt.xlim(0, n)
+    plt.plot(np.arange(0, t_finish + timestep, timestep), prob_H_total, label='$H(t)$')
+    plt.plot(np.arange(0, t_finish + timestep, timestep), prob_H_driv, label='$H_{driver}$')
+    plt.plot(np.arange(0, t_finish + timestep, timestep), prob_H_prob, label='$H_{problem}$')
+    plt.xlabel("Time, t")
+    plt.xlim(0, t_finish)
     plt.ylim(0, 1)
-    plt.ylabel("Normalised probability of states, P(d)")
+    plt.ylabel("Probability of being in ground state of hamiltonian")
+    plt.legend()
     plt.show()
 
