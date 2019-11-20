@@ -92,11 +92,11 @@ def problem_hamiltonian(n):
 
 if __name__ == '__main__':
     time_start = time.time()
-    M = 300     # number of slices
-    t_finish = 300
+    M = 500     # number of slices
+    t_finish = 500
     timestep = t_finish / M
 
-    n = 4  # number of dimensions of hypercube
+    n = 8  # number of dimensions of hypercube
     gamma = optimal_gamma(n)    # hopping rate
     print("gamma:", gamma)
 
