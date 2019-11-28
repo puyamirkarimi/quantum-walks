@@ -94,7 +94,7 @@ def color_plot(data, x_start=0.0, y_start=0.0, x_step=1.0, y_step=1.0):
     plt.xticks(range(int(x_start), int(x_end), 1))
 
     cb = fig.colorbar(cm.ScalarMappable(cmap=plt.get_cmap('plasma')))
-    cb.set_label('Probability, P(x, t)')
+    cb.set_label('$\mathrm{P_{success}}$')
 
     plt.show()
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
     time_start = time.time()
     #M = 500     # number of slices
     max_T = 500
-    num_runs = 21
+    num_runs = 101
     T_step = max_T/(num_runs-1)
 
     dims = np.array([3, 4, 5, 6, 7, 8])  # dimensions of hypercubes
