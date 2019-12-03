@@ -9,7 +9,7 @@ def get_2sat_formula():
 
 def solver(formula, C):
     m = len(formula[:,0])                           # number of clauses
-    max_lit_1 = np.amax(formula[:,3]) + 1
+    max_lit_1 = np.amax(formula[:,1]) + 1
     max_lit_2 = np.amax(formula[:,3]) + 1
     n = max(max_lit_1, max_lit_2)                   # number of literals
 
@@ -17,23 +17,23 @@ def solver(formula, C):
     best_assignment = assignment
     max_sat = 0
     for step in range(C*m**2):
-        unsat_clause, num_sat = check_satisfiability(formula, assignment, m)
+        unsat_clauses, num_sat = check_satisfiability(formula, assignment, m)
         print(num_sat)
         if num_sat > max_sat:
             max_sat = num_sat
             best_assignment = np.array(assignment)
-        if unsat_clause == -1:
+        if len(unsat_clauses) == 0:
             return m, m
+        unsat_clause = random.choice(unsat_clauses)
         assignment = random_flip(assignment, unsat_clause, formula)
-        # print(assignment)
     return max_sat, m, best_assignment
 
 
 def check_satisfiability(formula, assignment, num_clauses):
     """Inputs: formula, assignment
-     output 1: index of the last unsatisfied clause (-1 if all clauses satisfied)
+     output 1: indices of the unsatisfied clauses in a list
      output 2: number of satisfied clauses"""
-    unsatisfied_clause = -1
+    unsatisfied_clauses = list()
     num_satisfied = num_clauses
     for clause_index in range(num_clauses):
         clause = formula[clause_index]
@@ -44,9 +44,9 @@ def check_satisfiability(formula, assignment, num_clauses):
         if clause[2] < 0:
             bool_2 = not bool_2
         if not (bool_1 or bool_2):
-            unsatisfied_clause = clause_index
+            unsatisfied_clauses.append(clause_index)
             num_satisfied -= 1
-    return unsatisfied_clause, num_satisfied
+    return unsatisfied_clauses, num_satisfied
 
 
 def guess_truth_assignment(num_literals):
@@ -70,7 +70,7 @@ def random_flip(assignment, unsatisfied_clause, formula):
 
 
 if __name__ == "__main__":
-    C = 10                                          # multiplicative constant to scale solution probability
+    C = 1                                          # multiplicative constant to scale solution probability
     formula = get_2sat_formula()
     max_sat_solution, m, best_assign = solver(formula, C)
     print(max_sat_solution, "out of", m, "clauses are satisfiable. The optimum assignment is", best_assign)
