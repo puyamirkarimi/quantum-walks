@@ -2,28 +2,31 @@ import numpy as np
 import random
 
 
-def get_2sat_formula():
-    out = np.loadtxt("../../instances/zzzntbwlkgogbyddwlkpjifqxnjqef.m2s")
+def get_2sat_formula(instance_name):
+    out = np.loadtxt("../../instances/" + instance_name + ".m2s")
     return out.astype(int)
 
 
-def solver(formula, C):
+def get_instances():
+    """returns array of instance names, array of corresponding n"""
+    data = np.genfromtxt('m2s_nqubits.csv', delimiter=',', skip_header=1, dtype=str)
+    return data[:, 0], data[:, 1].astype(int)
+
+
+def solver(formula, C, n):
     m = len(formula[:,0])                           # number of clauses
-    max_lit_1 = np.amax(formula[:,1]) + 1
-    max_lit_2 = np.amax(formula[:,3]) + 1
-    n = max(max_lit_1, max_lit_2)                   # number of literals
 
     assignment = guess_truth_assignment(n)
     best_assignment = assignment
     max_sat = 0
-    for step in range(C*m**2):
+    for step in range(int(np.ceil(C*m**2))):
         unsat_clauses, num_sat = check_satisfiability(formula, assignment, m)
         print(num_sat)
         if num_sat > max_sat:
             max_sat = num_sat
             best_assignment = np.array(assignment)
         if len(unsat_clauses) == 0:
-            return m, m
+            return m, m, best_assignment
         unsat_clause = random.choice(unsat_clauses)
         assignment = random_flip(assignment, unsat_clause, formula)
     return max_sat, m, best_assignment
@@ -71,6 +74,8 @@ def random_flip(assignment, unsatisfied_clause, formula):
 
 if __name__ == "__main__":
     C = 1                                          # multiplicative constant to scale solution probability
-    formula = get_2sat_formula()
-    max_sat_solution, m, best_assign = solver(formula, C)
+    instance_names, instance_n_bits = get_instances()
+    formula = get_2sat_formula(instance_names[-54])
+    n = instance_n_bits[-54]          # number of literals
+    max_sat_solution, m, best_assign = solver(formula, C, n)
     print(max_sat_solution, "out of", m, "clauses are satisfiable. The optimum assignment is", best_assign)
