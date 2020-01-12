@@ -35,7 +35,7 @@ def sigma_i(sigma_x, i, n):
 
 def quantum_walk_hypercube(N, timesteps):
     P = 2**N  # number of positions
-    gamma = 0.5  # hopping rate
+    gamma = 1/N  # hopping rate
 
     A = hypercube(N)
     H = gamma * (A - N * np.eye(2 ** N))
@@ -78,7 +78,7 @@ def plot_furthest_qubit_prob(timesteps, data):
 def plot_prob_heatmap(data, N, timesteps):
     fig, ax = plt.subplots()
     im = ax.imshow(data, interpolation="gaussian", cmap=plt.get_cmap('plasma'))
-    ax.set_xlabel("Steps away from origin, x")
+    ax.set_xlabel("Hamming distance, x")
     ax.set_ylabel("Time, t", rotation=0, labelpad=18)
     plt.xticks(range(0, N + 1, 2))
     plt.yticks(range(0, timesteps + 1, 3))
@@ -93,8 +93,8 @@ def plot_prob_heatmap(data, N, timesteps):
 if __name__ == '__main__':
     time_start = timeit.timeit()
 
-    N = 10  # number of dimensions of hypercube
-    timesteps = 15
+    N = 8  # number of dimensions of hypercube
+    timesteps = 30
 
     data = run_many_walks(N, timesteps)  # 2D array of [timesteps_run, probability_at_distance_of_index]
 
