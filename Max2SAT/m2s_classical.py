@@ -3,7 +3,7 @@ import random
 
 
 def get_2sat_formula(instance_name):
-    out = np.loadtxt("../../instances/" + instance_name + ".m2s")
+    out = np.loadtxt("../../instances_original/" + instance_name + ".m2s")
     return out.astype(int)
 
 
