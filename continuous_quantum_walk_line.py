@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import binom
 from scipy import linalg
 import math
+from matplotlib.ticker import MultipleLocator
 
 N = 60         # number of random steps
 timesteps = 40
@@ -44,11 +45,12 @@ probN_classical = H_classical.dot(prob0_classical)
 
 prob = np.real(np.conj(psiN) * psiN)
 
+plt.rc('text', usetex=True)
+plt.rc('font', size=14)
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-plt.rc('text', usetex=True)
-plt.rc('font', size=14)
 plt.plot(positions, prob)
 plt.plot(positions, probN_classical, linestyle="--")
 plt.scatter(positions, prob, marker=".")
@@ -58,4 +60,5 @@ ax.set_xlabel("Position, $x$")
 ax.set_ylabel("Probability, $P(x)$")
 ax.set_xlim([-60, 60])
 ax.set_ylim([0, 0.07])
+ax.tick_params(direction='in', top=True, right=True)
 plt.show()

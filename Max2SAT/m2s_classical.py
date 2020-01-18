@@ -21,15 +21,18 @@ def solver(formula, C, n):
     max_sat = 0
     for step in range(int(np.ceil(C*m**2))):
         unsat_clauses, num_sat = check_satisfiability(formula, assignment, m)
-        print(num_sat)
         if num_sat > max_sat:
             max_sat = num_sat
             best_assignment = np.array(assignment)
         if len(unsat_clauses) == 0:
-            return m, m, best_assignment
+            return m, m, True
         unsat_clause = random.choice(unsat_clauses)
         assignment = random_flip(assignment, unsat_clause, formula)
-    return max_sat, m, best_assignment
+    if False in best_assignment:
+        correct_solution = False
+    else:
+        correct_solution = True
+    return max_sat, m, correct_solution
 
 
 def check_satisfiability(formula, assignment, num_clauses):
@@ -74,8 +77,17 @@ def random_flip(assignment, unsatisfied_clause, formula):
 
 if __name__ == "__main__":
     C = 1                                          # multiplicative constant to scale solution probability
+    num_instances = 1000
     instance_names, instance_n_bits = get_instances()
-    formula = get_2sat_formula(instance_names[-54])
-    n = instance_n_bits[-54]          # number of literals
-    max_sat_solution, m, best_assign = solver(formula, C, n)
-    print(max_sat_solution, "out of", m, "clauses are satisfiable. The optimum assignment is", best_assign)
+    unsolved_instances = list()
+    for i in range(num_instances):
+        if i % 500 == 0:
+            print(i)
+        formula = get_2sat_formula(instance_names[i])
+        n = instance_n_bits[i]                          # number of literals
+        max_sat_clauses, m, solution_correct = solver(formula, C, n)
+        if not solution_correct:
+            unsolved_instances.append([i, instance_names[i]])
+
+    print("Non-optimal solutions:", unsolved_instances)
+    print("count:", len(unsolved_instances))
