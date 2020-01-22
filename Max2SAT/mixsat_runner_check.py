@@ -15,13 +15,14 @@ if __name__ == '__main__':
     time_array = np.zeros(16)
 
     for n in range(1, 17):
+        failed = False
         time_start = time.time()
         for i in range((n-1)*10000, n*10000):                               # 10000 instances per value of n
             instance_name = instance_names[i]
             result = subprocess.run(['./../../mixsat/complete', './../../instances_dimacs/'+instance_name+'.txt'], stdout=subprocess.PIPE)
             output = result.stdout
             failed = b'-' in output
-        print("n=" + str(n) + " failed? " + str(failed))
+        print("n=" + str(n+4) + " failed? " + str(failed))
         time_end = time.time()
         average_runtime = (time_end - time_start) / 10000
         print("average runtime for n =", n+4, ":", average_runtime)
