@@ -5,7 +5,7 @@ from scipy import linalg
 import math
 from matplotlib.ticker import MultipleLocator
 
-N = 60         # number of random steps
+N = 100         # number of random steps
 timesteps = 40
 P = 2*N+1       # number of positions
 gamma = 0.5     # hopping rate
@@ -46,21 +46,20 @@ probN_classical = H_classical.dot(prob0_classical)
 prob = np.real(np.conj(psiN) * psiN)
 
 plt.rc('text', usetex=True)
-plt.rc('font', size=17)
+plt.rc('font', size=14)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-plt.plot(positions, prob, color='#1f77b4', label='Quantum walk')
-plt.plot(positions, probN_classical, linestyle="--", color='#ff7f0e', label='Classical walk')
-plt.scatter(positions, prob, marker=".", color='#1f77b4')
-plt.scatter(positions, probN_classical, marker=".", color='#ff7f0e')
+#plt.plot(positions, probN_classical, linestyle="--", color='grey')
+plt.plot(positions, prob, color='#68246D')
+
+# plt.scatter(positions, prob, marker=".")
+# plt.scatter(positions, probN_classical, marker=".", color='purple')
 # plt.xticks(range(-N, N+1, int(0.2*N)))
-ax.set_xlabel("Position, $x$")
-ax.set_ylabel("Probability, $P(x)$")
-ax.set_xlim([-60, 60])
-ax.set_ylim([0, 0.07])
-ax.tick_params(direction='in', top=True, right=True)
-plt.legend()
-plt.tight_layout()
-plt.show()
+# ax.set_xlabel("Position, $x$")
+# ax.set_ylabel("Probability, $P(x)$")
+ax.set_xlim([-70, 70])
+ax.set_ylim([-0.02, 0.1])
+#ax.tick_params(direction='in', top=True, right=True)
+plt.savefig('visual.png', dpi=400)
