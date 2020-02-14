@@ -21,6 +21,11 @@ def get_instances():
     return instance_data[:, 0], instance_data[:, 1].astype(int)
 
 
+def first_eigv(A):
+    """returns ground state of matrix A"""
+    return np.linalg.eigh(A)[1][:, 0]
+
+
 def hypercube(n_dim):
     sigma_x = np.array([[0, 1],
                         [1, 0]])
@@ -67,19 +72,33 @@ def quantum_walk_hypercube(N, H, psi0, timesteps, normalise):
     return result
 
 
-def hamiltonian_2sat(n):
+def hamiltonian_2sat(n, formula):
     N = 2 ** n
     out = np.zeros((N, N))
+    sigma_z = np.array([[1, 0],
+                        [0, -1]])
+    sigma_identity = np.eye(N)
+    sigma_z_i = np.zeros((n, N, N))
+    for i in range(n):
+        sigma_z_i[i] = sigma_i(sigma_z, i, n)
+    for clause in formula:
+        v_1 = clause[1]
+        v_2 = clause[3]
+        sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
+        sign_2 = -1 * clause[2]
+        out += (1/4) * (sign_1*sign_2*sigma_z_i[v_1]*sigma_z_i[v_2]
+                        + sign_1*sigma_z_i[v_1] + sign_2*sigma_z_i[v_2] + sigma_identity)
+    print(first_eigv(out))
     return out
 
 
-def run_many_walks(n, time_limit, gamma, normalise=False):
+def run_many_walks(formula, n, time_limit, gamma, normalise=False):
     N = 2 ** n  # number of positions
     A = hypercube(n)
-    H_problem = hamiltonian_2sat(n)
-    H = gamma * (A - n * np.eye(2 ** n)) - H_problem
+    H_problem = hamiltonian_2sat(n, formula)
+    H = gamma * (A - n * np.eye(2 ** n)) + H_problem
 
-    psi0 = np.ones(N) * (1 / np.sqrt(2 ** n))
+    psi0 = np.ones(N) * (1 / np.sqrt(N))
     output = np.zeros((time_limit + 1, n + 1))
     for timesteps in range(0, time_limit + 1):
         output[timesteps] = quantum_walk_hypercube(n, H, psi0, timesteps, normalise=normalise)
@@ -94,6 +113,7 @@ def plot_furthest_qubit_prob(timesteps, data):
     plt.xticks(range(0, timesteps + 1, 5))
     plt.ylim(0, 1)
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    plt.xlabel("Time, $t$")
     plt.show()
 
 
@@ -104,20 +124,22 @@ def plot_nearest_qubit_prob(timesteps, data):
     plt.xticks(range(0, timesteps + 1, 5))
     plt.ylim(0, 1)
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    plt.xlabel("Time, $t$")
+    plt.ylabel("Probability of being in ground state of $H_{prob}$")
     plt.show()
 
 
 def plot_prob_heatmap(data, N, timesteps):
     fig, ax = plt.subplots()
-    im = ax.imshow(data, interpolation="gaussian", cmap=plt.get_cmap('plasma'))
-    ax.set_xlabel("Hamming distance, d")
-    ax.set_ylabel("Time, t", rotation=0, labelpad=25)
+    im = ax.imshow(data, cmap=plt.get_cmap('plasma'))
+    ax.set_xlabel("Hamming distance, $d$")
+    ax.set_ylabel("Time, $t$", rotation=0, labelpad=25)
     plt.xticks(range(0, N + 1, 2))
     plt.yticks(range(0, timesteps + 1, 5))
     ax.invert_yaxis()
 
     cb = fig.colorbar(cm.ScalarMappable(cmap=plt.get_cmap('plasma')))
-    cb.set_label('Normalised probability, P(d, t)')
+    cb.set_label('Normalised probability, $P(d, t)$')
 
     plt.show()
 
@@ -142,7 +164,7 @@ if __name__ == '__main__':
     print("gamma:", gamma)
 
     time_start = time.time()
-    data = run_many_walks(n, timesteps, gamma, normalise=True)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+    data = run_many_walks(sat_formula, n, timesteps, gamma, normalise=True)  # 2D array of [timesteps_run, probability_at_distance_of_index]
     time_end = time.time()
 
     print("runtime:", time_end - time_start)
