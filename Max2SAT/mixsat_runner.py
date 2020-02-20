@@ -28,6 +28,6 @@ if __name__ == '__main__':
         print("average runtime for n =", n+4, ":", average_runtime)
         time_array[n-1] = average_runtime
 
-    with open("mixsat_runtimes.txt", "ab") as f:
+    with open("mixsat_runtimes_averaged.txt", "ab") as f:
         f.write(b"\n")
         np.savetxt(f, time_array)

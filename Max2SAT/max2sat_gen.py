@@ -118,3 +118,9 @@ def generate_max2sat(nqubits, nclauses, ensure_unique_solution=True, zero_soluti
         prob = max2sat_GT(prob, nqubits, sol)  # transform the problem so solution is the zero bitstring
 
     return prob
+
+
+if __name__ == '__main__':
+    num_qubits = 4
+    num_clauses = 3 * num_qubits
+    generate_max2sat(nqubits= )
