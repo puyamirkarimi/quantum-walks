@@ -12,6 +12,7 @@ def get_instances():
 if __name__ == '__main__':
     instance_names = np.array(range(137))
     runtimes = np.zeros(137)
+    states_count = np.zeros(137)
 
     for instance_name_int in instance_names:
         instance_name = str(instance_name_int)
@@ -21,12 +22,24 @@ if __name__ == '__main__':
         runtime = time_end_inst - time_start_inst
         runtimes[instance_name_int] = runtime
         #print(time_end_inst - time_start_inst)
-        output = result.stdout
+        output = str(result.stdout)
+
+        string_start_index = output.find('state_visited ') + 14
+        string_end_index = output.find(' pruned')
+        states_visited = int(output[string_start_index : string_end_index])
+        states_count[instance_name_int] = states_visited
+
+
         # print(output)
         # failed = b'-' in output
 
     #print("average runtime: ", average_runtime)
 
-    with open("crosson_runtimes.txt", "ab") as f:
+    # with open("crosson_runtimes.txt", "ab") as f:         # saves runtimes using time.time()
+    #     f.write(b"\n")
+    #     np.savetxt(f, runtimes)
+
+    with open("crosson_counts.txt", "ab") as f:         # saves counts
         f.write(b"\n")
-        np.savetxt(f, runtimes)
+        print(states_count)
+        np.savetxt(f, states_count)

@@ -12,22 +12,30 @@ def get_instances():
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
     # qubits_array = np.array(range(5, 21))                   # Adam's instances range from n=5 to n=20
-    time_array = np.zeros(16)
+    runtimes = np.zeros(10000)
+    states_count = np.zeros(10000)
 
-    for n in range(1, 17):
-        time_start = time.time()
-        for i in range((n-1)*10000, n*10000):                               # 10000 instances per value of n
-            instance_name = instance_names[i]
-            result = subprocess.run(['./../../mixsat/complete', './../../instances_dimacs/'+instance_name+'.txt'], stdout=subprocess.PIPE)
-            # output = result.stdout
-            # print(output)
-            # failed = b'-' in output
-        # print(failed)
-        time_end = time.time()
-        average_runtime = (time_end - time_start) / 10000
-        print("average runtime for n =", n+4, ":", average_runtime)
-        time_array[n-1] = average_runtime
+    n = 9
+    n_shifted = n-5                     # n_shifted runs from 0 to 15 instead of 5 to 20
 
-    with open("mixsat_runtimes_averaged.txt", "ab") as f:
+    for loop, i in enumerate(range(n_shifted*10000, (n_shifted+1)*10000)):                               # 10000 instances per value of n
+        instance_name = instance_names[i]
+        time_start_inst = time.time()
+        result = subprocess.run(['./../../mixsat/complete', './../../instances_dimacs/'+instance_name+'.txt'], stdout=subprocess.PIPE)
+        time_end_inst = time.time()
+        runtime = time_end_inst - time_start_inst
+        runtimes[loop] = runtime
+        output = str(result.stdout)
+
+        string_start_index = output.find('state_visited ') + 14
+        string_end_index = output.find(' pruned')
+        states_visited = int(output[string_start_index: string_end_index])
+        states_count[loop] = states_visited
+
+    with open("adam_runtimes_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
         f.write(b"\n")
-        np.savetxt(f, time_array)
+        np.savetxt(f, runtimes)
+
+    with open("adam_counts_"+str(n)+".txt", "ab") as f:         # saves counts
+        f.write(b"\n")
+        np.savetxt(f, states_count)
