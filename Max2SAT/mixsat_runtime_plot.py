@@ -58,9 +58,29 @@ def runtimes_data_adam(n):
     return average_data(runtimes_adam)
 
 
+def counts_data_adam_noGT(n):
+    counts_adam = np.loadtxt("adam_noGT_counts_"+str(n)+".txt").reshape((-1, 10000))
+    return average_data(counts_adam)
+
+
+def runtimes_data_adam_noGT(n):
+    runtimes_adam = np.loadtxt("adam_noGT_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    return average_data(runtimes_adam)
+
+
+def counts_data_adam_noGT_nondg(n):
+    counts_adam = np.loadtxt("adam_noGT_nondg_counts_"+str(n)+".txt").reshape((-1, 10000))
+    return average_data(counts_adam)
+
+
+def runtimes_data_adam_noGT_nondg(n):
+    runtimes_adam = np.loadtxt("adam_noGT_nondg_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    return average_data(runtimes_adam)
+
+
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=13)
+    plt.rc('font', size=16)
 
     n_list = [5, 9, 20]
     counts_list_adam = []
@@ -100,12 +120,13 @@ if __name__ == '__main__':
         plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
     #plt.scatter(x, y_crosson, label="n=20 (Crosson)")
     #plt.errorbar(x, counts_average, counts_standard_error)
-    plt.xlim([0, max_count])
-    #plt.ylim([0, 0.3])
+    plt.xlim([0, 375])
+    plt.ylim([9e-5, 1])
     plt.yscale('log')
     plt.legend()
     plt.xlabel("Number of states visited by MIXSAT algorithm")
     plt.ylabel("Number of instances (normalised)")
+    plt.tight_layout()
     plt.show()
 
     ################## RUNTIMES ##################
@@ -116,6 +137,7 @@ if __name__ == '__main__':
 
     for n in n_list:
         runtimes_adam_average, runtimes_adam_standard_error = runtimes_data_adam(n)
+        print(np.argmax(runtimes_adam_average))
         runtimes_adam_average = np.around(runtimes_adam_average, 5)         # binning
         runtimes_list_adam.append(runtimes_adam_average)
         min_runtime_temp = np.min(runtimes_adam_average)
@@ -146,11 +168,12 @@ if __name__ == '__main__':
         plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
     #plt.scatter(x_crosson, y_crosson, label="n=20 (Crosson)")
     # plt.errorbar(x, runtimes_average, runtimes_standard_error)
-    plt.xlim([0, max_runtime])
-    # plt.ylim([0, 0.3])
+    plt.xlim([0, 0.021])
+    plt.ylim([9e-5, 0.013])
     plt.yscale('log')
-    plt.xlabel("Rounded runtime of MIXSAT algorithm")
-    plt.ylabel("Number of instances (normalised)")
+    plt.xlabel("Binned runtime of MIXSAT algorithm ($s$)")
+    plt.ylabel("Normalised number of instances")
     plt.legend()
+    plt.tight_layout()
     plt.show()
 
