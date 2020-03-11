@@ -37,23 +37,26 @@ def sigma_i(sigma_x, i, n):
 def quantum_walk_hypercube(N, H, psi0, timesteps, normalise):
     psiN = expm_multiply(-(1j) * timesteps * H, psi0)
 
-    prob = np.real(np.conj(psiN) * psiN)
+    ground_state = np.zeros(len(psiN))
+    ground_state[0] = 1
 
-    result = np.zeros(N + 1)
-    normalise_array = np.zeros(N+1)
+    prob_ground = np.abs(np.dot(np.conjugate(ground_state), psiN)) ** 2
 
-    for i, probability in enumerate(prob):
-        binary_i = bin(i)
-        i_ones = [ones for ones in binary_i[2:] if ones == '1']
-        num_ones = len(i_ones)
-        result[num_ones] += probability
-        if normalise:
-            normalise_array[num_ones] += 1
+    # result = np.zeros(N + 1)
+    # normalise_array = np.zeros(N+1)
+    #
+    # for i, probability in enumerate(prob):
+    #     binary_i = bin(i)
+    #     i_ones = [ones for ones in binary_i[2:] if ones == '1']
+    #     num_ones = len(i_ones)
+    #     result[num_ones] += probability
+    #     if normalise:
+    #         normalise_array[num_ones] += 1
+    #
+    # if normalise:
+    #     result = result/normalise_array
 
-    if normalise:
-        result = result/normalise_array
-
-    return result
+    return prob_ground
 
 
 def run_many_walks(n, time_limit, gamma, normalise=False):
@@ -64,10 +67,10 @@ def run_many_walks(n, time_limit, gamma, normalise=False):
     H = gamma * (A - n * np.eye(2 ** n)) - marked_state  # not sure if marked_node should also be multiplied by gamma
 
     psi0 = np.ones(P) * (1 / np.sqrt(2 ** n))
-    output = np.zeros((time_limit + 1, n + 1))
-    for timesteps in range(0, time_limit + 1):
-        output[timesteps] = quantum_walk_hypercube(n, H, psi0, timesteps, normalise=normalise)
-        print(sum(output[timesteps]))
+    output = np.zeros(time_limit + 1)
+    for timestep in range(0, time_limit + 1):
+        output[timestep] = quantum_walk_hypercube(n, H, psi0, timestep, normalise=normalise)
+        print(timestep)
     return output
 
 
@@ -83,11 +86,16 @@ def plot_furthest_qubit_prob(timesteps, data):
 
 def plot_nearest_qubit_prob(timesteps, data):
     plt.figure()
-    plt.plot(range(timesteps + 1), data[:, 0])
+    plt.tick_params(direction='in', top=True, right=True)
+    colors = ['blue', 'forestgreen']
+    for i in range(len(data[:,0])):
+        plt.plot(range(timesteps + 1), data[i,:], color=colors[i])
     plt.xlim(0, timesteps)
-    plt.xticks(range(0, timesteps + 1, 5))
+    plt.xticks(range(0, timesteps + 1, 20))
     plt.ylim(0, 1)
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    plt.xlabel("$t_f$")
+    plt.ylabel("$P(t_f)$")
     plt.show()
 
 
@@ -116,18 +124,24 @@ def optimal_gamma(n):
 
 
 if __name__ == '__main__':
+    plt.rc('text', usetex=True)
+    plt.rc('font', size=14)
+
     time_start = time.time()
 
-    n = 8  # number of dimensions of hypercube
-    timesteps = 50
-    gamma = optimal_gamma(n)    # hopping rate
-    print("gamma:", gamma)
+    n_list = [6, 9]  # number of dimensions of hypercube
+    timesteps = 100
+    data = np.zeros((len(n_list), timesteps + 1))
 
-    data = run_many_walks(n, timesteps, gamma, normalise=True)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+    for i, n in enumerate(n_list):
+        gamma = optimal_gamma(n)  # hopping rate
+        print("n:", n, "gamma:", gamma)
+        data[i, :] = run_many_walks(n, timesteps, gamma, normalise=False)  # 2D array of [timesteps_run, probability_at_distance_of_index]
 
     time_end = time.time()
     print("runtime:", time_end - time_start)
 
     #plot_furthest_qubit_prob(timesteps, data)
+    print(data)
     plot_nearest_qubit_prob(timesteps, data)
-    plot_prob_heatmap(data, n, timesteps)
+

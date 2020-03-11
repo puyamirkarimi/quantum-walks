@@ -28,7 +28,6 @@ if __name__ == '__main__':
             runtime = rc2.oracle_time()
         runtimes[loop] = runtime
 
-
     with open("adam_runtimes_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
         f.write(b"\n")
         np.savetxt(f, runtimes)

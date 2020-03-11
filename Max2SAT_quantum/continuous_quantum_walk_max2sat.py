@@ -97,7 +97,7 @@ def run_many_walks(formula, n, time_limit, normalise=False):
     N = 2 ** n  # number of positions
     A = hypercube(n)
     H_problem = hamiltonian_2sat(n, formula)
-    gamma = heuristic_gamma(H_problem, n)
+    gamma = heuristic_gamma(n)
     H = gamma * (A - n * np.eye(2 ** n)) + H_problem
 
     psi0 = np.ones(N) * (1 / np.sqrt(N))
@@ -154,9 +154,16 @@ def optimal_gamma(n):
     return 0.77
 
 
-def heuristic_gamma(H, n):
-    energies = np.diagonal(H)
-    out = (1/(2*n)) * (np.max(energies)-np.min(energies))
+def heuristic_gamma(n):
+    out = "haven't defined heuristic gamma for given n"
+    if n == 5:
+        out = 0.56503
+    if n == 6:
+        out = 0.587375
+    if n == 7:
+        out = 0.5984357142857143
+    if n == 8:
+        out = 0.60751875
     print("heuristic gamma: ", out)
     return out
 

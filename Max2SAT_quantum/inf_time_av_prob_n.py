@@ -104,51 +104,61 @@ def inner_product_sq(psi1, psi2):
     return np.abs(np.dot(np.conjugate(psi1), psi2)) ** 2
 
 
-def inf_time_av_prob(gamma, N, H_prob, H_tot, psi_0):
+def inf_time_av_prob(N, ground_state, H_tot, psi_0):
     out = 0
-    ground_state = first_eig_vec(H_prob)
     for a in range(N):
         a_state = eig_vec(H_tot, a)
         out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
     return out
 
 
-def optimal_gamma(n):
-    N = 2**n
-    gam = 0
-    for r in range(1, n+1):
-        gam += comb(n, r) * (1/r)
-    gam = (1/2) * (1/N) * gam
-    return gam
+def heuristic_gamma(n):
+    out = "haven't defined heuristic gamma for given n"
+    if n == 5:
+        out = 0.56503
+    if n == 6:
+        out = 0.587375
+    if n == 7:
+        out = 0.5984357142857143
+    if n == 8:
+        out = 0.60751875
+    if n == 9:
+        out = 0.6163333333333333       # only 1000 problems sampled for this value
+    print("heuristic gamma: ", out)
+    return out
 
 
 if __name__ == "__main__":
     plt.rc('text', usetex=True)
-    #plt.rc('font', size=16)
+    plt.rc('font', size=14)
 
     instance_names, instance_n_bits = get_instances()
-    instance_num = 38000
-    instance_name = instance_names[instance_num]
-    sat_formula = get_2sat_formula(instance_name)
-    n = instance_n_bits[instance_num]  # number of variables/qubits
-    print("n:", n)
-    N = 2**n
-    H_problem = hamiltonian_2sat(n, sat_formula)
+
+    n = 9
+    n_shifted = n - 5
+
+    N = 2 ** n
     A = hypercube(n)
     psi_0 = np.ones(N) * (1 / np.sqrt(N))
+    gamma = heuristic_gamma(n)
+    H_qw = gamma * (A - n * np.eye(2 ** n))
+    sol_state = np.zeros(N)
+    sol_state[0] = 1
 
-    probs = []
-    for i in range(0, 100):
-        print(i)
-        gamma = i / 50
-        H_total = gamma * (A - n * np.eye(2 ** n)) + H_problem
+    start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
+    end = 100           # end should go up to 10000
 
-        probs.append(inf_time_av_prob(gamma, N, H_problem, H_total, psi_0))
+    probs = np.zeros(end-start)
 
-    plt.figure()
-    plt.plot(np.arange(0, 100)/50, np.array(probs))
-    plt.xlim([0, 2])
-    plt.ylim([0, 0.2])
-    plt.xlabel("$\gamma$")
-    plt.ylabel("$P_{\infty}$")
-    plt.show()
+    for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
+        instance_name = instance_names[i]
+        sat_formula = get_2sat_formula(instance_name)
+        H_problem = hamiltonian_2sat(n, sat_formula)
+        H_total = H_qw + H_problem
+        probs[loop] = inf_time_av_prob(N, sol_state, H_total, psi_0)
+
+        #if loop % 10 == 0:
+        print("loop:", loop)
+
+    with open("inf_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
+        np.savetxt(f, probs)

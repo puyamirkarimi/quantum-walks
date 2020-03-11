@@ -1,0 +1,16 @@
+Put this at the start:
+    plt.rc('text', usetex=True)
+    plt.rc('font', size=14)
+
+Template for plot:
+    plt.figure()
+    plt.tick_params(direction='in', top=True, right=True)
+    plt.xlim(start, end)
+    plt.ylim(start, end)
+    plt.xticks(range(start, end+1, step))
+    plt.yticks(range(start, end+1, step))
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.show()
+
+If the plot is going to take up the whole width, add 100px padding to left and right sides of the image.
