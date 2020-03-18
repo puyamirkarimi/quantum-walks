@@ -73,7 +73,7 @@ def energy_spread(H):
 if __name__ == "__main__":
     instance_names, instance_n_bits = get_instances()
 
-    num_samples = 1000              # max 10000
+    num_samples = 10000              # max 10000
 
     energy_spread_array = np.zeros(num_samples)
 

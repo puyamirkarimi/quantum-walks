@@ -54,7 +54,7 @@ if __name__ == '__main__':
     marker_size = 4
 
     n_list = [6]
-    classical_solver = "pysat"
+    classical_solver = "mixsat"
 
     # RUNTIMES SCATTER
     for n in n_list:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         plt.show()
 
     # COUNTS SCATTER
-    if classical_solver.lower() is not "pysat":
+    if classical_solver.lower() != "pysat":
         for n in n_list:
             y = quantum_data(n)
             x = counts_data(n, classical_solver)[0][:len(y)]

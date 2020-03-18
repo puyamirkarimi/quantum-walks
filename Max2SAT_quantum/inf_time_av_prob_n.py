@@ -31,6 +31,16 @@ def eig_vec(A, i):
     return np.linalg.eigh(A)[1][:, i]
 
 
+def eig_vecs(A):
+    """returns all eigenvectors of matrix A, ordered by increasing eigenvalue"""
+    return np.linalg.eigh(A)[1]
+
+
+def eig_vals(A):
+    """returns ith eigenvector of matrix A, ordered by increasing eigenvalue"""
+    return np.linalg.eigh(A)[0]
+
+
 def hypercube(n_dim):
     sigma_x = np.array([[0, 1],
                         [1, 0]])
@@ -106,8 +116,10 @@ def inner_product_sq(psi1, psi2):
 
 def inf_time_av_prob(N, ground_state, H_tot, psi_0):
     out = 0
+    eig_vectors = eig_vecs(H_tot)
     for a in range(N):
-        a_state = eig_vec(H_tot, a)
+        #a_state = eig_vec(H_tot, a)
+        a_state = eig_vectors[:, a]
         out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
     return out
 
@@ -155,10 +167,14 @@ if __name__ == "__main__":
         sat_formula = get_2sat_formula(instance_name)
         H_problem = hamiltonian_2sat(n, sat_formula)
         H_total = H_qw + H_problem
+        if loop == 0:
+            a = eig_vals(H_total)
+            print(a)
+            # print(np.unique(a, return_counts=True)[1])
         probs[loop] = inf_time_av_prob(N, sol_state, H_total, psi_0)
 
         #if loop % 10 == 0:
         print("loop:", loop)
 
-    with open("inf_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
-        np.savetxt(f, probs)
+    # with open("inf_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
+    #     np.savetxt(f, probs)
