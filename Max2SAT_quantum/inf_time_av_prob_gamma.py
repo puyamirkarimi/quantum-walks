@@ -146,7 +146,9 @@ def heuristic_gamma(n):
     if n == 8:
         out = 0.60751875
     if n == 9:
-        out = 0.6163333333333333       # only 1000 problems sampled for this value
+        out = 0.6139833333333333
+    if n == 10:
+        out = 0.619345
     print("heuristic gamma: ", out)
     return out
 
@@ -156,7 +158,7 @@ if __name__ == "__main__":
     #plt.rc('font', size=16)
 
     instance_names, instance_n_bits = get_instances()
-    n = 5
+    n = 8
     N = 2 ** n
     n_shifted = n - 5
 
@@ -174,9 +176,8 @@ if __name__ == "__main__":
     num_gammas = len(gammas)
     probs = np.zeros(num_gammas)
     H_lap = A - n * np.eye(2 ** n)
-    best_gamma_j = 0
-    gammas_array = np.arange(0, gamma_limit, gamma_step)
-    frequency = np.zeros(int(gamma_limit/gamma_step))       # 0, 0.01, 0.02, ... 0.99
+    # best_gamma_j = 0
+    # gammas_array = np.arange(0, gamma_limit, gamma_step)
     unbinned_gammas = np.zeros(end-start)
 
     for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
@@ -188,11 +189,9 @@ if __name__ == "__main__":
         if opt_gamma > gamma_limit:
             print("INCREASE GAMMA LIMIT")
             break
-        index = int(opt_gamma/gamma_step)
-        frequency[index] += 1
+        unbinned_gammas[loop] = opt_gamma
         if loop % 10 == 0:
             print("loop:", loop)
-        unbinned_gammas[loop] = res.x[0]
 
 
     # for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
@@ -219,3 +218,7 @@ if __name__ == "__main__":
     plt.xlabel("$\gamma$")
     plt.ylabel("$p(\gamma)$")
     plt.show()
+
+    with open("opt_gammas_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
+        np.savetxt(f, unbinned_gammas)
+

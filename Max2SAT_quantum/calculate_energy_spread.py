@@ -65,9 +65,14 @@ def hamiltonian_2sat(n, formula):
     return out
 
 
+def eig_vals(A):
+    """returns ground state of matrix A"""
+    return np.linalg.eigh(A)[0]
+
+
 def energy_spread(H):
-    energies = np.diagonal(H)
-    return np.max(energies)-np.min(energies)
+    energies = eig_vals(H)
+    return energies[-1]-energies[0]
 
 
 if __name__ == "__main__":
@@ -77,7 +82,7 @@ if __name__ == "__main__":
 
     energy_spread_array = np.zeros(num_samples)
 
-    n = 10
+    n = 11
     n_shifted = n - 5  # n_shifted runs from 0 to 15 instead of 5 to 20
 
     for loop, i in enumerate(range(n_shifted * 10000, n_shifted * 10000 + num_samples)):  # 10000 instances per value of n
