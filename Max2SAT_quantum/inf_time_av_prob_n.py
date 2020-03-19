@@ -118,7 +118,7 @@ def inf_time_av_prob(N, ground_state, H_tot, psi_0):
     out = 0
     eig_vectors = eig_vecs(H_tot)
     for a in range(N):
-        #a_state = eig_vec(H_tot, a)
+        # a_state = eig_vec(H_tot, a)
         a_state = eig_vectors[:, a]
         out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
     return out
@@ -135,7 +135,9 @@ def heuristic_gamma(n):
     if n == 8:
         out = 0.60751875
     if n == 9:
-        out = 0.6163333333333333       # only 1000 problems sampled for this value
+        out = 0.6139833333333333
+    if n == 10:
+        out = 0.619345
     print("heuristic gamma: ", out)
     return out
 
@@ -146,7 +148,7 @@ if __name__ == "__main__":
 
     instance_names, instance_n_bits = get_instances()
 
-    n = 9
+    n = 8
     n_shifted = n - 5
 
     N = 2 ** n
@@ -158,7 +160,7 @@ if __name__ == "__main__":
     sol_state[0] = 1
 
     start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
-    end = 100           # end should go up to 10000
+    end = 10000           # end should go up to 10000
 
     probs = np.zeros(end-start)
 
@@ -167,14 +169,10 @@ if __name__ == "__main__":
         sat_formula = get_2sat_formula(instance_name)
         H_problem = hamiltonian_2sat(n, sat_formula)
         H_total = H_qw + H_problem
-        if loop == 0:
-            a = eig_vals(H_total)
-            print(a)
-            # print(np.unique(a, return_counts=True)[1])
         probs[loop] = inf_time_av_prob(N, sol_state, H_total, psi_0)
 
-        #if loop % 10 == 0:
-        print("loop:", loop)
+        if loop % 10 == 0:
+            print("loop:", loop)
 
-    # with open("inf_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
-    #     np.savetxt(f, probs)
+    with open("inf_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
+        np.savetxt(f, probs)
