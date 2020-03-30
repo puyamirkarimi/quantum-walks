@@ -127,8 +127,8 @@ def plot_nearest_qubit_prob(timesteps, data):
     plt.ylim(0, 0.2)
     plt.yticks([0, 0.05, 0.1, 0.15])
     #plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-    plt.xlabel("Time, $t$")
-    plt.ylabel("Probability of being in the\nground state of $\hat{H}_{prob}$")
+    plt.xlabel("$t$")
+    plt.ylabel("$P(t_f)$")
     plt.tight_layout()
     plt.show()
 
@@ -164,18 +164,24 @@ def heuristic_gamma(n):
         out = 0.5984357142857143
     if n == 8:
         out = 0.60751875
+    if n == 9:
+        out = 0.6139833333333333
+    if n == 10:
+        out = 0.619345
+    if n == 11:
+        out = 0.6220136363636364
     print("heuristic gamma: ", out)
     return out
 
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=16)
+    plt.rc('font', size=14)
 
     instance_names, instance_n_bits = get_instances()
     instance_name = instance_names[32070]
     sat_formula = get_2sat_formula(instance_name)
-    n = instance_n_bits[32070]                   # number of variables/qubits
+    n = instance_n_bits[42070]                   # number of variables/qubits
     print("n:", n)
 
     timesteps = 30

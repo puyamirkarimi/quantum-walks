@@ -13,7 +13,7 @@ def plot_graph(x, y, fit):
     plt.xticks(range(5, 10, 1))
     # plt.yticks(range(start, end+1, step))
     plt.xlabel("$n$")
-    plt.ylabel(r"$\langle P_{\infty} \rangle ^{-1}$")
+    plt.ylabel(r"$1 / \langle P_{\infty} \rangle$")
     plt.yscale('log', basey=2)
     plt.show()
 
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
-    n_array = np.array([5, 6, 7, 8, 9])
+    n_array = np.array([5, 6, 7, 8])
     av_probs = np.zeros(len(n_array))
 
     for i, n in enumerate(n_array):

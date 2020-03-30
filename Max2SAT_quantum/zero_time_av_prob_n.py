@@ -8,7 +8,6 @@ from scipy.sparse import csc_matrix
 from scipy.special import comb
 import math
 import time
-from scipy.optimize import minimize
 
 
 def get_2sat_formula(instance_name):
@@ -35,6 +34,11 @@ def eig_vec(A, i):
 def eig_vecs(A):
     """returns all eigenvectors of matrix A, ordered by increasing eigenvalue"""
     return np.linalg.eigh(A)[1]
+
+
+def eig_vals(A):
+    """returns ith eigenvector of matrix A, ordered by increasing eigenvalue"""
+    return np.linalg.eigh(A)[0]
 
 
 def hypercube(n_dim):
@@ -110,33 +114,12 @@ def inner_product_sq(psi1, psi2):
     return np.abs(np.dot(np.conjugate(psi1), psi2)) ** 2
 
 
-def inf_time_av_prob(N, H_prob, H_tot, psi_0):
-    out = 0
-    ground_state = first_eig_vec(H_prob)
-    eig_vectors = eig_vecs(H_tot)
-    for a in range(N):
-        #a_state = eig_vec(H_tot, a)
-        a_state = eig_vectors[:, a]
-        out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
-    return out
-
-
-def opt_func(gamma, N, H_prob, H_lap, psi_0):
-    """ args = (N, H_problem, H_lap, psi_0) """
-    H_tot = gamma * H_lap + H_prob
-    out = 0
-    ground_state = first_eig_vec(H_prob)
-    eig_vectors = eig_vecs(H_tot)
-    for a in range(N):
-        #a_state = eig_vec(H_tot, a)
-        a_state = eig_vectors[:, a]
-        out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
-    return -1 * out
-    # return -1 * inf_time_av_prob(args[0], args[1], H_tot, args[3])
+def inf_time_av_prob(N, ground_state, H_tot, psi_0):
+    return inner_product_sq(ground_state, psi_0)
 
 
 def heuristic_gamma(n):
-    out = "haven't defined heuristic gamma for given n"
+    out = 0.5
     if n == 5:
         out = 0.56503
     if n == 6:
@@ -149,76 +132,43 @@ def heuristic_gamma(n):
         out = 0.6139833333333333
     if n == 10:
         out = 0.619345
+    if n == 11:
+        out = 0.6220136363636364
     print("heuristic gamma: ", out)
     return out
 
 
 if __name__ == "__main__":
     plt.rc('text', usetex=True)
-    #plt.rc('font', size=16)
+    plt.rc('font', size=14)
 
     instance_names, instance_n_bits = get_instances()
-    n = 8
-    N = 2 ** n
+
+    n = 13
     n_shifted = n - 5
 
-    start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
-    end = 10000           # end should go up to 10000
-
-    gamma_step = 0.01
-    gamma_limit = 1.5
-
-
+    N = 2 ** n
     A = hypercube(n)
     psi_0 = np.ones(N) * (1 / np.sqrt(N))
-    heur_gamma = heuristic_gamma(n)
-    gammas = np.arange(heur_gamma - 0.3, heur_gamma + 0.3, 0.01)
-    num_gammas = len(gammas)
-    probs = np.zeros(num_gammas)
-    H_lap = A - n * np.eye(2 ** n)
-    # best_gamma_j = 0
-    # gammas_array = np.arange(0, gamma_limit, gamma_step)
-    unbinned_gammas = np.zeros(end-start)
+    gamma = heuristic_gamma(n)
+    H_qw = gamma * (A - n * np.eye(2 ** n))
+    sol_state = np.zeros(N)
+    sol_state[0] = 1
+
+    start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
+    end = 3           # end should go up to 10000
+
+    probs = np.zeros(end-start)
 
     for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
         instance_name = instance_names[i]
         sat_formula = get_2sat_formula(instance_name)
         H_problem = hamiltonian_2sat(n, sat_formula)
-        res = minimize(opt_func, np.around(heur_gamma, decimals=2)-0.005, args=(N, H_problem, H_lap, psi_0), tol=0.01)
-        opt_gamma = res.x[0]
-        if opt_gamma > gamma_limit:
-            print("INCREASE GAMMA LIMIT")
-            break
-        unbinned_gammas[loop] = opt_gamma
+        H_total = H_qw + H_problem
+        probs[loop] = inf_time_av_prob(N, sol_state, H_total, psi_0)
+
         if loop % 10 == 0:
             print("loop:", loop)
 
-
-    # for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
-    #     instance_name = instance_names[i]
-    #     sat_formula = get_2sat_formula(instance_name)
-    #     H_problem = hamiltonian_2sat(n, sat_formula)
-    #     best_prob = 0
-    #     for j, gamma in enumerate(gammas):
-    #         H_total = gamma * H_lap + H_problem
-    #         prob = inf_time_av_prob(N, H_problem, H_total, psi_0)
-    #         if prob > best_prob:
-    #             best_prob = prob
-    #             best_gamma_j = j
-    #     probs[best_gamma_j] += 1
-    #
-    #     if loop % 10 == 0:
-    #         print("loop:", loop)
-
-    plt.figure()
-    plt.hist(unbinned_gammas, np.arange(0, gamma_limit, gamma_step))
-    #plt.plot(gammas_array, frequency)
-    # plt.xlim([np.min(gammas), np.max(gammas)])
-    # plt.ylim([0, 0.2])
-    plt.xlabel("$\gamma$")
-    plt.ylabel("$p(\gamma)$")
-    plt.show()
-
-    with open("opt_gammas_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
-        np.savetxt(f, unbinned_gammas)
-
+    with open("zero_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
+        np.savetxt(f, probs)

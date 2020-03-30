@@ -1,7 +1,7 @@
 import numpy as np
 
 if __name__ == '__main__':
-    n_list = [5, 6, 7, 8, 9, 10]
+    n_list = [5, 6, 7, 8, 9, 10, 11]
     for n in n_list:
         energy_spreads = np.loadtxt("energy_spread_n_" + str(n) + ".txt")
         av_energy_spread = np.mean(energy_spreads)

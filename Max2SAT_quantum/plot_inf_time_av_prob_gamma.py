@@ -8,6 +8,7 @@ from scipy.sparse import csc_matrix
 from scipy.special import comb
 import math
 import time
+from scipy.optimize import minimize
 
 
 def get_2sat_formula(instance_name):
@@ -34,11 +35,6 @@ def eig_vec(A, i):
 def eig_vecs(A):
     """returns all eigenvectors of matrix A, ordered by increasing eigenvalue"""
     return np.linalg.eigh(A)[1]
-
-
-def eig_vals(A):
-    """returns ith eigenvector of matrix A, ordered by increasing eigenvalue"""
-    return np.linalg.eigh(A)[0]
 
 
 def hypercube(n_dim):
@@ -114,14 +110,29 @@ def inner_product_sq(psi1, psi2):
     return np.abs(np.dot(np.conjugate(psi1), psi2)) ** 2
 
 
-def inf_time_av_prob(N, ground_state, H_tot, psi_0):
+def inf_time_av_prob(N, H_prob, H_tot, psi_0):
     out = 0
+    ground_state = first_eig_vec(H_prob)
     eig_vectors = eig_vecs(H_tot)
     for a in range(N):
-        # a_state = eig_vec(H_tot, a)
+        #a_state = eig_vec(H_tot, a)
         a_state = eig_vectors[:, a]
         out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
     return out
+
+
+def opt_func(gamma, N, H_prob, H_lap, psi_0):
+    """ args = (N, H_problem, H_lap, psi_0) """
+    H_tot = gamma * H_lap + H_prob
+    out = 0
+    ground_state = first_eig_vec(H_prob)
+    eig_vectors = eig_vecs(H_tot)
+    for a in range(N):
+        #a_state = eig_vec(H_tot, a)
+        a_state = eig_vectors[:, a]
+        out += inner_product_sq(ground_state, a_state) * inner_product_sq(a_state, psi_0)
+    return -1 * out
+    # return -1 * inf_time_av_prob(args[0], args[1], H_tot, args[3])
 
 
 def heuristic_gamma(n):
@@ -149,32 +160,49 @@ if __name__ == "__main__":
     plt.rc('font', size=14)
 
     instance_names, instance_n_bits = get_instances()
+    n_list = [5, 11]
+    colors = ['forestgreen', 'red']
+    linestyles = ['solid', 'dashed']
 
-    n = 10
-    n_shifted = n - 5
+    start = 630
+    end = start+2
 
-    N = 2 ** n
-    A = hypercube(n)
-    psi_0 = np.ones(N) * (1 / np.sqrt(N))
-    gamma = heuristic_gamma(n)
-    H_qw = gamma * (A - n * np.eye(2 ** n))
-    sol_state = np.zeros(N)
-    sol_state[0] = 1
+    instances_per_n = end - start
 
-    start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
-    end = 10000           # end should go up to 10000
+    gamma_step = 0.02
+    gamma_limit = 2
+    gammas = np.arange(0, gamma_limit+gamma_step, gamma_step)
+    num_gammas = len(gammas)
 
-    probs = np.zeros(end-start)
+    probs = np.zeros((len(n_list), instances_per_n, num_gammas))    # probability[n, instance, gamma]
+    heur_gammas = np.zeros(len(n_list))
 
-    for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
-        instance_name = instance_names[i]
-        sat_formula = get_2sat_formula(instance_name)
-        H_problem = hamiltonian_2sat(n, sat_formula)
-        H_total = H_qw + H_problem
-        probs[loop] = inf_time_av_prob(N, sol_state, H_total, psi_0)
+    for n_index, n in enumerate(n_list):
+        N = 2 ** n
+        n_shifted = n - 5
+        A = hypercube(n)
+        psi_0 = np.ones(N) * (1 / np.sqrt(N))
+        heur_gammas[n_index] = heuristic_gamma(n)
 
-        if loop % 10 == 0:
+        H_lap = A - n * np.eye(2 ** n)
+
+        for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
+            instance_name = instance_names[i]
+            sat_formula = get_2sat_formula(instance_name)
+            H_problem = hamiltonian_2sat(n, sat_formula)
+            for j, gamma in enumerate(gammas):
+                H_total = gamma * H_lap + H_problem
+                probs[n_index, loop, j] = inf_time_av_prob(N, H_problem, H_total, psi_0)
+                print(j)
             print("loop:", loop)
 
-    with open("inf_time_probs_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
-        np.savetxt(f, probs)
+    plt.figure()
+    for n_index in range(len(n_list)):
+        for instance_i in range(instances_per_n):
+            plt.plot(gammas, probs[n_index, instance_i, :], color=colors[n_index], linestyle=linestyles[instance_i])
+        plt.vlines(heur_gammas[n_index], 0, 0.3, colors=colors[n_index], linestyles='dotted')
+    plt.xlim([np.min(gammas), np.max(gammas)])
+    plt.ylim([0, 0.3])
+    plt.xlabel("$\gamma$")
+    plt.ylabel("$P_\infty$")
+    plt.show()
