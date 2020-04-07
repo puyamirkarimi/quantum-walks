@@ -81,19 +81,19 @@ def runtimes_data_adam_noGT_nondg(n):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=13)
+    plt.rc('font', size=14)
+    plt.rcParams["figure.figsize"] = (4.4, 4.8)
 
-    n_list = [5, 12, 20]
+    n_list = [10, 20]
     counts_list_adam = []
     runtimes_list_adam = []
 
 
     ################## RUNTIMES ##################
-    num_bins = 100
+    num_bins = 70
 
     for n in n_list:
         runtimes_adam_average, runtimes_adam_standard_error = runtimes_data_adam(n)
-        print(np.argmax(runtimes_adam_average))
         runtimes_list_adam.append(runtimes_adam_average)
 
     min_runtime = np.min(np.array(runtimes_list_adam).flatten())
@@ -101,23 +101,28 @@ if __name__ == '__main__':
     print(min_runtime, max_runtime)
 
     x = np.linspace(min_runtime, max_runtime, num=num_bins)
-    y_adam = np.zeros((len(n_list), len(x)))
+    # y_adam = np.zeros((len(n_list), len(x)))
+    #
+    # for i_adam in range(len(n_list)):
+    #     y_adam[i_adam] = np.histogram(runtimes_list_adam[i_adam], bins=num_bins, density=True, range=(min_runtime, max_runtime))[0]
+    #
+    # for i_adam in range(len(n_list)):
+    #     y_adam[i_adam] = zero_to_nan(y_adam[i_adam])          # replace zero elements in list with NaN so they aren't plotted
 
-    for i_adam in range(len(n_list)):
-        y_adam[i_adam] = np.histogram(runtimes_list_adam[i_adam], bins=num_bins, density=True, range=(min_runtime, max_runtime))[0]
-
-    for i_adam in range(len(n_list)):
-        y_adam[i_adam] = zero_to_nan(y_adam[i_adam])          # replace zero elements in list with NaN so they aren't plotted
-
-    fig2, ax2 = plt.subplots()
-    for i_adam, n in enumerate(n_list):
-        plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
+    fig2, ax1 = plt.subplots(gridspec_kw={'wspace':2, 'hspace':1})
+    # for i_adam, n in enumerate(n_list):
+    #     plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
     # plt.errorbar(x, runtimes_average, runtimes_standard_error)
     # plt.xlim([0, 0.021])
     # plt.ylim([9e-5, 0.013])
-    plt.yscale('log')
-    plt.xlabel("Rounded runtime of MIXSAT algorithm")
-    plt.ylabel("Number of instances (normalised)")
-    plt.legend()
-    plt.show()
-
+    ax1.hist(np.swapaxes(np.array(runtimes_list_adam), 0, 1), x, color=('deeppink', 'seagreen'))
+    # ax1.set_aspect('equal', 'box')
+    ax1.set_yscale('log')
+    ax1.set_xlim([0, 0.001])
+    ax1.set_ylim([0.6, 4000])
+    ax1.tick_params(direction='in', top=True, right=True, which='both')
+    ax1.set_xlabel(r"$\langle T_{classical} \rangle$ ($s$)")
+    ax1.set_ylabel(r"$p(\langle T_{classical} \rangle)$")
+    # plt.tight_layout()
+    plt.savefig('runtimes_histogram_rc2.png', dpi=300)
+    # plt.show()

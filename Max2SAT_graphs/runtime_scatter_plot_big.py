@@ -16,18 +16,6 @@ def average_data(data):
     return y_av, y_std_error
 
 
-def mask_data(data):
-    num_repeats = len(data[:, 0])
-    num_x_vals = len(data[0, :])
-    out = np.zeros((num_repeats-2, num_x_vals))
-    for x in range(num_x_vals):
-        vals = data[:, x]
-        vals1 = np.delete(vals, vals.argmin())
-        vals2 = np.delete(vals1, vals1.argmax())
-        out[:, x] = vals2
-    return out
-
-
 def zero_to_nan(array):
     """Replace every 0 with 'nan' and return a copy."""
     return [float('nan') if x==0 else x for x in array]
@@ -35,11 +23,11 @@ def zero_to_nan(array):
 
 def runtimes_data(n, name):
     if name == "mixsat":
-        runtimes = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT/big_runtimes_"+str(n)+".txt").reshape((-1, 1000))
     elif name == "pysat":
-        runtimes = np.loadtxt("./../Max2SAT_pysat/adam_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_pysat/big_runtimes_" + str(n) + ".txt").reshape((-1, 10000))[:,:1000]
     elif name == "branch and bound":
-        runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_bnb/big_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 1000))
     else:
         raise Exception
     return average_data(runtimes)
@@ -47,11 +35,11 @@ def runtimes_data(n, name):
 
 def runtimes_data_unaveraged(n, name):
     if name == "mixsat":
-        runtimes = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT/big_runtimes_"+str(n)+".txt").reshape((-1, 1000))
     elif name == "pysat":
-        runtimes = np.loadtxt("./../Max2SAT_pysat/adam_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_pysat/big_runtimes_" + str(n) + ".txt").reshape((-1, 10000))[:,:1000]
     elif name == "branch and bound":
-        runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_bnb/big_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 1000))
     else:
         raise Exception
     return runtimes
@@ -73,7 +61,7 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n_list = [10, 20]
+    n_list = [20, 35, 50]
     x_solver = "pysat"
     y_solver = "mixsat"
     x_label = "RC2"
@@ -81,10 +69,8 @@ if __name__ == '__main__':
 
     # RUNTIMES SCATTER
     for n in n_list:
-        x_raw_unmasked = runtimes_data_unaveraged(n, x_solver)
-        y_raw_unmasked = runtimes_data_unaveraged(n, y_solver)
-        x_raw = mask_data(x_raw_unmasked)
-        y_raw = mask_data(y_raw_unmasked)
+        x_raw = runtimes_data_unaveraged(n, x_solver)
+        y_raw = runtimes_data_unaveraged(n, y_solver)
 
         limit = 1000
         r = np.corrcoef(np.swapaxes(x_raw, 0, 1)[:limit,:], np.swapaxes(y_raw, 0, 1)[:limit,:])[1, 0]

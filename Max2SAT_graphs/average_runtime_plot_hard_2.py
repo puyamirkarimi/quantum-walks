@@ -16,6 +16,11 @@ def average_data(data):
     return y_av, y_std_error
 
 
+def zero_to_nan(array):
+    """Replace every 0 with 'nan' and return a copy."""
+    return [float('nan') if x==0 else x for x in array]
+
+
 def mask_data(data):
     num_repeats = len(data[:, 0])
     num_x_vals = len(data[0, :])
@@ -28,9 +33,16 @@ def mask_data(data):
     return out
 
 
-def zero_to_nan(array):
-    """Replace every 0 with 'nan' and return a copy."""
-    return [float('nan') if x==0 else x for x in array]
+def runtimes_data_masked(n, name):
+    if name == "mixsat":
+        runtimes = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    elif name == "pysat":
+        runtimes = np.loadtxt("./../Max2SAT_pysat/adam_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+    elif name == "branch and bound":
+        runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+    else:
+        raise Exception
+    return average_data(mask_data(runtimes))
 
 
 def runtimes_data(n, name):
@@ -45,7 +57,7 @@ def runtimes_data(n, name):
     return average_data(runtimes)
 
 
-def runtimes_data_masked(n, name):
+def runtimes_data_unaveraged(n, name):
     if name == "mixsat":
         runtimes = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
     elif name == "pysat":
@@ -54,7 +66,7 @@ def runtimes_data_masked(n, name):
         runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
     else:
         raise Exception
-    return average_data(mask_data(runtimes))
+    return runtimes
 
 
 def counts_data(n, name):
@@ -160,26 +172,45 @@ if __name__ == '__main__':
     plt.rc('font', size=14)
     colors = ['forestgreen', 'blue', 'red', 'black']
 
-    max_n_bnb = 10
     max_n_others = 20
 
-    # runtimes_bnb = np.zeros(max_n_bnb - 4)
-    # counts_bnb = np.zeros(max_n_bnb - 4)
     runtimes_mixsat = np.zeros(max_n_others - 4)
-    # counts_mixsat = np.zeros(max_n_others - 4)
     runtimes_pysat = np.zeros(max_n_others - 4)
 
-    # for i, n in enumerate(range(5, max_n_bnb+1)):
-    #     runtimes_bnb[i] = np.mean(runtimes_data(n, "branch and bound")[0].flatten())
-    #     counts_bnb[i] = np.mean(counts_data(n, "branch and bound")[0].flatten())
+    num_hard_instances = 200
+    num_hard_instances_total = int(2*num_hard_instances)
+    hard_instances_mixsat = np.zeros((16, num_hard_instances), dtype=int)
+    hard_instances_pysat = np.zeros((16, num_hard_instances), dtype=int)
+
+    # for i, n in enumerate(range(5, max_n_others+1)):
+    #     instance_hardness = np.zeros(10000)
+    #     runtimes_data_mixsat = runtimes_data(n, "mixsat")[0].flatten()
+    #     runtimes_data_pysat = runtimes_data(n, "pysat")[0].flatten()
+    #     norm_data_mixsat = runtimes_data_mixsat/np.mean(runtimes_data_mixsat)
+    #     norm_data_pysat = runtimes_data_pysat/np.mean(runtimes_data_pysat)
+    #     for j in range(10000):
+    #         instance_hardness[j] = norm_data_mixsat[j]**2 + norm_data_pysat[j]**2
+    #         if j < 10:
+    #             instance_hardness[j] = 0
+    #     hard_instances[i, :] = np.argpartition(instance_hardness, -1*num_hard_instances)[-1*num_hard_instances:]
+    #     print("hard instances", hard_instances[i])
+    #     for instance in hard_instances[i]:
+    #         runtimes_mixsat[i] += runtimes_data_mixsat[instance]/num_hard_instances
+    #         runtimes_pysat[i] += runtimes_data_pysat[instance]/num_hard_instances
 
     for i, n in enumerate(range(5, max_n_others+1)):
-        runtimes_mixsat[i] = np.mean(runtimes_data_masked(n, "mixsat")[0].flatten())
-        # counts_mixsat[i] = np.mean(counts_data(n, "mixsat")[0].flatten())
-        runtimes_pysat[i] = np.mean(runtimes_data_masked(n, "pysat")[0].flatten())
-
-    # counts_bnb *= runtimes_bnb[0]/counts_bnb[0]     # normalisation
-    # counts_mixsat *= runtimes_mixsat[0] / counts_mixsat[0]  # normalisation
+        masked_data_mixsat = runtimes_data_masked(n, "mixsat")[0].flatten()
+        masked_data_pysat = runtimes_data_masked(n, "pysat")[0].flatten()
+        runtimes_data_mixsat = runtimes_data(n, "mixsat")[0].flatten()
+        runtimes_data_pysat = runtimes_data(n, "pysat")[0].flatten()
+        hard_instances_mixsat[i, :] = np.argpartition(masked_data_mixsat, -1*num_hard_instances)[-1*num_hard_instances:]
+        hard_instances_pysat[i, :] = np.argpartition(masked_data_mixsat, -1 * num_hard_instances)[-1 * num_hard_instances:]
+        for instance in hard_instances_mixsat[i]:
+            runtimes_mixsat[i] += runtimes_data_mixsat[instance]/num_hard_instances_total
+            runtimes_pysat[i] += runtimes_data_pysat[instance]/num_hard_instances_total
+        for instance in hard_instances_pysat[i]:
+            runtimes_mixsat[i] += runtimes_data_mixsat[instance]/num_hard_instances_total
+            runtimes_pysat[i] += runtimes_data_pysat[instance]/num_hard_instances_total
 
     fig, ax2 = before_plot()
     n_array = np.array([5, 6, 7, 8, 9, 10])
@@ -190,7 +221,12 @@ if __name__ == '__main__':
 
     for i, n in enumerate(n_array):
         probs = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
-        av_probs[i] = 1 / np.mean(probs)
+        av_prob = 0
+        for instance in hard_instances_pysat[i]:
+            av_prob += probs[instance]/num_hard_instances_total
+        for instance in hard_instances_mixsat[i]:
+            av_prob += probs[instance]/num_hard_instances_total
+        av_probs[i] = 1/av_prob
 
     # for i, n in enumerate(n_array2):
     #     probs2 = np.loadtxt("./../Max2SAT_quantum/zero_time_probs_n_" + str(n) + ".txt")

@@ -2,6 +2,11 @@ Put this at the start:
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
+Put this at the start for subplots
+    plt.rc('text', usetex=True)
+    plt.rc('font', size=16)
+    plt.rcParams["figure.figsize"] = (9.6, 4.8)
+
 Template for plot:
     plt.figure()
     plt.tick_params(direction='in', top=True, right=True)
@@ -11,6 +16,18 @@ Template for plot:
     plt.yticks(range(start, end+1, step))
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.show()
+
+Template for subplots:
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.set_xlim([min_x, max_x])
+    ax1.set_ylim([min_y, max_y])
+    ax2.set_xlim([min_x, max_x])
+    ax2.set_ylim([min_y, max_y])
+    ax1.tick_params(direction='in', top=True, right=True, which='both')
+    ax2.tick_params(direction='in', top=True, right=True, which='both', , labelleft=False)
+
+For saving:
+plt.savefig('name.png', dpi=200)
+
 
 If the plot is going to take up the whole width, add 100px padding to left and right sides of the image.

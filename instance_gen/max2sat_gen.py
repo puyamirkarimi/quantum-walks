@@ -109,7 +109,7 @@ def generate_max2sat(nqubits, nclauses, ensure_unique_solution=True, zero_soluti
         prob = max2sat_prob(nqubits=nqubits, nclauses=nclauses)  # get a candidate problem
         if not ensure_unique_solution: break  # if we don't need unique solution, we are done
         probvals = max2sat_values(prob=prob, nqubits=nqubits)  # calculate the problem values
-        nsols = probvals[probvals == np.min(probvals)].shape[0]  # coun't the number of solutions
+        nsols = probvals[probvals == np.min(probvals)].shape[0]  # count the number of solutions
         if nsols == 1: break  # if solution is unique, we are done
         # if we are here, we didn't find a unique solution problem, so we'll go back around
 
@@ -120,7 +120,30 @@ def generate_max2sat(nqubits, nclauses, ensure_unique_solution=True, zero_soluti
     return prob
 
 
+def make_file(name, formula, num_var, num_cls):
+    with open("./../../instances_big/"+name+".gz", 'w') as file:
+        file.write('p cnf '+str(num_var)+' '+str(num_cls)+'\n')
+        for clause in range(num_cls):
+            sign_1 = formula[clause, 0]
+            sign_2 = formula[clause, 2]
+            v_1 = formula[clause, 1] + 1
+            v_2 = formula[clause, 3] + 1
+            file.write(str(int(sign_1*v_1))+" "+str(int(sign_2*v_2))+" 0\n")
+
+
 if __name__ == '__main__':
-    num_qubits = 4
-    num_clauses = 3 * num_qubits
-    generate_max2sat(nqubits= )
+    n = 65
+    num_clauses = 3 * n
+
+    # done n = 20, 25, 30, 35, 40, 45, 50, 55, 60, 65
+    # 10,000 for n = 30
+
+    num_instances = 1000
+
+    for i in range(num_instances):
+        instance = generate_max2sat(n, num_clauses, ensure_unique_solution=False, zero_solution=False)
+        instance_name = str(n) + "_" + str(i)
+        make_file(instance_name, instance, n, num_clauses)
+        np.savetxt("./../../instances_big_adam_format/" + instance_name + ".gz", instance)
+        if i % 100 == 0:
+            print(i)

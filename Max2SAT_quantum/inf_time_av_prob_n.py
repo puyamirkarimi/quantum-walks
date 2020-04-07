@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     instance_names, instance_n_bits = get_instances()
 
-    n = 10
+    n = 11
     n_shifted = n - 5
 
     N = 2 ** n
