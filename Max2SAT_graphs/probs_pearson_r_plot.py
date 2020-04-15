@@ -45,47 +45,55 @@ def runtimes_data_unaveraged(n, name):
     return runtimes
 
 
-def counts_data(n, name):
-    if name == "mixsat":
-        counts = np.loadtxt("./../Max2SAT/adam_counts_"+str(n)+".txt").reshape((-1, 10000))
-    elif name == "branch and bound":
-        counts = np.loadtxt("./../Max2SAT_bnb/adam_counts_" + str(n) + ".txt").reshape((-1, 10000))
-    else:
-        raise Exception
-    return average_data(counts)
+def probs_data(n):
+    data = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
+    return np.reciprocal(data)
 
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=14)
+    plt.rc('font', size=16)
+    plt.rcParams["figure.figsize"] = (9.6, 4.8)
 
     marker_size = 4
 
-    n_list = np.arange(5, 21)
+    n_list = np.arange(5, 11)
     r1 = np.zeros(len(n_list))
     r2 = np.zeros(len(n_list))
-    x_solver = "pysat"
-    y_solver = "mixsat"
 
-    # RUNTIMES SCATTER
-    for i, n in enumerate(n_list):
-        x_raw = runtimes_data_unaveraged(n, x_solver)
-        y_raw = runtimes_data_unaveraged(n, y_solver)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
 
-        limit = 1000
-        r1[i] = np.corrcoef(np.swapaxes(x_raw, 0, 1)[:limit,:], np.swapaxes(y_raw, 0, 1)[:limit,:])[1, 0]
+    ax1.tick_params(direction='in', top=True, right=True, which='both')
+    ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
 
-        x = average_data(x_raw)[0]
-        y = average_data(y_raw)[0]
+    solvers = ['pysat', 'mixsat']
+    ax = [ax1, ax2]
 
-        r2[i] = pearsonr(x, y)[0]
-        print(i)
+    for solver_i, solver in enumerate(solvers):
+        for i, n in enumerate(n_list):
+            x_raw = runtimes_data_unaveraged(n, solver)
+            y_raw = probs_data(n)
 
-    fig, ax = plt.subplots()
-    # plt.scatter(n_list, r1, label="r1")
-    plt.scatter(n_list, r2, label="r2")
-    plt.xlabel("$n$")
-    plt.ylabel("$r$")
+            limit = 10000
+
+            x = average_data(x_raw)[0]
+            y = y_raw
+            r1[i] = np.corrcoef(x[:limit], y[:limit])[1, 0]
+
+            r2[i] = pearsonr(x, y)[0]
+            print(i)
+        ax[solver_i].scatter(n_list, r2)
+        ax[solver_i].set_xlabel("$n$")
+
+    ax1.set_ylabel("$r$")
+    min_y = -0.2
+    max_y = 0.2
+    # ax1.set_xlim([min_x, max_x])
+    ax1.set_ylim([min_y, max_y])
+    # ax2.set_xlim([min_x, max_x])
+    ax2.set_ylim([min_y, max_y])
+
     # plt.tight_layout()
     plt.show()
+    # plt.savefig('pearson_r_quantum_classical.png', dpi=200)
 

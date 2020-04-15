@@ -15,6 +15,18 @@ def average_data(data):
     return y_av, y_std_error
 
 
+def mask_data(data):
+    num_repeats = len(data[:, 0])
+    num_x_vals = len(data[0, :])
+    out = np.zeros((num_repeats-2, num_x_vals))
+    for x in range(num_x_vals):
+        vals = data[:, x]
+        vals1 = np.delete(vals, vals.argmin())
+        vals2 = np.delete(vals1, vals1.argmax())
+        out[:, x] = vals2
+    return out
+
+
 # def plot_graph(x, y, y_std_error, fit_1, fit_2):
 #     fig, ax = plt.subplots()
 #     plt.scatter(x[4:], y[4:])
@@ -38,105 +50,26 @@ def zero_to_nan(array):
     return [float('nan') if x==0 else x for x in array]
 
 
-def counts_data_crosson():
-    counts_crosson = np.loadtxt("crosson_counts.txt").reshape((-1, 137))
-    return average_data(counts_crosson)
-
-
-def runtimes_data_crosson():
-    runtimes_crosson = np.loadtxt("crosson_runtimes.txt").reshape((-1, 137))
-    return average_data(runtimes_crosson)
-
-
-def counts_data_adam(n):
-    counts_adam = np.loadtxt("adam_counts_"+str(n)+".txt").reshape((-1, 10000))
-    return average_data(counts_adam)
-
-
 def runtimes_data_adam(n):
-    runtimes_adam = np.loadtxt("adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
-    return average_data(runtimes_adam)
+    runtimes_adam = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    return average_data(mask_data(runtimes_adam))
 
 
-def counts_data_adam_noGT(n):
-    counts_adam = np.loadtxt("adam_noGT_counts_"+str(n)+".txt").reshape((-1, 10000))
-    return average_data(counts_adam)
-
-
-def runtimes_data_adam_noGT(n):
-    runtimes_adam = np.loadtxt("adam_noGT_runtimes_"+str(n)+".txt").reshape((-1, 10000))
-    return average_data(runtimes_adam)
-
-
-def counts_data_adam_noGT_nondg(n):
-    counts_adam = np.loadtxt("adam_noGT_nondg_counts_"+str(n)+".txt").reshape((-1, 10000))
-    return average_data(counts_adam)
-
-
-def runtimes_data_adam_noGT_nondg(n):
-    runtimes_adam = np.loadtxt("adam_noGT_nondg_runtimes_"+str(n)+".txt").reshape((-1, 10000))
-    return average_data(runtimes_adam)
+def runtimes_data_adam_pysat(n):
+    runtimes_adam = np.loadtxt("./../Max2SAT_pysat/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    return average_data(mask_data(runtimes_adam))
 
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=14)
+    plt.rc('font', size=16)
+    plt.rcParams["figure.figsize"] = (9.6, 4.8)
 
-    n_list = [5, 10]
+    n_list = [10, 20]
     counts_list_adam = []
     runtimes_list_adam = []
 
-    # ################## COUNTS ##################
-    # counts_crosson_average, counts_crosson_standard_error = counts_data_crosson()
-    # min_count = np.min(counts_crosson_average)
-    # max_count = np.max(counts_crosson_average)
-    #
-    # for n in n_list:
-    #     counts_adam_average, counts_adam_standard_error = counts_data_adam(n)
-    #     counts_list_adam.append(counts_adam_average)
-    #     min_count_temp = np.min(counts_adam_average)
-    #     max_count_temp = np.max(counts_adam_average)
-    #     if min_count_temp < min_count:
-    #         min_count = min_count_temp
-    #     if max_count_temp > max_count:
-    #         max_count = max_count_temp
-    #
-    # x = np.arange(np.floor(min_count), np.ceil(max_count)+1)
-    # y_adam = np.zeros((len(n_list), len(x)))
-    # y_crosson = np.zeros(len(x))
-    #
-    # for i, count in enumerate(x):
-    #     for i_adam in range(len(n_list)):
-    #         y_adam[i_adam, i] = np.count_nonzero(counts_list_adam[i_adam] == count) / 10000           # division by 10000 is to normalise
-    #     y_crosson[i] = np.count_nonzero(counts_crosson_average == count) / 137
-    #
-    # for i_adam in range(len(n_list)):
-    #     y_adam[i_adam] = zero_to_nan(y_adam[i_adam])          # replace zero elements in list with NaN so they aren't plotted
-    #
-    # y_crosson = zero_to_nan(y_crosson)
-    #
-    # fig1, ax1 = plt.subplots()
-    # for i_adam, n in enumerate(n_list):
-    #     plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
-    # #plt.scatter(x, y_crosson, label="n=20 (Crosson)")
-    # #plt.errorbar(x, counts_average, counts_standard_error)
-    # plt.xlim([0, 375])
-    # plt.ylim([9e-5, 1])
-    # plt.yscale('log')
-    # plt.legend()
-    # plt.xlabel("Number of states visited by MIXSAT algorithm")
-    # plt.ylabel("Number of instances (normalised)")
-    # plt.tight_layout()
-    # plt.show()
-
-    ################## RUNTIMES ##################
-    # runtimes_crosson_average, runtimes_crosson_standard_error = runtimes_data_crosson()
-    # runtimes_crosson_average = np.around(runtimes_crosson_average, 4)           # binning
-
-    num_bins = 450
-    break_start = 0.02
-    break_end = 0.1685
-    end = 0.175
+    num_bins = 40
 
     for n in n_list:
         runtimes_adam_average, runtimes_adam_standard_error = runtimes_data_adam(n)
@@ -148,46 +81,68 @@ if __name__ == '__main__':
 
     x = np.linspace(min_runtime, max_runtime, num=num_bins)
 
-    ratio = 3.1
-    fig2, (ax1, ax2) = plt.subplots(1, 2, sharey=True, gridspec_kw={'width_ratios': [ratio, 1], 'wspace':1, 'hspace':1})
+    fig2, (ax2, ax1) = plt.subplots(1, 2, sharey=True)
     # for i_adam, n in enumerate(n_list):
     #     plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
     # plt.errorbar(x, runtimes_average, runtimes_standard_error)
     # plt.xlim([0, 0.021])
     # plt.ylim([9e-5, 0.013])
+    print(np.swapaxes(np.array(runtimes_list_adam), 0, 1))
     ax1.hist(np.swapaxes(np.array(runtimes_list_adam), 0, 1), x, color=('deeppink', 'seagreen'))
-    ax2.hist(np.swapaxes(np.array(runtimes_list_adam), 0, 1), x, color=('deeppink', 'seagreen'))
     ax1.set_yscale('log')
-    ax2.set_yscale('log')
-    ax1.set_xlim([0, break_start])
-    ax2.set_xlim([break_end, end])
 
-    ax1.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
+    ax1.set_xlim([0, 0.017])
+
     # ax1.yaxis.tick_left()
     # ax1.tick_params(labelright='off')
-    ax2.yaxis.tick_right()
-    ax1.set_xticks([0, 0.005, 0.01, 0.015])
-    ax2.set_xticks([0.17, 0.175])
     ax1.set_ylim([0.6, 4000])
     ax2.set_ylim([0.6, 5000])
 
-    d = .015  # how big to make the diagonal lines in axes coordinates
-    # arguments to pass plot, just so we don't keep repeating them
-    kwargs = dict(transform=ax1.transAxes, color='k', clip_on=False)
-    ax1.plot((1 - d, 1 + d), (-d, +d), **kwargs)
-    ax1.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
-    ax1.tick_params(direction='in', top=True, which='both')
-    ax2.tick_params(direction='in', top=True, right=True, which='both')
-
-    kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-    ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
-    ax2.plot((-d, +d), (-d, +d), **kwargs)
-
-    ax1.set_xlabel(r"$\langle T_{classical} \rangle$ ($s$)")
-    # ax2.set_xlabel(r"$\langle T_{classical} \rangle$ ($s$)")
-    ax1.set_ylabel(r"$p(\langle T_{classical} \rangle)$")
-    # ax2.set_ylabel(r"$p(\langle T_{classical} \rangle)$")
+    ax1.set_xlabel(r"$\overline{T}_{inst}$~/~$s$")
+    # ax2.set_xlabel(r"$\overline{T}_{inst}$~/~$s$")
+    ax2.set_ylabel(r"$p(\overline{T}_{inst})$")
+    # ax2.set_ylabel(r"$\overline{T}_{inst}$~/~$s$")
     # plt.tight_layout()
     # plt.savefig('mixsat.png', dpi=300)
+    # plt.show()
+
+
+    ################## pysat ##################
+    num_bins = 70
+    runtimes_list_adam = []
+
+    for n in n_list:
+        runtimes_adam_average, runtimes_adam_standard_error = runtimes_data_adam_pysat(n)
+        runtimes_list_adam.append(runtimes_adam_average)
+
+    min_runtime = np.min(np.array(runtimes_list_adam).flatten())
+    max_runtime = np.max(np.array(runtimes_list_adam).flatten())
+    print(min_runtime, max_runtime)
+
+    x = np.linspace(min_runtime, max_runtime, num=num_bins)
+    # y_adam = np.zeros((len(n_list), len(x)))
+    #
+    # for i_adam in range(len(n_list)):
+    #     y_adam[i_adam] = np.histogram(runtimes_list_adam[i_adam], bins=num_bins, density=True, range=(min_runtime, max_runtime))[0]
+    #
+    # for i_adam in range(len(n_list)):
+    #     y_adam[i_adam] = zero_to_nan(y_adam[i_adam])          # replace zero elements in list with NaN so they aren't plotted
+
+    # for i_adam, n in enumerate(n_list):
+    #     plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
+    # plt.errorbar(x, runtimes_average, runtimes_standard_error)
+    # plt.xlim([0, 0.021])
+    # plt.ylim([9e-5, 0.013])
+    ax2.hist(np.swapaxes(np.array(runtimes_list_adam), 0, 1), x, color=('deeppink', 'seagreen'))
+    # ax1.set_aspect('equal', 'box')
+    ax2.set_yscale('log')
+    ax2.set_xlim([0, 0.001])
+    ax2.set_ylim([0.6, 4000])
+    ax2.tick_params(direction='in', top=True, right=True, which='both')
+    ax1.tick_params(direction='in', top=True, right=True, which='both')
+    ax2.set_xlabel(r"$\overline{T}_{inst}$~/~$s$")
+    # ax2.set_ylabel(r"$\overline{T}_{inst}$~/~$s$")
+
+    # plt.savefig('runtimes_histograms.png', dpi=200)
+    plt.tight_layout()
     plt.show()

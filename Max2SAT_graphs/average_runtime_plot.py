@@ -16,6 +16,14 @@ def average_data(data):
     return y_av, y_std_error
 
 
+def total_error(std_errors):
+    """ From back page of Hughes and Hase errors book. Calculating error of averaging each instance runtime. """
+    error = 0
+    for std_err in std_errors:
+        error += std_err**2
+    return np.sqrt(error)/len(std_errors)
+
+
 def mask_data(data):
     num_repeats = len(data[:, 0])
     num_x_vals = len(data[0, :])
@@ -76,7 +84,7 @@ def before_plot():
     return fig, ax
 
 
-def plot_graph(x, y, fit, label):
+def plot_graph(x, y, y_err=None, fit=None, label=None):
     # if label == "MIXSAT runtimes":
     #     plt.scatter(x[:4], y[:4], color='gray')
     #     plt.scatter(x[4:], y[4:], label=label)
@@ -101,7 +109,10 @@ def plot_graph(x, y, fit, label):
         color = "gray"
         plt.plot(x, y, ':', color=color)
         return
-    plt.scatter(x, y, color=color, s=18)
+    if y_err is not None:
+        plt.errorbar(x, y, y_err, color=color, fmt='o', ms=4.2, capsize=1.5)
+    else:
+        plt.scatter(x, y, color=color, s=18)
     if fit is not None:
         plt.plot(x, fit, '--', color=color)
 
@@ -121,7 +132,7 @@ def after_plot2(fig, ax, scale):
     # plt.legend(loc="upper right")
 
 
-def fit_and_plot(runtimes, label):
+def fit_and_plot(runtimes, label, y_err):
     n_array = np.array(range(5, len(runtimes)+5))
     if label == "MIXSAT counts":
         plot_graph(n_array, runtimes, None, label)
@@ -137,10 +148,10 @@ def fit_and_plot(runtimes, label):
     exp_fit = a * np.exp2(b * n_array)
     print(label + ": " + str(a) + " * 2^(" + str(b) + " * n)")
     print("a error:", a_error, "b error:", b_error)
-    plot_graph(n_array, runtimes, exp_fit, label)
+    plot_graph(n_array, runtimes, y_err, exp_fit, label)
 
 
-def fit_and_plot2(x_array, y_array, label):
+def fit_and_plot2(x_array, y_array, label, y_err):
     # m_log, c_log = np.polyfit(x_array[0:], np.log2(y_array), 1, w=np.sqrt(y_array))
     # exp_fit = np.exp2(m_log * x_array + c_log)
     # print("Quantum:" + str(np.exp2(c_log))+" * 2^(" + str(m_log) + " * n)")
@@ -152,7 +163,7 @@ def fit_and_plot2(x_array, y_array, label):
     exp_fit = a * np.exp2(b * x_array)
     print(label + ": " + str(a) + " * 2^(" + str(b) + " * n)")
     print("a error:", a_error, "b error:", b_error)
-    plot_graph(x_array, y_array, exp_fit, label)
+    plot_graph(x_array, y_array, y_err, exp_fit, label)
 
 
 if __name__ == '__main__':
@@ -163,27 +174,32 @@ if __name__ == '__main__':
     max_n_bnb = 10
     max_n_others = 20
 
-    # runtimes_bnb = np.zeros(max_n_bnb - 4)
-    # counts_bnb = np.zeros(max_n_bnb - 4)
     runtimes_mixsat = np.zeros(max_n_others - 4)
-    # counts_mixsat = np.zeros(max_n_others - 4)
     runtimes_pysat = np.zeros(max_n_others - 4)
+    errors_mixsat = np.zeros(max_n_others - 4)
+    errors_pysat = np.zeros(max_n_others - 4)
 
     # for i, n in enumerate(range(5, max_n_bnb+1)):
     #     runtimes_bnb[i] = np.mean(runtimes_data(n, "branch and bound")[0].flatten())
     #     counts_bnb[i] = np.mean(counts_data(n, "branch and bound")[0].flatten())
 
     for i, n in enumerate(range(5, max_n_others+1)):
-        runtimes_mixsat[i] = np.mean(runtimes_data_masked(n, "mixsat")[0].flatten())
-        # counts_mixsat[i] = np.mean(counts_data(n, "mixsat")[0].flatten())
-        runtimes_pysat[i] = np.mean(runtimes_data_masked(n, "pysat")[0].flatten())
+        run_data_mixsat, error_data_mixsat = runtimes_data_masked(n, "mixsat")
+        runtimes_mixsat[i] = np.mean(run_data_mixsat.flatten())  # .flatten() needed?
+        errors_mixsat[i] = total_error(error_data_mixsat)
+
+        run_data_pysat, error_data_pysat = runtimes_data_masked(n, "pysat")
+        runtimes_pysat[i] = np.mean(run_data_pysat.flatten())  # .flatten() needed?
+        errors_pysat[i] = total_error(error_data_pysat)
 
     # counts_bnb *= runtimes_bnb[0]/counts_bnb[0]     # normalisation
     # counts_mixsat *= runtimes_mixsat[0] / counts_mixsat[0]  # normalisation
 
     fig, ax2 = before_plot()
-    n_array = np.array([5, 6, 7, 8, 9, 10])
+    plt.tick_params(direction='in', top=True, right=True)
+    n_array = np.array([5, 6, 7, 8, 9, 10, 11])
     av_probs = np.zeros(len(n_array))
+    quantum_errors = np.zeros(len(n_array))
     n_array2 = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
     av_probs2 = np.zeros(len(n_array2))
     av_probs3 = np.zeros(len(n_array2))
@@ -191,6 +207,7 @@ if __name__ == '__main__':
     for i, n in enumerate(n_array):
         probs = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
         av_probs[i] = 1 / np.mean(probs)
+        quantum_errors[i] = np.std(1/probs, ddof=1) / np.sqrt(len(probs))
 
     # for i, n in enumerate(n_array2):
     #     probs2 = np.loadtxt("./../Max2SAT_quantum/zero_time_probs_n_" + str(n) + ".txt")
@@ -200,16 +217,16 @@ if __name__ == '__main__':
     av_probs2 = np.exp2(n_array2)
     av_probs3 = np.sqrt(av_probs2)
 
-    fit_and_plot2(n_array, av_probs, "Quantum")
-    fit_and_plot2(n_array2, av_probs2, "Guess")
-    fit_and_plot2(n_array2, av_probs3, "Guess Sqrt")
+    fit_and_plot2(n_array, av_probs, "Quantum", quantum_errors)
+    fit_and_plot2(n_array2, av_probs2, "Guess", None)
+    fit_and_plot2(n_array2, av_probs3, "Guess Sqrt", None)
 
     ax1 = ax2.twinx()
-    ax1.set_ylabel(r"$\langle T_{classical} \rangle$~/~$s$")
+    ax1.set_ylabel(r"$\langle T \rangle$~/~$s$")
     # fit_and_plot(runtimes_bnb, "B\&B runtimes")
     # fit_and_plot(counts_bnb, "B\&B counts")
-    fit_and_plot(runtimes_pysat, "PySAT runtimes")
-    fit_and_plot(runtimes_mixsat, "MIXSAT runtimes")
+    fit_and_plot(runtimes_pysat, "PySAT runtimes", errors_pysat)
+    fit_and_plot(runtimes_mixsat, "MIXSAT runtimes", errors_mixsat)
     # fit_and_plot(counts_mixsat, "MIXSAT counts")
 
     scale = after_plot(fig, ax1)

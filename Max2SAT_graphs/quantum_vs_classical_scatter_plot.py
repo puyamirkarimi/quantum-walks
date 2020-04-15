@@ -104,9 +104,9 @@ if __name__ == '__main__':
         ax[i].loglog()
     ax1.tick_params(direction='in', top=True, right=True, which='both')
     ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
-    # plt.tight_layout()
-    # plt.show()
-    plt.savefig('quantum_classical_scatters.png', dpi=200)
+    plt.tight_layout()
+    plt.show()
+    # plt.savefig('quantum_classical_scatters.png', dpi=200)
 
     # # COUNTS SCATTER
     # if classical_solver.lower() != "pysat":

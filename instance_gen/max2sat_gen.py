@@ -121,7 +121,7 @@ def generate_max2sat(nqubits, nclauses, ensure_unique_solution=True, zero_soluti
 
 
 def make_file(name, formula, num_var, num_cls):
-    with open("./../../instances_big/"+name+".gz", 'w') as file:
+    with open("./../../instances_big_2/"+name+".gz", 'w') as file:
         file.write('p cnf '+str(num_var)+' '+str(num_cls)+'\n')
         for clause in range(num_cls):
             sign_1 = formula[clause, 0]
@@ -131,19 +131,36 @@ def make_file(name, formula, num_var, num_cls):
             file.write(str(int(sign_1*v_1))+" "+str(int(sign_2*v_2))+" 0\n")
 
 
+def make_file_wcnf(name, formula, num_var, num_cls):
+    with open("./../../instances_big_wcnf_2/"+name+'.txt', 'w') as file:    # path of output instance files in WCNF format
+        file.write('p wcnf '+str(num_var)+' '+str(num_cls)+'\n')
+        for clause in range(num_cls):
+            sign_1 = formula[clause, 0]
+            sign_2 = formula[clause, 2]
+            v_1 = formula[clause, 1] + 1
+            v_2 = formula[clause, 3] + 1
+            file.write("1 "+str(int(sign_1*v_1))+" "+str(int(sign_2*v_2))+" 0\n")
+
+
 if __name__ == '__main__':
-    n = 65
-    num_clauses = 3 * n
 
-    # done n = 20, 25, 30, 35, 40, 45, 50, 55, 60, 65
-    # 10,000 for n = 30
+    # done n = 19, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, ...., 150
+    # in folders /instances_big_adam_format_2/, /instances_big_2/ and /instances_big_wcnf_2/
+    # with 10,000 instances for n = 30, 1,000 instances for rest
 
+    # n = 75
+
+    # num_clauses = 3 * n
     num_instances = 1000
 
-    for i in range(num_instances):
-        instance = generate_max2sat(n, num_clauses, ensure_unique_solution=False, zero_solution=False)
-        instance_name = str(n) + "_" + str(i)
-        make_file(instance_name, instance, n, num_clauses)
-        np.savetxt("./../../instances_big_adam_format/" + instance_name + ".gz", instance)
-        if i % 100 == 0:
-            print(i)
+    for n in range(75, 155, 5):
+        num_clauses = 3 * n
+        for i in range(num_instances):
+            instance = generate_max2sat(n, num_clauses, ensure_unique_solution=False, zero_solution=False)
+            instance_name = str(n) + "_" + str(i)
+            make_file(instance_name, instance, n, num_clauses)
+            make_file_wcnf(instance_name, instance, n, num_clauses)
+            np.savetxt("./../../instances_big_adam_format_2/" + instance_name + ".gz", instance)
+            # if i % 100 == 0:
+            #     print(i)
+        print("Done n =", n)

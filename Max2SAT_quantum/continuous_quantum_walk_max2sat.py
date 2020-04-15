@@ -133,6 +133,15 @@ def plot_nearest_qubit_prob(timesteps, data):
     plt.show()
 
 
+def plot_nearest_qubit_prob_2(timesteps, data, ax, color):
+    ax.plot(range(timesteps + 1), data[:, 0], color=color)
+    ax.set_xlim(0, timesteps)
+    ax.set_xticks(range(0, timesteps + 1, 10))
+    ax.set_ylim(0, 0.6)
+    #plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    ax.set_xlabel("$t_f$")
+
+
 def plot_prob_heatmap(data, N, timesteps):
     fig, ax = plt.subplots()
     im = ax.imshow(data, cmap=plt.get_cmap('plasma'), norm=colors.Normalize(vmin=0, vmax=0.2))
@@ -176,22 +185,34 @@ def heuristic_gamma(n):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=14)
+    plt.rc('font', size=16)
+    plt.rcParams["figure.figsize"] = (9.6, 4.8)
 
+    fig, axs = plt.subplots(1, 2)
+    colors = ['#7ea700', 'deeppink']
+    axs[0].tick_params(direction='in', top=True, right=True, which='both')
+    axs[1].tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
+    axs[0].set_ylabel("$P(t_f)$")
+    # axs[0].set_yticks([0, 0.05, 0.1, 0.15, 0.2])
+
+    timesteps = 50
     instance_names, instance_n_bits = get_instances()
-    instance_name = instance_names[32070]
-    sat_formula = get_2sat_formula(instance_name)
-    n = instance_n_bits[42070]                   # number of variables/qubits
-    print("n:", n)
+    instance_nums = [1, 50031] #50031
+    for i, instance_num in enumerate(instance_nums):
+        # instance_name = instance_names[32070]
+        instance_name = instance_names[instance_num]
+        sat_formula = get_2sat_formula(instance_name)
+        n = instance_n_bits[instance_num]                   # number of variables/qubits
+        print("n:", n)
 
-    timesteps = 30
+        time_start = time.time()
+        data = run_many_walks(sat_formula, n, timesteps, normalise=True)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+        time_end = time.time()
 
-    time_start = time.time()
-    data = run_many_walks(sat_formula, n, timesteps, normalise=True)  # 2D array of [timesteps_run, probability_at_distance_of_index]
-    time_end = time.time()
+        print("runtime:", time_end - time_start)
 
-    print("runtime:", time_end - time_start)
+        plot_nearest_qubit_prob_2(timesteps, data, axs[i], colors[i])
+        # plot_prob_heatmap(data, n, timesteps)
 
-    #plot_furthest_qubit_prob(timesteps, data)
-    plot_nearest_qubit_prob(timesteps, data)
-    plot_prob_heatmap(data, n, timesteps)
+    plt.savefig('inst_success_probs_n_5_10.png', dpi=200)
+    # plt.show()

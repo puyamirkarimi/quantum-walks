@@ -24,10 +24,29 @@ Template for subplots:
     ax2.set_xlim([min_x, max_x])
     ax2.set_ylim([min_y, max_y])
     ax1.tick_params(direction='in', top=True, right=True, which='both')
-    ax2.tick_params(direction='in', top=True, right=True, which='both', , labelleft=False)
+    ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
+    ax1.set_xlabel("x")
+    ax2.set_xlabel("x")
+    ax1.set_ylabel("y")
 
 For saving:
 plt.savefig('name.png', dpi=200)
 
+For scatters:
+plt.scatter(x, y, s=18) (or ms instead of s?)
+
+For scatters with error bars:
+ax.errorbar(x, y, y_err, color='red', fmt='o', ms=4.2, capsize=1.5)
 
 If the plot is going to take up the whole width, add 100px padding to left and right sides of the image.
+
+n  | colour
+---|-------------
+10 | deeppink
+20 | forestgreen
+11 | darkorchid
+5  | #7ea700
+9  | red?
+6  | darkorange
+7  | orangered
+

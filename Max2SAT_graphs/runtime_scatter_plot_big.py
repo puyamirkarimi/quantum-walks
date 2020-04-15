@@ -98,26 +98,3 @@ if __name__ == '__main__':
         plt.loglog()
         plt.tight_layout()
         plt.show()
-
-
-
-    # # COUNTS SCATTER
-    # if "pysat" not in x_solver + y_solver:
-    #     for n in n_list:
-    #         x = counts_data(n, x_solver)[0]
-    #         y = counts_data(n, y_solver)[0]
-    #         min_x = np.min(x)
-    #         min_y = np.min(y)
-    #         max_x = np.max(x)
-    #         max_y = np.max(y)
-    #
-    #         fig, ax = plt.subplots()
-    #         plt.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
-    #         plt.xlim([min_x, max_x])
-    #         plt.ylim([min_y, max_y])
-    #         plt.xlabel("Instance count for " + x_solver)
-    #         plt.ylabel("Instance count for " + y_solver)
-    #         plt.legend()
-    #         plt.loglog()
-    #         plt.tight_layout()
-    #         plt.show()

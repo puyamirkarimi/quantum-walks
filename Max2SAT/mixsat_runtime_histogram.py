@@ -82,7 +82,7 @@ if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
-    n_list = [5, 10]
+    n_list = [10, 20]
     counts_list_adam = []
     runtimes_list_adam = []
 

@@ -160,7 +160,7 @@ if __name__ == "__main__":
     plt.rc('font', size=14)
 
     instance_names, instance_n_bits = get_instances()
-    n_list = [5, 11]
+    n_list = [5, 10]
     colors = ['forestgreen', 'red']
     linestyles = ['solid', 'dashed']
 
@@ -205,4 +205,5 @@ if __name__ == "__main__":
     plt.ylim([0, 0.3])
     plt.xlabel("$\gamma$")
     plt.ylabel("$P_\infty$")
-    plt.show()
+    plt.savefig('p_infty_gamma_n_5_10.png', dpi=200)
+    # plt.show()

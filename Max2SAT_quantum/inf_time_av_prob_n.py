@@ -161,7 +161,7 @@ if __name__ == "__main__":
     sol_state = np.zeros(N)
     sol_state[0] = 1
 
-    start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
+    start = 9000             # start should be set to previous end (same as the linenumber of final filled line in txt)
     end = 10000           # end should go up to 10000
 
     probs = np.zeros(end-start)

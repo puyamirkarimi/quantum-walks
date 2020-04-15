@@ -124,5 +124,5 @@ if __name__ == '__main__':
     ax1.set_xlabel(r"$\langle T_{classical} \rangle$ ($s$)")
     ax1.set_ylabel(r"$p(\langle T_{classical} \rangle)$")
     # plt.tight_layout()
-    plt.savefig('runtimes_histogram_rc2.png', dpi=300)
-    # plt.show()
+    # plt.savefig('runtimes_histogram_rc2.png', dpi=300)
+    plt.show()
