@@ -74,6 +74,22 @@ def run_many_walks(n, time_limit, gamma, normalise=False):
     return output
 
 
+def run_many_walks_2(n, timesteps, limit, gamma, normalise=False):
+    P = 2 ** n  # number of positions
+    A = hypercube(n)
+    marked_state = np.zeros((2 ** n, 2 ** n))
+    marked_state[0, 0] = 1
+    H = gamma * (A - n * np.eye(2 ** n)) - marked_state  # not sure if marked_node should also be multiplied by gamma
+
+    psi0 = np.ones(P) * (1 / np.sqrt(2 ** n))
+    output = np.zeros(timesteps + 1)
+    for step in range(0, timesteps + 1):
+        timestep = (step/timesteps)*np.sqrt(2 ** n)*limit
+        output[step] = quantum_walk_hypercube(n, H, psi0, timestep, normalise=normalise)
+        print(step)
+    return output
+
+
 def plot_furthest_qubit_prob(timesteps, data):
     plt.figure()
     plt.plot(range(timesteps + 1), data[:, -1])
@@ -84,34 +100,24 @@ def plot_furthest_qubit_prob(timesteps, data):
     plt.show()
 
 
-def plot_nearest_qubit_prob(timesteps, data):
-    plt.figure()
-    plt.tick_params(direction='in', top=True, right=True)
-    colors = ['blue', 'forestgreen']
+def plot_nearest_qubit_prob(ax, timesteps, data, colors):
     for i in range(len(data[:,0])):
-        plt.plot(range(timesteps + 1), data[i,:], color=colors[i])
-    plt.xlim(0, timesteps)
-    plt.xticks(range(0, timesteps + 1, 20))
-    plt.ylim(0, 1)
-    plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-    plt.xlabel("$t_f$")
-    plt.ylabel("$P(t_f)$")
-    plt.show()
+        ax.plot(range(timesteps + 1), data[i,:], color=colors[i])
+    ax.set_xlim(0, timesteps)
+    ax.set_xticks(range(0, timesteps + 1, 20))
+    ax.set_ylim(0, 1)
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    ax.set_xlabel("$t_f$")
+    ax.set_ylabel("$P(t_f)$")
 
 
-def plot_prob_heatmap(data, N, timesteps):
-    fig, ax = plt.subplots()
-    im = ax.imshow(data.T, interpolation="gaussian", cmap=plt.get_cmap('plasma'))
-    ax.set_xlabel("Time, t")
-    ax.set_ylabel("Hamming distance, d")
-    plt.yticks(range(0, N + 1, 2))
-    plt.xticks(range(0, timesteps + 1, 5))
-    ax.invert_yaxis()
-
-    cb = fig.colorbar(cm.ScalarMappable(cmap=plt.get_cmap('plasma')))
-    cb.set_label('Normalised probability, P(d, t)')
-
-    plt.show()
+def plot_nearest_qubit_prob_2(ax, time_array, data, colors):
+    for i in range(len(data[:,0])):
+        ax.plot(time_array, data[i,:], color=colors[i])
+    ax.set_xlim(0, time_array[-1])
+    # ax.set_xticks(range(0, timesteps + 1, 20))
+    ax.set_ylim(0, 1)
+    ax.set_xlabel(r"$t_f / \sqrt{N}$")
 
 
 def optimal_gamma(n):
@@ -125,23 +131,37 @@ def optimal_gamma(n):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=14)
+    plt.rc('font', size=16)
+    plt.rcParams["figure.figsize"] = (9.6, 4.8)
 
     time_start = time.time()
 
-    n_list = [6, 9]  # number of dimensions of hypercube
+    n_list = [5, 9]  # number of dimensions of hypercube
     timesteps = 100
+    sqrt_limit = 5.48
     data = np.zeros((len(n_list), timesteps + 1))
+    data_2 = np.zeros((len(n_list), timesteps + 1))
 
     for i, n in enumerate(n_list):
         gamma = optimal_gamma(n)  # hopping rate
         print("n:", n, "gamma:", gamma)
         data[i, :] = run_many_walks(n, timesteps, gamma, normalise=False)  # 2D array of [timesteps_run, probability_at_distance_of_index]
 
+    for i, n in enumerate(n_list):
+        gamma = optimal_gamma(n)  # hopping rate
+        print("n:", n, "gamma:", gamma)
+        data_2[i, :] = run_many_walks_2(n, timesteps, sqrt_limit, gamma, normalise=False)  # 2D array of [timesteps_run, probability_at_distance_of_index]
+
     time_end = time.time()
     print("runtime:", time_end - time_start)
 
-    #plot_furthest_qubit_prob(timesteps, data)
-    print(data)
-    plot_nearest_qubit_prob(timesteps, data)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.tick_params(direction='in', top=True, right=True, which='both')
+    ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
+    colors = ['forestgreen', 'red']
 
+    plot_nearest_qubit_prob(ax1, timesteps, data, colors)
+    times = np.linspace(0, sqrt_limit, num=101)
+    plot_nearest_qubit_prob_2(ax2, times, data_2, colors)
+    # plt.show()
+    plt.savefig('continuous_time_search.png', dpi=200)

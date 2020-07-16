@@ -101,6 +101,8 @@ def plot_graph(x, y, y_err=None, fit=None, label=None):
         color = "forestgreen"
     elif label == "Quantum":
         color = "red"
+    elif label == "Quantum (optimal gamma)":
+        color = "orange"
     elif label == "Guess":
         color = "black"
         plt.plot(x, y, '--', color=color)
@@ -127,7 +129,7 @@ def after_plot(fig, ax):
 
 def after_plot2(fig, ax, scale):
     # plt.errorbar(x, y, y_std_error)
-    ax.set_ylim([4, scale*4])
+    ax.set_ylim([3, scale*4])
     ax.set_yscale('log')
     # plt.legend(loc="upper right")
 
@@ -204,10 +206,18 @@ if __name__ == '__main__':
     av_probs2 = np.zeros(len(n_array2))
     av_probs3 = np.zeros(len(n_array2))
 
+    n_array_opt = np.array([5, 6, 7, 8, 9])
+    av_probs_opt = np.zeros(len(n_array_opt))
+    quantum_errors_opt = np.zeros(len(n_array_opt))
+
     for i, n in enumerate(n_array):
         probs = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
         av_probs[i] = 1 / np.mean(probs)
         quantum_errors[i] = np.std(1/probs, ddof=1) / np.sqrt(len(probs))
+    for i, n in enumerate(n_array_opt):
+        probs = np.loadtxt("./../Max2SAT_quantum/opt_inf_time_probs_n_" + str(n) + ".txt")
+        av_probs_opt[i] = 1 / np.mean(probs)
+        quantum_errors_opt[i] = np.std(1/probs, ddof=1) / np.sqrt(len(probs))
 
     # for i, n in enumerate(n_array2):
     #     probs2 = np.loadtxt("./../Max2SAT_quantum/zero_time_probs_n_" + str(n) + ".txt")
@@ -218,6 +228,7 @@ if __name__ == '__main__':
     av_probs3 = np.sqrt(av_probs2)
 
     fit_and_plot2(n_array, av_probs, "Quantum", quantum_errors)
+    fit_and_plot2(n_array_opt, av_probs_opt, "Quantum (optimal gamma)", quantum_errors_opt)
     fit_and_plot2(n_array2, av_probs2, "Guess", None)
     fit_and_plot2(n_array2, av_probs3, "Guess Sqrt", None)
 
@@ -231,5 +242,8 @@ if __name__ == '__main__':
 
     scale = after_plot(fig, ax1)
     after_plot2(fig, ax2, scale)
+    ax1.tick_params(direction='in', right=True, which='both')
+    ax2.tick_params(direction='in', top=True, which='both')
     # plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig('average_runtimes.png', dpi=200)

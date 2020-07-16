@@ -189,11 +189,11 @@ if __name__ == '__main__':
     plt.rcParams["figure.figsize"] = (9.6, 4.8)
 
     fig, axs = plt.subplots(1, 2)
-    colors = ['#7ea700', 'deeppink']
+    colors = ['forestgreen', 'deeppink']
     axs[0].tick_params(direction='in', top=True, right=True, which='both')
     axs[1].tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
     axs[0].set_ylabel("$P(t_f)$")
-    # axs[0].set_yticks([0, 0.05, 0.1, 0.15, 0.2])
+    axs[0].set_yticks(np.arange(0.1, 0.7, 0.1))
 
     timesteps = 50
     instance_names, instance_n_bits = get_instances()

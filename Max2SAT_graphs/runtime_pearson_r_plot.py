@@ -30,7 +30,7 @@ def runtimes_data(n, name):
         runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
     else:
         raise Exception
-    return average_data(runtimes)
+    return average_data(mask_data(runtimes))
 
 
 def runtimes_data_unaveraged(n, name):
@@ -45,14 +45,16 @@ def runtimes_data_unaveraged(n, name):
     return runtimes
 
 
-def counts_data(n, name):
-    if name == "mixsat":
-        counts = np.loadtxt("./../Max2SAT/adam_counts_"+str(n)+".txt").reshape((-1, 10000))
-    elif name == "branch and bound":
-        counts = np.loadtxt("./../Max2SAT_bnb/adam_counts_" + str(n) + ".txt").reshape((-1, 10000))
-    else:
-        raise Exception
-    return average_data(counts)
+def mask_data(data):
+    num_repeats = len(data[:, 0])
+    num_x_vals = len(data[0, :])
+    out = np.zeros((num_repeats-2, num_x_vals))
+    for x in range(num_x_vals):
+        vals = data[:, x]
+        vals1 = np.delete(vals, vals.argmin())
+        vals2 = np.delete(vals1, vals1.argmax())
+        out[:, x] = vals2
+    return out
 
 
 if __name__ == '__main__':
@@ -69,8 +71,8 @@ if __name__ == '__main__':
 
     # RUNTIMES SCATTER
     for i, n in enumerate(n_list):
-        x_raw = runtimes_data_unaveraged(n, x_solver)
-        y_raw = runtimes_data_unaveraged(n, y_solver)
+        x_raw = mask_data(runtimes_data_unaveraged(n, x_solver))
+        y_raw = mask_data(runtimes_data_unaveraged(n, y_solver))
 
         limit = 1000
         r1[i] = np.corrcoef(np.swapaxes(x_raw, 0, 1)[:limit,:], np.swapaxes(y_raw, 0, 1)[:limit,:])[1, 0]
@@ -83,9 +85,14 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
     # plt.scatter(n_list, r1, label="r1")
-    plt.scatter(n_list, r2, label="r2")
+    plt.scatter(n_list, r2, s=18, color='slateblue')
     plt.xlabel("$n$")
+    plt.xlim([4.7, 20.3])
+    plt.xticks([5, 10, 15, 20])
+    plt.ylim([0.07, 0.5])
+    plt.yticks(np.arange(0.1, 0.6, 0.1))
     plt.ylabel("$r$")
+    plt.tick_params(direction='in', top=True, right=True)
     # plt.tight_layout()
-    plt.show()
-
+    # plt.show()
+    plt.savefig('pearson_r.png', dpi=200)

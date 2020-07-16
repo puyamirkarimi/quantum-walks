@@ -37,11 +37,11 @@ if __name__ == '__main__':
     plt.rc('font', size=16)
     plt.rcParams["figure.figsize"] = (9.6, 4.8)
 
-    n = 9
+    n_array = np.array([5, 9])
     gamma_limit = 1.5
     gamma_step = 0.01
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [1, 1.25]})
+    fig, (ax1, ax2) = plt.subplots(1, 2)
     axes = (ax1, ax2)
     ax1.tick_params(direction='in', top=True, right=True, which='both')
     ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
@@ -49,24 +49,20 @@ if __name__ == '__main__':
     ax1.set_xlabel(r"$P_\infty$")
     ax2.set_xlabel(r"$P_\infty$")
     ax1.set_ylabel(r"$\gamma_{opt}$")
-    for ax in axes:
-        ax.set_xlim([0, 0.2])
-        ax.set_ylim([0.15, 1.4])
 
-    probs1 = quantum_data_unopt(n)
-    probs2 = quantum_data_opt(n)
-    delta_probs = probs2 - probs1
-    cm = plt.get_cmap("seismic")
+    colors = ['forestgreen', 'crimson']
+    ax1.set_xlim([0, 0.35])
+    ax2.set_xlim([0, 0.2])
+    ax1.set_ylim([0.2, 1.3])
+    ax2.set_ylim([0.2, 1.3])
+    ax1.set_yticks(np.arange(0.4, 1.4, 0.2))
 
-    opt_gammas = np.loadtxt("new_opt_gammas_"+str(n)+".txt")
-    heur_gam = heuristic_gamma(n)
-    axes[0].scatter(probs1, opt_gammas, c=delta_probs, cmap=cm, vmin = -0.1, vmax=0.1, linewidths=0.075, marker='.', s=4, edgecolors='black')
-    axes[0].hlines(heur_gam, 0, 0.2, colors='yellow')
+    for i, n in enumerate(n_array):
+        opt_gammas = np.loadtxt("new_opt_gammas_"+str(n)+".txt")
+        heur_gam = heuristic_gamma(n)
+        probs1 = quantum_data_unopt(n)
+        axes[i].scatter(probs1, opt_gammas, linewidths=0, marker='.', s=4, color=colors[i])
+        axes[i].hlines(heur_gam, 0, 0.4, colors='yellow')
 
-    im = axes[1].scatter(probs2, opt_gammas, c=delta_probs, cmap=cm, vmin = -0.1, vmax=0.1, linewidths=0.075, marker='.', s=4, edgecolors='black')
-    cbar = fig.colorbar(im, ax=axes[1])
-    cbar.ax.set_ylabel('$\Delta P_\infty$')
-    axes[1].hlines(heur_gam, 0, 0.2, colors='yellow')
-
-    # plt.savefig('opt_gamma_vs_p_infty_n_'+ str(n) +'.png', dpi=200)
-    plt.show()
+    plt.savefig('opt_gamma_vs_p_infty.png', dpi=200)
+    # plt.show()

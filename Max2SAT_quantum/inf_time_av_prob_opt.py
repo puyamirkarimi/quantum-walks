@@ -160,7 +160,7 @@ if __name__ == "__main__":
     #plt.rc('font', size=16)
 
     instance_names, instance_n_bits = get_instances()
-    n = 9
+    n = 8
     N = 2 ** n
     n_shifted = n - 5
 

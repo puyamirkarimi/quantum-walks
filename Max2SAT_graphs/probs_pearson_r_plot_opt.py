@@ -46,7 +46,7 @@ def runtimes_data_unaveraged(n, name):
 
 
 def probs_data(n):
-    data = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
+    data = np.loadtxt("./../Max2SAT_quantum/opt_inf_time_probs_n_" + str(n) + ".txt")
     return np.reciprocal(data)
 
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n_list = np.arange(5, 12)
+    n_list = np.arange(5, 10)
     r1 = np.zeros(len(n_list))
     r2 = np.zeros(len(n_list))
 
@@ -95,6 +95,7 @@ if __name__ == '__main__':
             r2[i] = pearsonr(x, y)[0]
             print(i)
         ax[solver_i].scatter(n_list, r2, color='slateblue', s=23)
+        print(solver, ":", r2)
         ax[solver_i].set_xlabel("$n$")
 
     ax1.set_ylabel("$r$")
@@ -109,6 +110,6 @@ if __name__ == '__main__':
     ax2.set_ylim([min_y, max_y])
 
     # plt.tight_layout()
-    # plt.show()
-    plt.savefig('pearson_r_quantum_classical.png', dpi=200)
+    plt.show()
+    # plt.savefig('pearson_r_quantum_classical.png', dpi=200)
 

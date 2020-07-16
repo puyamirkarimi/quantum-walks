@@ -69,8 +69,7 @@ def counts_data(n, name):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=16)
-    plt.rcParams["figure.figsize"] = (10, 4.8)
+    plt.rc('font', size=13)
 
     marker_size = 4
 
@@ -81,8 +80,6 @@ if __name__ == '__main__':
     y_label = "MIXSAT"
 
     # RUNTIMES SCATTER
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-
     for n in n_list:
         x_raw_unmasked = runtimes_data_unaveraged(n, x_solver)
         y_raw_unmasked = runtimes_data_unaveraged(n, y_solver)
@@ -100,40 +97,21 @@ if __name__ == '__main__':
 
         print(pearsonr(x, y))
 
-        if n == 10:
-            min_x = np.min(x)
+        min_x = np.min(x)
         min_y = np.min(y)
         max_x = np.max(x)
         max_y = np.max(y)
 
-        if n == 10:
-            ax1.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, color='deeppink')
-            # ax1.set_xlim([min_x, max_x])
-            # ax1.set_ylim([min_y, max_y])
-            ax1.set_xlabel(r"$\langle T_{instance} \rangle$~/~$s$~~" + "(" + x_label + ")")
-            ax1.set_ylabel(r"$\langle T_{instance} \rangle$~/~$s$~~" + "(" + y_label + ")")
-            ax1.set_yticks([5e-3, 10e-2, 20e-2])
-            # plt.legend()
-            ax1.tick_params(direction='in', top=True, right=True, which='both')
-            ax1.loglog()
-        if n == 20:
-            max_y = 0.02
-            min_x = 3e-5
-            min_y = 4.5e-3
-            ax2.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, color='seagreen')
-            ax1.set_xlim([min_x, max_x])
-            ax1.set_ylim([min_y, max_y])
-            ax2.set_xlim([min_x, max_x])
-            ax2.set_ylim([min_y, max_y])
-            ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
-            ax2.set_xlabel(r"$\langle T_{instance} \rangle$~/~$s$~~" + "(" + x_label + ")")
-            # ax2.set_ylabel(r"$\langle T_{instance} \rangle$~/~$s$~~" + "(" + y_label + ")")
-            # plt.legend()
-            ax2.loglog()
-
-    # plt.tight_layout()
-    # plt.show()
-    plt.savefig('classical_runtimes_scatters.png', dpi=200)
+        fig, ax = plt.subplots()
+        plt.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
+        plt.xlim([min_x, max_x])
+        plt.ylim([min_y, max_y])
+        plt.xlabel(r"$\langle T_{instance} \rangle$~/~$s$ " + "(" + x_label + ")")
+        plt.ylabel(r"$\langle T_{instance} \rangle$~/~$s$ " + "(" + y_label + ")")
+        # plt.legend()
+        plt.loglog()
+        plt.tight_layout()
+        plt.show()
 
 
 

@@ -45,7 +45,7 @@ def runtimes_data_masked(n, name):
 
 
 def quantum_data(n):
-    probs = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
+    probs = np.loadtxt("./../Max2SAT_quantum/opt_inf_time_probs_n_" + str(n) + ".txt")
     return np.reciprocal(probs)
 
 
@@ -78,10 +78,10 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n = 10
+    n = 9
     classical_solvers = ["pysat", "mixsat"]
     x_labels = ["RC2", "MIXSAT"]
-    colors = ["deeppink", "deeppink"]
+    colors = ["slateblue", "slateblue"]
     fig, (ax1, ax2) = plt.subplots(1, 2)
     ax = [ax1, ax2]
 
@@ -96,22 +96,17 @@ if __name__ == '__main__':
         max_y = 100
 
         ax[i].scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, color=colors[i])
-        ax[i].set_xlim([7, 110])
-        ax[i].set_ylim([7, 110])
+        ax[i].set_xlim([min_x, max_x])
+        ax[i].set_ylim([min_y, max_y])
         if i == 0:
             ax[i].set_ylabel("$1/P_{\infty}$")
-        ax[i].set_xlabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + x_labels[i] + ")")
+        ax[i].set_xlabel(r"$\overline{T}_{instance}$~/~$s$~~" + "(" + x_labels[i] + ")")
         ax[i].loglog()
     ax1.tick_params(direction='in', top=True, right=True, which='both')
     ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
-
-    ax1.set_xlim([3e-5, 0.0011])
-
-    ax2.set_xlim([0.0039, 0.011])
-
-    # plt.tight_layout()
-    # plt.show()
-    plt.savefig('quantum_classical_scatters.png', dpi=200)
+    plt.tight_layout()
+    plt.show()
+    # plt.savefig('quantum_classical_scatters.png', dpi=200)
 
     # # COUNTS SCATTER
     # if classical_solver.lower() != "pysat":

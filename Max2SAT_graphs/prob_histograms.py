@@ -41,6 +41,7 @@ if __name__ == '__main__':
 
     for n in n_list:
         prob_list.append(quantum_data(n))
+    print(prob_list)
 
     min_runtime = np.min(np.array(prob_list).flatten())
     max_runtime = np.max(np.array(prob_list).flatten())
@@ -55,13 +56,14 @@ if __name__ == '__main__':
     plt.xlim([0, 100])
     plt.ylim([0.6, 1e4])
     print(np.swapaxes(np.array(prob_list), 0, 1))
-    plt.hist(np.swapaxes(np.array(prob_list), 0, 1), x, color=('royalblue', 'deeppink'))
+    plt.hist(np.swapaxes(np.array(prob_list), 0, 1), x, color=('gold', 'deeppink'))
     plt.yscale('log')
 
     plt.xlabel(r"$1/P_\infty$")
-
     plt.ylabel("Frequency")
+
+    plt.tick_params(direction='in', top=True, right=True, which='both')
     # ax2.set_ylabel(r"$\overline{T}_{inst}$~/~$s$")
     # plt.tight_layout()
-    plt.savefig('probability_histogram.png', dpi=200)
-    # plt.show()
+    # plt.savefig('probability_histogram.png', dpi=200)
+    plt.show()

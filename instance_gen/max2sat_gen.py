@@ -121,7 +121,7 @@ def generate_max2sat(nqubits, nclauses, ensure_unique_solution=True, zero_soluti
 
 
 def make_file(name, formula, num_var, num_cls):
-    with open("./../../instances_big_2/"+name+".gz", 'w') as file:
+    with open("./../../instances_big_2_9k/"+name+".gz", 'w') as file:
         file.write('p cnf '+str(num_var)+' '+str(num_cls)+'\n')
         for clause in range(num_cls):
             sign_1 = formula[clause, 0]
@@ -132,7 +132,7 @@ def make_file(name, formula, num_var, num_cls):
 
 
 def make_file_wcnf(name, formula, num_var, num_cls):
-    with open("./../../instances_big_wcnf_2/"+name+'.txt', 'w') as file:    # path of output instance files in WCNF format
+    with open("./../../instances_big_wcnf_2_9k/"+name+'.txt', 'w') as file:    # path of output instance files in WCNF format
         file.write('p wcnf '+str(num_var)+' '+str(num_cls)+'\n')
         for clause in range(num_cls):
             sign_1 = formula[clause, 0]
@@ -145,22 +145,23 @@ def make_file_wcnf(name, formula, num_var, num_cls):
 if __name__ == '__main__':
 
     # done n = 19, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, ...., 150
-    # in folders /instances_big_adam_format_2/, /instances_big_2/ and /instances_big_wcnf_2/
+    # in folders /instances_big_adam_format_2/, /instances_big_2/ and /instances_big_wcnf_2/ 1,000 each
+    # 9000 more in ..._9k
     # with 10,000 instances for n = 30, 1,000 instances for rest
 
     # n = 75
 
     # num_clauses = 3 * n
-    num_instances = 1000
+    num_instances = 9000
 
-    for n in range(75, 155, 5):
+    for n in range(25, 155, 5):
         num_clauses = 3 * n
         for i in range(num_instances):
             instance = generate_max2sat(n, num_clauses, ensure_unique_solution=False, zero_solution=False)
             instance_name = str(n) + "_" + str(i)
             make_file(instance_name, instance, n, num_clauses)
             make_file_wcnf(instance_name, instance, n, num_clauses)
-            np.savetxt("./../../instances_big_adam_format_2/" + instance_name + ".gz", instance)
+            np.savetxt("./../../instances_big_adam_format_2_9k/" + instance_name + ".gz", instance)
             # if i % 100 == 0:
             #     print(i)
         print("Done n =", n)

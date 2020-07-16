@@ -178,7 +178,7 @@ if __name__ == '__main__':
     colors = ['forestgreen', 'blue', 'red', 'black']
 
     max_n_others = 20
-    n_array = np.array([5, 6, 7, 8, 9, 10])
+    n_array = np.array([5, 6, 7, 8, 9])
     n_array2 = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
 
     hard_percentage_array = np.array([.1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95, 1])
@@ -224,7 +224,7 @@ if __name__ == '__main__':
         av_probs_pysat = np.zeros(len(n_array))
 
         for i, n in enumerate(n_array):
-            probs = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
+            probs = np.loadtxt("./../Max2SAT_quantum/opt_inf_time_probs_n_" + str(n) + ".txt")
             av_prob_mixsat = 0
             av_prob_pysat = 0
             for instance in hard_instances_pysat[i]:
@@ -260,7 +260,6 @@ if __name__ == '__main__':
     ax1.set_ylim([0.38, 0.55])
     ax1.set_yticks([0.4, 0.45, 0.5, 0.55])
     ax2.set_ylim([0, 0.17])
-    # ax2.set_yticks([0, 0.05, 0.1, 0.15])
     for ax in axes:
         ax.errorbar(1-hard_percentage_array, scalings_quantum_mixsat, errors_quantum_mixsat, color='red', marker='o', ms=4.2, capsize=1.5)
         ax.errorbar(1-hard_percentage_array, scalings_quantum_pysat, errors_quantum_pysat, color='purple', marker='o', ms=4.2, capsize=1.5)
@@ -296,5 +295,5 @@ if __name__ == '__main__':
     ax1.tick_params(direction='in', top=True, right=True, which='both')
     ax2.tick_params(direction='in', right=True, which='both')
 
-    plt.savefig("scaling_hard.png", dpi=200)
+    plt.savefig("scaling_hard_opt.png", dpi=200)
     # plt.show()

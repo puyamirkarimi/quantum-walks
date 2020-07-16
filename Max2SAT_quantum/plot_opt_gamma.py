@@ -26,7 +26,7 @@ if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
-    n_array = np.array([8])
+    n_array = np.array([9])
     gamma_limit = 1.5
     gamma_step = 0.01
 
@@ -35,12 +35,13 @@ if __name__ == '__main__':
     #plt.plot(gammas_array, frequency)
     plt.xlim([0, 1.5])
     plt.xticks([0, 0.25, 0.5, 0.75, 1, 1.25, 1.5])
-    plt.ylim([0, 300])
+    plt.yticks(np.arange(50, 400, 50))
+    plt.ylim([0, 350])
     plt.xlabel("$\gamma_{opt}$")
     plt.ylabel("Frequency")
 
     for i, n in enumerate(n_array):
-        unbinned_gammas = np.loadtxt("opt_gammas_3_"+str(n)+".txt")
+        unbinned_gammas = np.loadtxt("new_opt_gammas_"+str(n)+".txt")
         heur_gam = heuristic_gamma(n)
 
         num_less = 0
@@ -56,10 +57,11 @@ if __name__ == '__main__':
         print("number of opt gammas above heur gamma:", num_more)
         print("mean opt gamma", mean_gam)
 
-        plt.hist(unbinned_gammas, np.arange(0, gamma_limit, gamma_step), color='mediumblue')
-        plt.vlines(heur_gam, 0, 300, colors='yellow')
-        plt.vlines(mean_gam, 0, 300, colors='lime', linestyles='dotted')
-        plt.vlines(median_gam, 0, 300, colors='orange', linestyles='dotted')
+        plt.hist(unbinned_gammas, np.arange(0, gamma_limit, gamma_step), color='crimson')
+        plt.vlines(heur_gam, 0, 350, colors='yellow')
+        plt.vlines(mean_gam, 0, 350, colors='lime', linestyles='dotted')
+        plt.vlines(median_gam, 0, 350, colors='blue', linestyles='dotted')
 
-    # plt.savefig('opt_gamma_n_8.png', dpi=200)
+    plt.tick_params(direction='in', top=True, right=True)
+    # plt.savefig('opt_gamma_n_9.png', dpi=200)
     plt.show()

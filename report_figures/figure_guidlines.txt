@@ -9,7 +9,7 @@ Put this at the start for subplots
 
 Template for plot:
     plt.figure()
-    plt.tick_params(direction='in', top=True, right=True)
+    plt.tick_params(direction='in', top=True, right=True, which='both')
     plt.xlim(start, end)
     plt.ylim(start, end)
     plt.xticks(range(start, end+1, step))
@@ -19,12 +19,12 @@ Template for plot:
 
 Template for subplots:
     fig, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.tick_params(direction='in', top=True, right=True, which='both')
+    ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
     ax1.set_xlim([min_x, max_x])
     ax1.set_ylim([min_y, max_y])
     ax2.set_xlim([min_x, max_x])
     ax2.set_ylim([min_y, max_y])
-    ax1.tick_params(direction='in', top=True, right=True, which='both')
-    ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
     ax1.set_xlabel("x")
     ax2.set_xlabel("x")
     ax1.set_ylabel("y")
@@ -33,20 +33,33 @@ For saving:
 plt.savefig('name.png', dpi=200)
 
 For scatters:
-plt.scatter(x, y, s=18) (or ms instead of s?)
+plt.scatter(x, y, s=18)     # for plots
+plt.scatter(x, y, s=23)     # for subplots
 
 For scatters with error bars:
 ax.errorbar(x, y, y_err, color='red', fmt='o', ms=4.2, capsize=1.5)
 
 If the plot is going to take up the whole width, add 100px padding to left and right sides of the image.
 
+If putting the ticks inside makes the 0s overlap, remove one of the zeros (usually the x axis one)
+
 n  | colour
 ---|-------------
-10 | deeppink
-20 | forestgreen
-11 | darkorchid
-5  | #7ea700
-9  | red?
-6  | darkorange
-7  | orangered
+20 | forestgreen or seagreen? (green)
+11 | darkorchid (purple)
+10 | deeppink (pink)
+9  | red? (red)
+7  | darkorange (orange)
+6  | darkorange? (orange)
+5  | blue (blue)
 
+new:
+n  | colour
+---|-------------
+20 | mediumblue (blue)
+11 | darkorchid (purple)
+10 | deeppink (pink)
+9  | crimson / red (red)
+7  | gold (yellow)
+6  | if neeeded make this one gold and make 7 darkorange
+5  | forestgreen (green)

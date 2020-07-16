@@ -157,55 +157,55 @@ def heuristic_gamma(n):
 
 if __name__ == "__main__":
     plt.rc('text', usetex=True)
-    plt.rc('font', size=14)
+    #plt.rc('font', size=16)
 
     instance_names, instance_n_bits = get_instances()
-    n_list = [5, 10]
-    colors = ['forestgreen', 'deeppink']
-    linestyles = ['solid', 'dashed']
+    n_list = [10]
 
-    start = 630
-    end = start+2
+    start = 0             # start should be set to previous end (same as the linenumber of final filled line in txt)
+    end = 1000           # end should go up to 10000
 
-    instances_per_n = end - start
+    gamma_step = 0.01
+    gamma_limit = 1.5
 
-    gamma_step = 0.02
-    gamma_limit = 2
-    gammas = np.arange(0, gamma_limit+gamma_step, gamma_step)
-    num_gammas = len(gammas)
-
-    probs = np.zeros((len(n_list), instances_per_n, num_gammas))    # probability[n, instance, gamma]
-    heur_gammas = np.zeros(len(n_list))
-
-    for n_index, n in enumerate(n_list):
+    for n in n_list:
+        print("----- n:", n, "-----")
         N = 2 ** n
         n_shifted = n - 5
+
         A = hypercube(n)
         psi_0 = np.ones(N) * (1 / np.sqrt(N))
-        heur_gammas[n_index] = heuristic_gamma(n)
-
+        heur_gamma = heuristic_gamma(n)
+        gammas = np.arange(heur_gamma - 0.3, heur_gamma + 0.3, 0.01)
+        num_gammas = len(gammas)
+        probs = np.zeros(num_gammas)
         H_lap = A - n * np.eye(2 ** n)
+        # best_gamma_j = 0
+        # gammas_array = np.arange(0, gamma_limit, gamma_step)
+        unbinned_gammas = np.zeros(end-start)
 
         for loop, i in enumerate(range(n_shifted*10000+start, n_shifted*10000+end)):
             instance_name = instance_names[i]
             sat_formula = get_2sat_formula(instance_name)
             H_problem = hamiltonian_2sat(n, sat_formula)
-            for j, gamma in enumerate(gammas):
-                H_total = gamma * H_lap + H_problem
-                probs[n_index, loop, j] = inf_time_av_prob(N, H_problem, H_total, psi_0)
-                print(j)
-            print("loop:", loop)
+            res = minimize(opt_func, np.random.uniform(2, 12)/10, args=(N, H_problem, H_lap, psi_0), tol=0.001)
+            opt_gamma = res.x[0]
+            if opt_gamma > gamma_limit:
+                print("INCREASE GAMMA LIMIT")
+                break
+            unbinned_gammas[loop] = opt_gamma
+            if loop % 10 == 0:
+                print("loop:", loop)
 
-    plt.figure()
-    for n_index in range(len(n_list)):
-        for instance_i in range(instances_per_n):
-            plt.plot(gammas, probs[n_index, instance_i, :], color=colors[n_index], linestyle=linestyles[instance_i])
-        plt.vlines(heur_gammas[n_index], 0, 0.3, colors=colors[n_index], linestyles='dotted')
-    plt.xlim([np.min(gammas), np.max(gammas)])
-    plt.ylim([0, 0.3])
-    plt.xlabel("$\gamma$")
-    plt.ylabel("$P_\infty$")
-    plt.yticks(np.arange(0.05, 0.35, 0.05))
-    plt.tick_params(direction='in', top=True, right=True, which='both')
-    # plt.savefig('p_infty_gamma_n_5_10.png', dpi=200)
-    plt.show()
+        # plt.figure()
+        # plt.hist(unbinned_gammas, np.arange(0, gamma_limit, gamma_step))
+        # #plt.plot(gammas_array, frequency)
+        # # plt.xlim([np.min(gammas), np.max(gammas)])
+        # # plt.ylim([0, 0.2])
+        # plt.xlabel("$\gamma$")
+        # plt.ylabel("$p(\gamma)$")
+        # plt.show()
+
+        with open("new_opt_gammas_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
+            np.savetxt(f, unbinned_gammas)
+
