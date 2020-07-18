@@ -11,16 +11,18 @@ def get_instances():
 if __name__ == "__main__":
     instance_names, instance_n_bits = get_instances()
 
-    n = 5
+    n = 11
     n_shifted = n - 5
 
     probs = np.loadtxt("inf_time_probs_n_" + str(n) + ".txt")
-    csv_array = np.empty([10000, 2], dtype="S30")
+    names = list()
 
     for loop, i in enumerate(range(n_shifted*10000, (n_shifted+1)*10000)):
-        csv_array[loop, 0] = instance_names[i]
-        csv_array[loop, 1] = str(probs[loop])
+        names.append(str(instance_names[i]))
 
     filename = "inf_time_probs_n_" + str(n) + ".csv"
-    with open(filename, 'wb') as f:
-        csv.writer(f).writerows(csv_array)
+    with open(filename, 'w') as f:
+        writer = csv.writer(f)
+        f.write('id,P_infty\n')
+        for row in zip(names, probs):
+            writer.writerow(row)

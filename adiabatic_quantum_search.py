@@ -96,7 +96,7 @@ if __name__ == '__main__':
     t_finish = 500
     timestep = t_finish / M
 
-    n = 8  # number of dimensions of hypercube
+    n = 7  # number of dimensions of hypercube
     gamma = optimal_gamma(n)    # hopping rate
     print("gamma:", gamma)
 
