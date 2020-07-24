@@ -63,43 +63,33 @@ def hamiltonian_2sat(n, formula):
     return out
 
 
-def adiabatic(n, T, M, H_driver, H_problem, normalise=True):
+def adiabatic(n, T, M, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True):
     N = 2**n
     psiN = np.ones(N) * (1 / np.sqrt(N))
     H = H_driver
 
-    prob_ground_H = np.zeros(M+1)
-    prob_ground_H[0] = np.abs(np.dot(first_eigv(H), psiN))**2
-
-    prob_ground_H_driv = np.zeros(M + 1)
-    ground_state_driv = first_eigv(H_driver)
-    prob_ground_H_driv[0] = np.abs(np.dot(np.conjugate(ground_state_driv), psiN))**2
-
-    prob_ground_H_prob = np.zeros(M + 1)
-    ground_state_prob = first_eigv(H_problem)
-    prob_ground_H_prob[0] = np.abs(np.dot(np.conjugate(ground_state_prob), psiN)) ** 2
-
     for i in range(1, M + 1):
         t = i * (T / M)
         H = hamiltonian(t, T, H_driver, H_problem)
-        # U = expm(-1j * (T / M) * H)
-        # psiN = np.dot(U, psiN)
-        A = -1j * (T / M) * H
-        psiN = expm_multiply(A, psiN)
-        prob_ground_H[i] = np.abs(np.dot(np.conjugate(first_eigv(H)), psiN))**2
-        prob_ground_H_driv[i] = np.abs(np.dot(np.conjugate(ground_state_driv), psiN))**2
-        prob_ground_H_prob[i] = np.abs(np.dot(np.conjugate(ground_state_prob), psiN)) ** 2
+        if sprs:
+            A = -1j * (T / M) * H
+            psiN = expm_multiply(A, psiN)
+        else:
+            U = expm(-1j * (T / M) * H)
+            psiN = np.dot(U, psiN)
 
-    return prob_ground_H, prob_ground_H_driv, prob_ground_H_prob
+    return np.abs(np.dot(np.conjugate(ground_state_prob), psiN)) ** 2
 
 
 def hamiltonian(t, T, H_driver, H_problem):
-    print("t/T:", t/T)
     return (1 - t/T)*H_driver + (t/T)*H_problem
 
 
-def first_eigv(A):
-    return eigsh(A, k=1, which='SM')[1][:, 0]
+def first_eigv(A, sprs=True):
+    if sprs:
+        return eigsh(A, k=1, which='SM')[1][:, 0]
+    else:
+        return np.linalg.eigh(A)[1][:, 0]
 
 
 def optimal_gamma(n):
@@ -138,35 +128,44 @@ def heuristic_gamma(n):
 
 if __name__ == '__main__':
     time_start = time.time()
-    M = 128     # number of slices
-    t_finish =
-    timestep = t_finish / M
+    M = 50     # number of slices
+    max_T = 300
 
     instance_names, instance_n_bits = get_instances()
 
-    instance_num = 30002
-    n = instance_n_bits[instance_num]
+    n = 5
+    sprs = False
+
     gamma = heuristic_gamma(n)    # hopping rate
+    n_shifted = n - 5  # n_shifted runs from 0 to 15 instead of 5 to 20
 
-    instance_name = instance_names[instance_num]
-    sat_formula = get_2sat_formula(instance_name)
+    if sprs:
+        H_driver = sparse.csc_matrix(driver_hamiltonian(n, gamma))
+    else:
+        H_driver = driver_hamiltonian(n, gamma)
+    ground_state_calculated = False
+    ground_state_prob = None
 
-    H_driver = sparse.csc_matrix(driver_hamiltonian(n, gamma))
-    H_problem = sparse.csc_matrix(hamiltonian_2sat(n, sat_formula))
-
-    prob_H_total, prob_H_driv, prob_H_prob = adiabatic(n, t_finish, M, H_driver, H_problem)
+    for loop, i in enumerate(range(n_shifted * 10000, (n_shifted + 1) * 10000)):  # 10000 instances per value of n
+        success_prob = 0
+        t_finish = 0
+        for t_finish in range(1, max_T):
+            timestep = t_finish / M
+            instance_name = instance_names[i]
+            sat_formula = get_2sat_formula(instance_name)
+            if sprs:
+                H_problem = sparse.csc_matrix(hamiltonian_2sat(n, sat_formula))
+            else:
+                H_problem = hamiltonian_2sat(n, sat_formula)
+            if not ground_state_calculated:
+                ground_state_prob = first_eigv(H_problem, sprs=sprs)
+            success_prob = adiabatic(n, t_finish, M, H_driver, H_problem, ground_state_prob, sprs=sprs)
+            if success_prob >= 0.99:
+                break
+        print(loop, success_prob, t_finish)
+        if loop % 10 == 0:
+            print("Instance:", loop)
 
     time_end = time.time()
     print("runtime:", time_end - time_start)
-
-    plt.figure()
-    plt.plot(np.arange(0, t_finish + timestep, timestep), prob_H_total, label='$H(t)$')
-    plt.plot(np.arange(0, t_finish + timestep, timestep), prob_H_driv, label='$H_{driver}$')
-    plt.plot(np.arange(0, t_finish + timestep, timestep), prob_H_prob, label='$H_{problem}$')
-    plt.xlabel("Time, t")
-    plt.xlim(0, t_finish)
-    plt.ylim(0, 1)
-    plt.ylabel("Probability of being in ground state of hamiltonian")
-    plt.legend()
-    plt.show()
 
