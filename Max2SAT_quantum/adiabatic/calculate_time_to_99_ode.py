@@ -9,6 +9,7 @@ from scipy.special import comb
 import time
 from scipy.integrate import complex_ode
 
+
 def get_2sat_formula(instance_name):
     out = np.loadtxt("../../../instances_original/" + instance_name + ".m2s")
     return out.astype(int)

@@ -73,7 +73,7 @@ def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs
     r.set_initial_value(psi0, 0)
     # r.set_f_params(T, H_driver, H_problem)
     psiN = r.integrate(T)
-    return np.abs(np.conjugate(ground_state_prob).dot(psiN)) ** 2
+    return np.abs(np.conjugate(ground_state_prob).dot(psiN)) ** 2, r.successful()
 
 
 def hamiltonian(t, T, H_driver, H_problem):
@@ -165,6 +165,8 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
         H_problem = hamiltonian_2sat(n, sat_formula)
     ground_state_prob = np.zeros(2**n)
     ground_state_prob[0] = 1
+    successful_integration = False
+    success = False
 
     while success_prob < 0.99 and not abandon:
         t_finish_old = t_finish
@@ -173,19 +175,21 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
             abandon = True
             T = -1
             break
-        success_prob = adiabatic(n, t_finish, H_driver, H_problem, ground_state_prob, sprs=sprs, n_steps=n_steps)
+        success_prob, successful_integration = adiabatic(n, t_finish, H_driver, H_problem, ground_state_prob, sprs=sprs, n_steps=n_steps)
+        success = successful_integration
 
     if not abandon:
         while t_finish - t_finish_old > 1:
             t_mid = int((t_finish + t_finish_old) / 2)
-            success_prob = adiabatic(n, t_mid, H_driver, H_problem, ground_state_prob, sprs=sprs)
+            success_prob, successful_integration = adiabatic(n, t_mid, H_driver, H_problem, ground_state_prob, sprs=sprs)
             if success_prob < 0.99:
                 t_finish_old = t_mid
             else:
                 t_finish = t_mid
+                success = successful_integration
         T = t_finish
 
-    return T
+    return T, success
 
 
 if __name__ == '__main__':
