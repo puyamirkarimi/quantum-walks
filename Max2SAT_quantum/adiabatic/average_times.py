@@ -3,7 +3,7 @@ import numpy as np
 if __name__ == '__main__':
     n_list = [5, 6, 7]
     for n in n_list:
-        times = np.loadtxt("adiabatic_time_n_" + str(n) + ".txt")
+        times = np.loadtxt("new_adiabatic_time_n_" + str(n) + ".txt")
         new_times = []
         num_discarded = 0
         for time in times:

@@ -1,16 +1,13 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from scipy.linalg import expm
 from scipy import sparse
-from scipy.sparse.linalg import expm_multiply
 from scipy.sparse.linalg import eigsh
 from scipy.special import comb
-import time
 from scipy.integrate import complex_ode
+from pathlib import Path
 
-def get_2sat_formula(instance_name):
-    out = np.loadtxt("../../../instances_original/" + instance_name + ".m2s")
+
+def get_2sat_formula(path_to_instance):
+    out = np.loadtxt(path_to_instance)
     return out.astype(int)
 
 
@@ -23,7 +20,7 @@ def get_instances():
 def hypercube(n_dim):
     sigma_x = np.array([[0, 1],
                         [1, 0]])
-    A = sigma_i(sigma_x, 0, n)
+    A = sigma_i(sigma_x, 0, n_dim)
 
     for i in range(1, n_dim):
         A += sigma_i(sigma_x, i, n_dim)
@@ -67,32 +64,16 @@ def schrodinger(t, psi, T, H_driver, H_problem):
     return -1j * ((1 - t/T)*H_driver + (t/T)*H_problem).dot(psi)
 
 
-def adiabatic(n, T, M, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True):
+def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=4000):
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
     r = complex_ode(newschro)
-    r.set_integrator("dop853", nsteps=2000)
+    r.set_integrator("dop853", nsteps=n_steps)
     r.set_initial_value(psi0, 0)
     # r.set_f_params(T, H_driver, H_problem)
-    # print(r.f_params)
     psiN = r.integrate(T)
     return np.abs(np.conjugate(ground_state_prob).dot(psiN)) ** 2
-    # N = 2**n
-    # psiN = np.ones(N) * (1 / np.sqrt(N))
-    # H = H_driver
-    #
-    # for i in range(1, M + 1):
-    #     t = i * (T / M)
-    #     H = hamiltonian(t, T, H_driver, H_problem)
-    #     if sprs:
-    #         A = -1j * (T / M) * H
-    #         psiN = expm_multiply(A, psiN)
-    #     else:
-    #         U = expm(-1j * (T / M) * H)
-    #         psiN = np.dot(U, psiN)
-    #
-    # return np.abs(np.dot(np.conjugate(ground_state_prob), psiN)) ** 2
 
 
 def hamiltonian(t, T, H_driver, H_problem):
@@ -136,79 +117,60 @@ def heuristic_gamma(n):
         out = 0.619345
     if n == 11:
         out = 0.6220136363636364
-    print("heuristic gamma: ", out)
     return out
 
 
-if __name__ == '__main__':
-    time_start = time.time()
-    M = 100     # number of slices
-    max_T = 2048
+def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_steps=4000):
+    instances_path = Path(instances_folder)
+    instance_name += ".m2s"
+    instance_path = instances_path / instance_name
+    max_T = 8192
 
-    instance_names, instance_n_bits = get_instances()
+    sprs = sparse_matrix
 
-    n = 8
-    sprs = True
-
-    gamma = heuristic_gamma(n)    # hopping rate
-    n_shifted = n - 5  # n_shifted runs from 0 to 15 instead of 5 to 20
+    gamma = heuristic_gamma(n)  # hopping rate
 
     if sprs:
         H_driver = sparse.csc_matrix(driver_hamiltonian(n, gamma))
     else:
         H_driver = driver_hamiltonian(n, gamma)
-    ground_state_calculated = False
-    ground_state_prob = None
 
-    times_array = np.zeros(10000)
+    abandon = False
+    success_prob = 0
+    t_finish_old = 1
+    t_finish = 1
+    T = 0
+    sat_formula = get_2sat_formula(instance_path)
+    if sprs:
+        H_problem = sparse.csc_matrix(hamiltonian_2sat(n, sat_formula))
+    else:
+        H_problem = hamiltonian_2sat(n, sat_formula)
+    ground_state_prob = np.zeros(2**n)
+    ground_state_prob[0] = 1
 
-    for loop, i in enumerate(range(n_shifted * 10000, (n_shifted + 1) * 10000)):  # 10000 instances per value of n
-        abandon = False
-        success_prob = 0
-        t_finish_old = 1
-        t_finish = 1
-        success_prob_old = 0
-        T = 0
-        instance_name = instance_names[i]
-        sat_formula = get_2sat_formula(instance_name)
-        if sprs:
-            H_problem = sparse.csc_matrix(hamiltonian_2sat(n, sat_formula))
-        else:
-            H_problem = hamiltonian_2sat(n, sat_formula)
-        if not ground_state_calculated:
-            ground_state_prob = first_eigv(H_problem, sprs=sprs)
-            ground_state_calculated = True
+    while success_prob < 0.99 and not abandon:
+        t_finish_old = t_finish
+        t_finish *= 2
+        if t_finish > max_T:
+            abandon = True
+            T = -1
+            break
+        success_prob = adiabatic(n, t_finish, H_driver, H_problem, ground_state_prob, sprs=sprs, n_steps=n_steps)
 
-        while success_prob < 0.99 and not abandon:
-            success_prob_old = success_prob
-            t_finish_old = t_finish
-            t_finish *= 2
-            if t_finish > max_T:
-                abandon = True
-                T = -1
-                break
-            success_prob = adiabatic(n, t_finish, M, H_driver, H_problem, ground_state_prob, sprs=sprs)
+    if not abandon:
+        while t_finish - t_finish_old > 1:
+            t_mid = int((t_finish + t_finish_old) / 2)
+            success_prob = adiabatic(n, t_mid, H_driver, H_problem, ground_state_prob, sprs=sprs)
+            if success_prob < 0.99:
+                t_finish_old = t_mid
+            else:
+                t_finish = t_mid
+        T = t_finish
 
-        if not abandon:
-            while t_finish - t_finish_old > 1:
-                t_mid = int((t_finish + t_finish_old)/2)
-                success_prob = adiabatic(n, t_mid, M, H_driver, H_problem, ground_state_prob, sprs=sprs)
-                if success_prob < 0.99:
-                    t_finish_old = t_mid
-                else:
-                    t_finish = t_mid
-            T = t_finish
+    return T
 
-        print(loop, success_prob, T)
-        times_array[loop] = T
 
-        if loop % 10 == 0:
-            print("Instance:", loop)
-
-    time_end = time.time()
-    print("runtime:", time_end - time_start)
-
-    with open("new_adiabatic_time_n_"+str(n)+".txt", "ab") as f:         # saves runtimes using time.time()
-        np.savetxt(f, times_array)
-
+if __name__ == '__main__':
+    instance_names, instance_n_bits = get_instances()
+    print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=False))
 

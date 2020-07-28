@@ -128,7 +128,7 @@ def heuristic_gamma(n):
 
 if __name__ == '__main__':
     time_start = time.time()
-    M = 100     # number of slices
+    M = 200     # number of slices
     max_T = 512
 
     instance_names, instance_n_bits = get_instances()
