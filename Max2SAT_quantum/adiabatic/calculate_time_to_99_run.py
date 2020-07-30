@@ -165,8 +165,8 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
         H_problem = hamiltonian_2sat(n, sat_formula)
     ground_state_prob = np.zeros(2**n)
     ground_state_prob[0] = 1
-    successful_integration = False
-    success = False
+    successful_integration = True
+    success = True
 
     while success_prob < 0.99 and not abandon:
         t_finish_old = t_finish
@@ -176,17 +176,19 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
             T = -1
             break
         success_prob, successful_integration = adiabatic(n, t_finish, H_driver, H_problem, ground_state_prob, sprs=sprs, n_steps=n_steps)
-        success = successful_integration
+        if not successful_integration:
+            success = False
 
     if not abandon:
         while t_finish - t_finish_old > 1:
             t_mid = int((t_finish + t_finish_old) / 2)
             success_prob, successful_integration = adiabatic(n, t_mid, H_driver, H_problem, ground_state_prob, sprs=sprs)
+            if not successful_integration:
+                success = False
             if success_prob < 0.99:
                 t_finish_old = t_mid
             else:
                 t_finish = t_mid
-                success = successful_integration
         T = t_finish
 
     return T, success
@@ -194,5 +196,5 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
 
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
-    print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=False))
+    print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=False, n_steps=1000))
 
