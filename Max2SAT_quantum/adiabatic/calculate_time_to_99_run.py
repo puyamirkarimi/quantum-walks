@@ -142,7 +142,6 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
     instances_path = Path(instances_folder)
     instance_name += ".m2s"
     instance_path = instances_path / instance_name
-    max_T = 8192
 
     sprs = sparse_matrix
 
@@ -196,5 +195,5 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
 
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
-    print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=False, n_steps=1000))
+    print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=False, max_T=32, n_steps=1000))
 
