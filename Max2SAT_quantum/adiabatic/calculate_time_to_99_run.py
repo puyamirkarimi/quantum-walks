@@ -181,7 +181,7 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
     if not abandon:
         while t_finish - t_finish_old > 1:
             t_mid = int((t_finish + t_finish_old) / 2)
-            success_prob, successful_integration = adiabatic(n, t_mid, H_driver, H_problem, ground_state_prob, sprs=sprs)
+            success_prob, successful_integration = adiabatic(n, t_mid, H_driver, H_problem, ground_state_prob, sprs=sprs, n_steps=n_steps)
             if not successful_integration:
                 success = False
             if success_prob < 0.99:
@@ -195,5 +195,5 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
 
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
-    print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=False, max_T=32, n_steps=1000))
+    print(run(instance_names[2825 + 4*10000], "../../../instances_original/", 9, sparse_matrix=True, max_T=8192, n_steps=1000000))
 
