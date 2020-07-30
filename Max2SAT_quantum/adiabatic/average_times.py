@@ -9,11 +9,11 @@ if __name__ == '__main__':
             times = np.loadtxt("new_adiabatic_time_n_" + str(n) + ".txt")
         new_times = []
         num_discarded = 0
-        for time in times:
+        for i, time in enumerate(times):
             if time > 0:
                 new_times.append(time)
             if time > 2000:
-                print(time)
+                print(time, i)
             else:
                 num_discarded += 1
         av_time = np.mean(new_times)

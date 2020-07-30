@@ -64,7 +64,7 @@ def schrodinger(t, psi, T, H_driver, H_problem):
     return -1j * ((1 - t/T)*H_driver + (t/T)*H_problem).dot(psi)
 
 
-def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=4000):
+def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=16384):
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
@@ -138,7 +138,7 @@ def heuristic_gamma(n):
     return out
 
 
-def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_steps=4000):
+def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_steps=16384):
     instances_path = Path(instances_folder)
     instance_name += ".m2s"
     instance_path = instances_path / instance_name
@@ -195,5 +195,5 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
 
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
-    print(run(instance_names[2825 + 4*10000], "../../../instances_original/", 9, sparse_matrix=True, max_T=8192, n_steps=1000000))
+    print(run(instance_names[2825 + 4*10000], "../../../instances_original/", 9, sparse_matrix=True, max_T=8192, n_steps=16384))
 
