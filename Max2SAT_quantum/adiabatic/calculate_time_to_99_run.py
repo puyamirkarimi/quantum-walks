@@ -27,6 +27,14 @@ def hypercube(n_dim):
     return -1 * A
 
 
+def hypercube_sparse(n_dim, sigma_x):
+    A = sigma_i_sparse(sigma_x, 0, n_dim)
+
+    for i in range(1, n_dim):
+        A += sigma_i_sparse(sigma_x, i, n_dim)
+    return -1 * A
+
+
 def sigma_i(sigma, i, n_dim):
     n = n_dim -1            # because of i starting from 0 rather than 1
     if i > 0:
@@ -38,6 +46,20 @@ def sigma_i(sigma, i, n_dim):
         out = sigma
     for j_after in range(n - i):
         out = np.kron(out, np.eye(2))
+    return out
+
+
+def sigma_i_sparse(sigma, i, n_dim):
+    n = n_dim - 1            # because of i starting from 0 rather than 1
+    if i > 0:
+        out = sparse.eye(2, format='csc')
+        for j_before in range(i - 1):
+            out = sparse.kron(out, np.eye(2))
+        out = sparse.kron(out, sigma)
+    else:
+        out = sigma
+    for j_after in range(n - i):
+        out = sparse.kron(out, np.eye(2))
     return out
 
 
@@ -60,11 +82,29 @@ def hamiltonian_2sat(n, formula):
     return out
 
 
+def hamiltonian_2sat_sparse(n, formula, sigma_z):
+    N = 2 ** n
+    out = sparse.csc_matrix((N, N))
+    sigma_identity = sparse.eye(N, format='csc')
+    # sigma_z_i = sparse.csc_matrix((n, N, N))
+    # for i in range(n):
+    #     sigma_z_i[i] = sigma_i_sparse(sigma_z, i, n)
+    for clause in formula:
+        v_1 = clause[1]
+        v_2 = clause[3]
+        sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
+        sign_2 = -1 * clause[2]
+        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n)*sigma_i_sparse(sigma_z, v_2, n)
+                        + sign_1*sigma_i_sparse(sigma_z, v_1, n) + sign_2*sigma_i_sparse(sigma_z, v_2, n) + sigma_identity)
+    return out
+
+
 def schrodinger(t, psi, T, H_driver, H_problem):
     return -1j * ((1 - t/T)*H_driver + (t/T)*H_problem).dot(psi)
 
 
 def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=16384):
+    print(T)
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
@@ -73,6 +113,7 @@ def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs
     r.set_initial_value(psi0, 0)
     # r.set_f_params(T, H_driver, H_problem)
     psiN = r.integrate(T)
+    # print(np.abs(np.conjugate(ground_state_prob).dot(psiN)) ** 2)
     return np.abs(np.conjugate(ground_state_prob).dot(psiN)) ** 2, r.successful()
 
 
@@ -99,6 +140,11 @@ def optimal_gamma(n):
 def driver_hamiltonian(n, gamma):
     A = hypercube(n)
     return (A + n * np.eye(2 ** n))/2      # plus or minus??? keep the half?
+
+
+def driver_hamiltonian_sparse(n, gamma, sigma_x):
+    A = hypercube_sparse(n, sigma_x)
+    return (A + n * sparse.eye(2 ** n, format='csc'))/2      # plus or minus??? keep the half?
 
 
 def heuristic_gamma(n):
@@ -144,11 +190,15 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
     instance_path = instances_path / instance_name
 
     sprs = sparse_matrix
+    sigma_x_sparse = sparse.csc_matrix(np.array([[0, 1],
+                                                 [1, 0]]))
+    sigma_z_sparse = sparse.csc_matrix(np.array([[1, 0],
+                                                 [0, -1]]))
 
     gamma = heuristic_gamma(n)  # hopping rate
 
     if sprs:
-        H_driver = sparse.csc_matrix(driver_hamiltonian(n, gamma))
+        H_driver = driver_hamiltonian_sparse(n, gamma, sigma_x_sparse)
     else:
         H_driver = driver_hamiltonian(n, gamma)
 
@@ -159,7 +209,7 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
     T = 0
     sat_formula = get_2sat_formula(instance_path)
     if sprs:
-        H_problem = sparse.csc_matrix(hamiltonian_2sat(n, sat_formula))
+        H_problem = hamiltonian_2sat_sparse(n, sat_formula, sigma_z_sparse)
     else:
         H_problem = hamiltonian_2sat(n, sat_formula)
     ground_state_prob = np.zeros(2**n)
@@ -195,5 +245,11 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
 
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
-    print(run(instance_names[2825 + 4*10000], "../../../instances_original/", 9, sparse_matrix=True, max_T=8192, n_steps=16384))
+
+    # print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=True, max_T=65536, n_steps=200000))
+
+    i_nums = [949, 1248, 1736, 2959, 6199, 6243, 8713, 9418, 9800]
+    for i_num in i_nums:
+        print("instance", i_num, run(instance_names[i_num + 5 * 10000], "../../../instances_original/", 10, sparse_matrix=True, max_T=65536,
+              n_steps=200000))
 

@@ -39,21 +39,8 @@ plt.scatter(x, y, s=23)     # for subplots
 For scatters with error bars:
 ax.errorbar(x, y, y_err, color='red', fmt='o', ms=4.2, capsize=1.5)
 
-If the plot is going to take up the whole width, add 100px padding to left and right sides of the image.
-
 If putting the ticks inside makes the 0s overlap, remove one of the zeros (usually the x axis one)
 
-n  | colour
----|-------------
-20 | forestgreen or seagreen? (green)
-11 | darkorchid (purple)
-10 | deeppink (pink)
-9  | red? (red)
-7  | darkorange (orange)
-6  | darkorange? (orange)
-5  | blue (blue)
-
-new:
 n  | colour
 ---|-------------
 20 | mediumblue (blue)
