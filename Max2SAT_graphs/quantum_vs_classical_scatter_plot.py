@@ -109,9 +109,9 @@ if __name__ == '__main__':
 
     ax2.set_xlim([0.0039, 0.011])
 
-    # plt.tight_layout()
-    # plt.show()
-    plt.savefig('quantum_classical_scatters.png', dpi=200)
+    plt.tight_layout()
+    plt.show()
+    # plt.savefig('quantum_classical_scatters.png', dpi=200)
 
     # # COUNTS SCATTER
     # if classical_solver.lower() != "pysat":

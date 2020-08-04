@@ -1,7 +1,7 @@
 import numpy as np
 
 if __name__ == '__main__':
-    n_list = [10]
+    n_list = [11]
     for n in n_list:
         print("-----",n,"------")
         if n > 8:

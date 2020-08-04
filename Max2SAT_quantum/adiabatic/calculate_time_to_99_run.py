@@ -86,16 +86,16 @@ def hamiltonian_2sat_sparse(n, formula, sigma_z):
     N = 2 ** n
     out = sparse.csc_matrix((N, N))
     sigma_identity = sparse.eye(N, format='csc')
-    # sigma_z_i = sparse.csc_matrix((n, N, N))
-    # for i in range(n):
-    #     sigma_z_i[i] = sigma_i_sparse(sigma_z, i, n)
+    sigma_z_i = list()
+    for i in range(n):
+        sigma_z_i.append(sigma_i_sparse(sigma_z, i, n))
     for clause in formula:
         v_1 = clause[1]
         v_2 = clause[3]
         sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
         sign_2 = -1 * clause[2]
-        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n)*sigma_i_sparse(sigma_z, v_2, n)
-                        + sign_1*sigma_i_sparse(sigma_z, v_1, n) + sign_2*sigma_i_sparse(sigma_z, v_2, n) + sigma_identity)
+        out += (1 / 4) * (sign_1 * sign_2 * sigma_z_i[v_1] * sigma_z_i[v_2]
+                          + sign_1 * sigma_z_i[v_1] + sign_2 * sigma_z_i[v_2] + sigma_identity)
     return out
 
 
@@ -104,7 +104,7 @@ def schrodinger(t, psi, T, H_driver, H_problem):
 
 
 def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=16384):
-    print(T)
+    # print(T)
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
@@ -248,8 +248,10 @@ if __name__ == '__main__':
 
     # print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=True, max_T=65536, n_steps=200000))
 
-    i_nums = [949, 1248, 1736, 2959, 6199, 6243, 8713, 9418, 9800]
+    i_nums = [215, 669, 2947, 3106, 5110, 5436, 8571, 9121]
+    # n=10 instances 949, 1248 too hard (max_T=32768)
+    # n=11 instance 8571 too hard (max_T=32768)
     for i_num in i_nums:
-        print("instance", i_num, run(instance_names[i_num + 5 * 10000], "../../../instances_original/", 10, sparse_matrix=True, max_T=65536,
-              n_steps=200000))
+        print("instance", i_num, run(instance_names[i_num + 4 * 10000], "../../../instances_original/", 9, sparse_matrix=True, max_T=32768,
+              n_steps=100000))
 

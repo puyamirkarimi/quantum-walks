@@ -10,11 +10,7 @@ if __name__ == '__main__':
     for j, n in enumerate(n_list):
         print("-----", n, "------")
         if n > 8:
-            if n == 9:
-                data = np.genfromtxt('final_adiabatic_time_n_' + str(n) + '.csv', delimiter=',', skip_header=1,
-                                     dtype=str)
-            else:
-                data = np.genfromtxt('adiabatic_time_n_' + str(n) + '.csv', delimiter=',', skip_header=1, dtype=str)
+            data = np.genfromtxt('adiabatic_time_n_' + str(n) + '.csv', delimiter=',', skip_header=1, dtype=str)
             times = data[:, 1].astype(int)
             success = data[:, 2]
         else:
@@ -45,7 +41,7 @@ if __name__ == '__main__':
     # plt.yticks(range(start, end + 1, step))
     plt.xlabel("$n$")
     plt.yscale('log', basey=2)
-    plt.ylabel("$T_{0.99}$")
+    plt.ylabel(r"$\langle T_{0.99} \rangle$")
     plt.show()
 
 
