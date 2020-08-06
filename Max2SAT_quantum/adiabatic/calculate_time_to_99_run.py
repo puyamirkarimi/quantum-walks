@@ -92,7 +92,7 @@ def hamiltonian_2sat_sparse(n, formula, sigma_z):
         v_2 = clause[3]
         sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
         sign_2 = -1 * clause[2]
-        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n).multiply(sigma_i_sparse(sigma_z, v_2, n))
+        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n).dot(sigma_i_sparse(sigma_z, v_2, n))
                         + sign_1*sigma_i_sparse(sigma_z, v_1, n) + sign_2*sigma_i_sparse(sigma_z, v_2, n) + sigma_identity)
     return out
 
@@ -250,5 +250,5 @@ if __name__ == '__main__':
     # n=10 instances 949, 1248 too hard (max_T=32768)
     # n=11 instance 8571 too hard (max_T=32768)
     for i_num in i_nums:
-        print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
+        print("instance", i_num, run(instance_names[i_num + 3 * 10000], "../../../instances_original/", 8, sparse_matrix=True, max_T=32768,
               n_steps=100000))
