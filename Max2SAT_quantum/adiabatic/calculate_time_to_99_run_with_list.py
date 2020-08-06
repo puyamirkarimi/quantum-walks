@@ -66,8 +66,6 @@ def sigma_i_sparse(sigma, i, n_dim):
 
 
 def hamiltonian_2sat(n, formula):
-    print("start")
-    time1 = time.process_time()
     N = 2 ** n
     out = np.zeros((N, N))
     sigma_z = np.array([[1, 0],
@@ -83,8 +81,6 @@ def hamiltonian_2sat(n, formula):
         sign_2 = -1 * clause[2]
         out += (1/4) * (sign_1*sign_2*sigma_z_i[v_1]*sigma_z_i[v_2]
                         + sign_1*sigma_z_i[v_1] + sign_2*sigma_z_i[v_2] + sigma_identity)
-    time2 = time.process_time()
-    print("TIME", time2 - time1)
     return out
 
 
@@ -93,21 +89,17 @@ def hamiltonian_2sat_sparse(n, formula, sigma_z):
     time1 = time.process_time()
     N = 2 ** n
     out = sparse.csc_matrix((N, N))
-    print("1")
     sigma_identity = sparse.eye(N, format='csc')
-    print("2")
-    # sigma_z_i = sparse.csc_matrix((n, N, N))
-    # for i in range(n):
-    #     sigma_z_i[i] = sigma_i_sparse(sigma_z, i, n)
+    sigma_z_i = list()
+    for i in range(n):
+        sigma_z_i.append(sigma_i_sparse(sigma_z, i, n))
     for clause in formula:
         v_1 = clause[1]
         v_2 = clause[3]
         sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
         sign_2 = -1 * clause[2]
-        print("3")
-        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n)*sigma_i_sparse(sigma_z, v_2, n)
-                        + sign_1*sigma_i_sparse(sigma_z, v_1, n) + sign_2*sigma_i_sparse(sigma_z, v_2, n) + sigma_identity)
-        print("4")
+        out += (1 / 4) * (sign_1 * sign_2 * sigma_z_i[v_1] * sigma_z_i[v_2]
+                          + sign_1 * sigma_z_i[v_1] + sign_2 * sigma_z_i[v_2] + sigma_identity)
     time2 = time.process_time()
     print("TIME", time2 - time1)
     return out
@@ -118,7 +110,7 @@ def schrodinger(t, psi, T, H_driver, H_problem):
 
 
 def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=16384):
-    print(T)
+    # print(T)
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
@@ -266,9 +258,7 @@ if __name__ == '__main__':
     # n=10 instances 949, 1248 too hard (max_T=32768)
     # n=11 instance 8571 too hard (max_T=32768)
     for i_num in i_nums:
-        print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
+        print("instance", i_num, run(instance_names[i_num + 8 * 10000], "../../../instances_original/", 13, sparse_matrix=True, max_T=32768,
               n_steps=100000))
+    # time 10364
 
-    # time 10420 n = 13, sparse
-    # time 22.3 n = 12, dense
-    # time
