@@ -51,7 +51,6 @@ def sigma_i(sigma, i, n_dim):
 
 
 def sigma_i_sparse(sigma, i, n_dim):
-    print("call")
     n = n_dim - 1            # because of i starting from 0 rather than 1
     if i > 0:
         out = sparse.eye(2, format='csc')
@@ -66,8 +65,6 @@ def sigma_i_sparse(sigma, i, n_dim):
 
 
 def hamiltonian_2sat(n, formula):
-    print("start")
-    time1 = time.process_time()
     N = 2 ** n
     out = np.zeros((N, N))
     sigma_z = np.array([[1, 0],
@@ -83,33 +80,20 @@ def hamiltonian_2sat(n, formula):
         sign_2 = -1 * clause[2]
         out += (1/4) * (sign_1*sign_2*sigma_z_i[v_1]*sigma_z_i[v_2]
                         + sign_1*sigma_z_i[v_1] + sign_2*sigma_z_i[v_2] + sigma_identity)
-    time2 = time.process_time()
-    print("TIME", time2 - time1)
     return out
 
 
 def hamiltonian_2sat_sparse(n, formula, sigma_z):
-    print("start")
-    time1 = time.process_time()
     N = 2 ** n
     out = sparse.csc_matrix((N, N))
-    print("1")
     sigma_identity = sparse.eye(N, format='csc')
-    print("2")
-    # sigma_z_i = sparse.csc_matrix((n, N, N))
-    # for i in range(n):
-    #     sigma_z_i[i] = sigma_i_sparse(sigma_z, i, n)
     for clause in formula:
         v_1 = clause[1]
         v_2 = clause[3]
         sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
         sign_2 = -1 * clause[2]
-        print("3")
-        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n)*sigma_i_sparse(sigma_z, v_2, n)
+        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n).multiply(sigma_i_sparse(sigma_z, v_2, n))
                         + sign_1*sigma_i_sparse(sigma_z, v_1, n) + sign_2*sigma_i_sparse(sigma_z, v_2, n) + sigma_identity)
-        print("4")
-    time2 = time.process_time()
-    print("TIME", time2 - time1)
     return out
 
 
@@ -118,7 +102,7 @@ def schrodinger(t, psi, T, H_driver, H_problem):
 
 
 def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=16384):
-    print(T)
+    # print(T)
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
@@ -268,7 +252,3 @@ if __name__ == '__main__':
     for i_num in i_nums:
         print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
               n_steps=100000))
-
-    # time 10420 n = 13, sparse
-    # time 22.3 n = 12, dense
-    # time

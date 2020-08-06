@@ -260,5 +260,3 @@ if __name__ == '__main__':
     for i_num in i_nums:
         print("instance", i_num, run(instance_names[i_num + 8 * 10000], "../../../instances_original/", 13, sparse_matrix=True, max_T=32768,
               n_steps=100000))
-    # time 10364
-
