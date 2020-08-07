@@ -45,6 +45,10 @@ def mask_data(data):
     return out
 
 
+def bnb_data(n):
+    return np.genfromtxt('./../Max2SAT_quantum/bnb/mixbnb.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 4].astype(int)
+
+
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=16)
@@ -56,42 +60,20 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
 
     x = quantum_walk_data(n)
-    y = adiabatic_data(n)
+    y = bnb_data(n)
 
     min_x = np.min(x)
     min_y = np.min(y)
     max_x = np.max(x)
-    max_y = 100
+    max_y = np.max(y)
 
     ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
     ax.set_xlim([8, 150])
-    ax.set_ylim([19, 34000])
+    # ax.set_ylim([19, 34000])
     ax.set_xlabel("$1/P_{\infty}$")
-    ax.set_ylabel(r"$\langle T_{0.99} \rangle$")
+    ax.set_ylabel("calls")
     ax.loglog()
 
     # plt.tight_layout()
     # plt.show()
-    plt.savefig('n_'+str(n)+'_adiabatic_vs_QW.png', dpi=200)
-
-    # # COUNTS SCATTER
-    # if classical_solver.lower() != "pysat":
-    #     for n in n_list:
-    #         y = quantum_data(n)
-    #         x = counts_data(n, classical_solver)[0][:len(y)]
-    #
-    #         min_x = np.min(x)
-    #         min_y = np.min(y)
-    #         max_x = np.max(x)
-    #         max_y = np.max(y)
-    #
-    #         fig, ax = plt.subplots()
-    #         plt.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
-    #         plt.xlim([min_x, max_x])
-    #         plt.ylim([min_y, max_y])
-    #         plt.xlabel("Average instance runtime for " + classical_solver)
-    #         plt.ylabel("Inverse infinite time probability")
-    #         plt.legend()
-    #         plt.loglog()
-    #         plt.tight_layout()
-    #         plt.show()
+    plt.savefig('n_'+str(n)+'_bnb_vs_QW.png', dpi=200)
