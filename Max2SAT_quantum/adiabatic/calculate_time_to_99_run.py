@@ -92,7 +92,10 @@ def hamiltonian_2sat_sparse(n, formula, sigma_z):
         v_2 = clause[3]
         sign_1 = -1 * clause[0]                 # -1 because signs should be opposite in Hamiltonian
         sign_2 = -1 * clause[2]
-        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n).dot(sigma_i_sparse(sigma_z, v_2, n))
+        '''below we use .multiply(), which is elementwise multiplication, rather than .dot(), which is matrix
+        multiplication, becasue the matrices in the problem Hamiltonian are diagonal so the end result is the same for
+        both types of multiplication, even though .dot() is technically the correct type.'''
+        out += (1/4) * (sign_1*sign_2*sigma_i_sparse(sigma_z, v_1, n).multiply(sigma_i_sparse(sigma_z, v_2, n))
                         + sign_1*sigma_i_sparse(sigma_z, v_1, n) + sign_2*sigma_i_sparse(sigma_z, v_2, n) + sigma_identity)
     return out
 
@@ -246,9 +249,9 @@ if __name__ == '__main__':
 
     # print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=True, max_T=65536, n_steps=200000))
 
-    i_nums = [215, 669, 2947, 3106, 5110, 5436, 8571, 9121]
+    i_nums = [93,1079,2775,3274,3552,3569,3634,4131,4224,4408,4484,4659,4762,4932,4970]
     # n=10 instances 949, 1248 too hard (max_T=32768)
     # n=11 instance 8571 too hard (max_T=32768)
     for i_num in i_nums:
-        print("instance", i_num, run(instance_names[i_num + 3 * 10000], "../../../instances_original/", 8, sparse_matrix=True, max_T=32768,
+        print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
               n_steps=100000))
