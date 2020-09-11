@@ -105,7 +105,7 @@ def schrodinger(t, psi, T, H_driver, H_problem):
 
 
 def adiabatic(n, T, H_driver, H_problem, ground_state_prob, normalise=True, sprs=True, n_steps=16384):
-    # print(T)
+    print(T)
     N = 2**n
     psi0 = np.ones(N) * (1 / np.sqrt(N))
     newschro = lambda t, y: schrodinger(t, y, T, H_driver, H_problem)
@@ -249,9 +249,10 @@ if __name__ == '__main__':
 
     # print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=True, max_T=65536, n_steps=200000))
 
-    i_nums = [93,1079,2775,3274,3552,3569,3634,4131,4224,4408,4484,4659,4762,4932,4970]
+    i_nums = [,5902]
     # n=10 instances 949, 1248 too hard (max_T=32768)
     # n=11 instance 8571 too hard (max_T=32768)
+    # n=12 instances 93, 2775, 3274 5160, 5354, 7385 too hard (max_T=32768)
     for i_num in i_nums:
         print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
-              n_steps=100000))
+              n_steps=1000000))

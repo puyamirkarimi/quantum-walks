@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n = 11
+    n = 13
     fig, ax = plt.subplots()
 
     x = adiabatic_data(n)
