@@ -22,6 +22,24 @@ def bnb_data(n):
     return np.genfromtxt('./../Max2SAT_quantum/bnb/mixbnb.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 4].astype(int)
 
 
+def adams_quantum_walk_data(n):
+    return np.reciprocal(np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 2].astype(float))
+
+
+def adams_adiabatic_data(n):
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', missing_values='', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 10]
+    b = []
+    skipped = 0
+    for i, element in enumerate(a):
+        if element != '':
+            b.append(float(element))
+        else:
+            b.append(float('nan'))
+            skipped += 1
+    print("n:", n, " skipped:", skipped)
+    return np.array(b)
+
+
 def log_tick_formatter(val, pos=None):
     return "{:.0f}".format(10**val)
 
@@ -32,10 +50,10 @@ if __name__ == "__main__":
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
-    n = 11
+    n = 15
 
-    z = quantum_walk_data(n)
-    y = adiabatic_data(n)
+    z = adams_quantum_walk_data(n)
+    y = adams_adiabatic_data(n)
     x = bnb_data(n)
 
     ax.scatter(np.log10(x), np.log10(y), np.log10(z), marker='.', s=3, alpha=0.17)

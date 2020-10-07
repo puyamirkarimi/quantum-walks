@@ -22,7 +22,7 @@ def zero_to_nan(array):
 
 def quantum_walk_data(n):
     probs = np.loadtxt("./../Max2SAT_quantum/inf_time_probs_n_" + str(n) + ".txt")
-    return np.reciprocal(probs)
+    return probs
 
 
 def adiabatic_data(n):
@@ -49,17 +49,35 @@ def bnb_data(n):
     return np.genfromtxt('./../Max2SAT_quantum/bnb/mixbnb.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 4].astype(int)
 
 
+def adams_quantum_walk_data(n):
+    return np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 2].astype(float)
+
+
+def adams_adiabatic_data(n):
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', missing_values='', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 10]
+    b = []
+    skipped = 0
+    for i, element in enumerate(a):
+        if element != '':
+            b.append(float(element))
+        else:
+            b.append(float('nan'))
+            skipped += 1
+    print("n:", n, " skipped:", skipped)
+    return np.array(b)
+
+
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=16)
+    plt.rc('font', size=26)
     plt.rcParams["figure.figsize"] = (6, 6)
 
     marker_size = 4
 
-    n = 13
+    n = 15
     fig, ax = plt.subplots()
 
-    x = adiabatic_data(n)
+    x = adams_adiabatic_data(n)
     y = bnb_data(n)
 
     min_x = np.min(x)
@@ -69,11 +87,12 @@ if __name__ == '__main__':
 
     ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
     # ax.set_ylim([8, 150])
-    ax.set_xlim([19, 34000])
-    ax.set_xlabel(r"$\langle T_{0.99} \rangle$")
-    ax.set_ylabel("calls")
-    ax.loglog()
+    # ax.set_xlim([19, 34000])
+    ax.set_xlabel(r"$T_{0.99}$")
+    ax.set_ylabel(r"$N_{calls}$")
+    ax.set_xscale('log', basex=2)
+    ax.set_yscale('log', basey=2)
 
-    # plt.tight_layout()
+    plt.tight_layout()
     # plt.show()
     plt.savefig('n_'+str(n)+'_bnb_vs_adiabatic.png', dpi=200)
