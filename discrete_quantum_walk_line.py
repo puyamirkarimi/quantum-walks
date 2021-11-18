@@ -31,8 +31,9 @@ U = S_hat.dot(np.kron(np.eye(P), C_hat))                        # walk operator
 
 posn0 = np.zeros(P)
 posn0[N] = 1                                              # array indexing starts from 0, so index N is the central posn
-#psi0 = np.kron(posn0,(coin0+coin1*1j)/np.sqrt(2.))        # initial state
-psi0 = np.kron(posn0, coin0)
+psi0 = np.kron(posn0,(coin0+coin1*1j)/np.sqrt(2.))        # initial state
+# psi0 = np.kron(posn0, coin0)
+# psi0 = np.kron(posn0, coin1)
 
 psiN = np.linalg.matrix_power(U, N).dot(psi0)
 
