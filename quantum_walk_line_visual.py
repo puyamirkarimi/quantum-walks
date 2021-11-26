@@ -1,3 +1,8 @@
+'''
+Creates a quantum walk visual to be used as a background
+in powerpoint presentations
+'''
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom
@@ -62,4 +67,6 @@ plt.plot(positions, prob, color='#68246D')
 ax.set_xlim([-70, 70])
 ax.set_ylim([-0.02, 0.1])
 #ax.tick_params(direction='in', top=True, right=True)
-plt.savefig('visual.png', dpi=400)
+
+plt.show()
+# plt.savefig('visual.png', dpi=400)
