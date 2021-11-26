@@ -194,7 +194,7 @@ def fit_and_plot2(x_array, y_array, label, y_err):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=26)
+    plt.rc('font', size=14)
     colors = ['forestgreen', 'blue', 'red', 'black']
 
     max_n_others = 20
@@ -252,7 +252,7 @@ if __name__ == '__main__':
     #     av_probs3[i] = np.sqrt(av_probs2[i])
 
     av_probs2 = np.exp2(n_array2)
-    av_probs3 = np.sqrt(n_array2)
+    av_probs3 = np.sqrt(av_probs2)
 
     fit_and_plot2(n_array, av_probs, "QW", quantum_errors)
 
@@ -274,5 +274,5 @@ if __name__ == '__main__':
     ax1.tick_params(direction='in', right=True, which='both')
     ax2.tick_params(direction='in', top=True, which='both')
     plt.tight_layout()
-    # plt.show()
-    plt.savefig('scalings.png', dpi=200)
+    plt.show()
+    # plt.savefig('scalings.png', dpi=200)

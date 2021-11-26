@@ -1,3 +1,6 @@
 *.png
 *.txt
 *.csv
+
+/.idea
+/__pycache__

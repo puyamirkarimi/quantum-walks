@@ -67,6 +67,13 @@ def bnb_data(n):
     return np.genfromtxt('./../Max2SAT_quantum/bnb/mixbnb.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 4].astype(int)
 
 
+def get_satisfiable_list(n):
+    data = np.genfromtxt('./../instance_gen/m2s_satisfiable.csv', delimiter=',', skip_header=1, dtype=str)
+    satisfiable_data = data[:, 1]
+    m = n - 5
+    return satisfiable_data[m*10000:(m+1)*10000]
+
+
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=24)
@@ -74,7 +81,7 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n = 15
+    n = 10
     fig, ax = plt.subplots()
 
     x = adams_quantum_walk_data(n)
@@ -85,14 +92,19 @@ if __name__ == '__main__':
     max_x = np.max(x)
     max_y = np.max(y)
 
-    ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
+    satisfiable = get_satisfiable_list(n).astype(int)
+    colors = ['green', 'red']
+
+    from matplotlib.colors import ListedColormap
+
+    ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, c=satisfiable, linewidths=0.8, cmap=ListedColormap(colors))
     # ax.set_xlim([8, 150])
     # ax.set_ylim([19, 34000])
     ax.set_xlabel(r"$\overline{P}(0, 100)$")
     ax.set_ylabel(r"$N_{calls}$")
-    ax.set_xscale('log', basex=2)
-    ax.set_yscale('log', basey=2)
+    ax.set_xscale('log', base=2)
+    ax.set_yscale('log', base=2)
 
-    # plt.tight_layout()
-    # plt.show()
-    plt.savefig('n_'+str(n)+'_bnb_vs_QW.png', dpi=200)
+    plt.tight_layout()
+    plt.show()
+    # plt.savefig('n_'+str(n)+'_bnb_vs_QW.png', dpi=200)

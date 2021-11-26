@@ -144,6 +144,6 @@ if __name__ == '__main__':
     ax2.set_xlabel(r"$\overline{T}_{inst}$~/~$s$")
     # ax2.set_ylabel(r"$\overline{T}_{inst}$~/~$s$")
 
-    plt.savefig('runtimes_histograms.png', dpi=200)
-    # plt.tight_layout()
-    # plt.show()
+    # plt.savefig('runtimes_histograms.png', dpi=200)
+    plt.tight_layout()
+    plt.show()

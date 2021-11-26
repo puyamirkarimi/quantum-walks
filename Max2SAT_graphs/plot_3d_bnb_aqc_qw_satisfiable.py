@@ -44,19 +44,30 @@ def log_tick_formatter(val, pos=None):
     return "{:.0f}".format(10**val)
 
 
+def get_satisfiable_list(n):
+    data = np.genfromtxt('./../Max2SAT/m2s_satisfiable.csv', delimiter=',', skip_header=1, dtype=str)
+    satisfiable_data = data[:, 1]
+    m = n - 5
+    return satisfiable_data[m*10000:(m+1)*10000]
+
+
 if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
-    n = 15
+    n = 7
 
     z = adams_quantum_walk_data(n)
     y = adams_adiabatic_data(n)
     x = bnb_data(n)
 
-    ax.scatter(np.log10(x), np.log10(y), np.log10(z), marker='.', s=3, alpha=0.17)
+    satisfiable = get_satisfiable_list(n).astype(int)
+    colors = ['green', 'red']
+    from matplotlib.colors import ListedColormap
+
+    ax.scatter(np.log10(x), np.log10(y), np.log10(z), marker='.', s=3, alpha=0.17, c=satisfiable, cmap=ListedColormap(colors))
 
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))

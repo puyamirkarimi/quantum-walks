@@ -165,40 +165,73 @@ def prob_array(filename):
     return np.loadtxt('./../../instances_original/'+filename+".m2s")
 
 
+def prob_array_paired_instances(filename):
+    return np.loadtxt('./../../instances_pairs_adam_format_5/'+filename+".txt")
+
+
+# if __name__ == '__main__':
+#     instance_names, instance_n_bits = get_instances()
+
+#     runtimes_time = np.zeros(10000)
+#     runtimes_processtime = np.zeros(10000)
+#     counts = np.zeros(10000)
+
+#     n = 10
+#     n_shifted = n - 5  # n_shifted runs from 0 to 15 instead of 5 to 20
+
+#     for loop, i in enumerate(range(n_shifted * 10000, (n_shifted + 1) * 10000)):  # 10000 instances per value of n
+#         instance_name = instance_names[i]
+#         solution = solve_m2s(n, prob_array(instance_names[i]))
+#         runtimes_time[loop] = solution['duration']
+#         runtimes_processtime[loop] = solution['duration_processtime']
+#         counts[loop] = solution['calls']
+#         if loop % 100 == 0:
+#             print("loop:", loop)
+
+#     # for loop, i in enumerate(range(n_shifted * 10000, (n_shifted + 1) * 10000)):  # 10000 instances per value of n
+#     #     instance_name = instance_names[i]
+#     #     solution = solve_m2s(n, prob_array(instance_names[i]))
+#     #     if 1 in solution['sol']:
+#     #         print("error")
+
+#     with open("adam_runtimes_time_"+str(n)+".txt", "ab") as f:         # saves time
+#         f.write(b"\n")
+#         np.savetxt(f, runtimes_time)
+
+#     with open("adam_runtimes_processtime_"+str(n)+".txt", "ab") as f:         # saves processtime
+#         f.write(b"\n")
+#         np.savetxt(f, runtimes_processtime)
+
+#     with open("adam_counts_"+str(n)+".txt", "ab") as f:         # saves counts
+#         f.write(b"\n")
+#         np.savetxt(f, counts)
+
+
 if __name__ == '__main__':
-    instance_names, instance_n_bits = get_instances()
+    '''running for the paired instances'''
 
-    runtimes_time = np.zeros(10000)
-    runtimes_processtime = np.zeros(10000)
     counts = np.zeros(10000)
+    counts_transformed = np.zeros(10000)
 
-    n = 10
-    n_shifted = n - 5  # n_shifted runs from 0 to 15 instead of 5 to 20
+    n = 5
 
-    for loop, i in enumerate(range(n_shifted * 10000, (n_shifted + 1) * 10000)):  # 10000 instances per value of n
-        instance_name = instance_names[i]
-        solution = solve_m2s(n, prob_array(instance_names[i]))
-        runtimes_time[loop] = solution['duration']
-        runtimes_processtime[loop] = solution['duration_processtime']
-        counts[loop] = solution['calls']
-        if loop % 100 == 0:
-            print("loop:", loop)
+    num_instances = 10000
 
-    # for loop, i in enumerate(range(n_shifted * 10000, (n_shifted + 1) * 10000)):  # 10000 instances per value of n
-    #     instance_name = instance_names[i]
-    #     solution = solve_m2s(n, prob_array(instance_names[i]))
-    #     if 1 in solution['sol']:
-    #         print("error")
+    for i in range(num_instances):
+        instance_name = str(n) + "_" + str(i)
+        instance_name_transformed = str(n) + "_" + str(i) + "_transformed"
+        solution = solve_m2s(n, prob_array_paired_instances(instance_name))
+        solution_transformed = solve_m2s(n, prob_array_paired_instances(instance_name_transformed))
+        counts[i] = solution['calls']
+        counts_transformed[i] = solution_transformed['calls']
+        if i % 100 == 0:
+            print("loop:", i)
 
-    with open("adam_runtimes_time_"+str(n)+".txt", "ab") as f:         # saves time
-        f.write(b"\n")
-        np.savetxt(f, runtimes_time)
-
-    with open("adam_runtimes_processtime_"+str(n)+".txt", "ab") as f:         # saves processtime
-        f.write(b"\n")
-        np.savetxt(f, runtimes_processtime)
-
-    with open("adam_counts_"+str(n)+".txt", "ab") as f:         # saves counts
+    with open("paired_counts_"+str(n)+".txt", "ab") as f:         # saves counts
         f.write(b"\n")
         np.savetxt(f, counts)
+    
+    with open("paired_transformed_counts_"+str(n)+".txt", "ab") as f:         # saves counts
+        f.write(b"\n")
+        np.savetxt(f, counts_transformed)
 

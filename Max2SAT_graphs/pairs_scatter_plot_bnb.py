@@ -2,22 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def average_data(data):
-    num_repeats = len(data[:, 0])
-    num_x_vals = len(data[0, :])
-    y_av = np.zeros(num_x_vals)
-    y_std_error = np.zeros(num_x_vals)
-
-    for x in range(num_x_vals):
-        y_av[x] = np.mean(data[:, x])
-        y_std_error[x] = np.std(data[:, x], ddof=1) / np.sqrt(num_repeats)
-
-    return y_av, y_std_error
+def bnb_data(n):
+    return np.loadtxt('./../Max2SAT_bnb/paired_counts_{}.txt'.format(n))
 
 
-def zero_to_nan(array):
-    """Replace every 0 with 'nan' and return a copy."""
-    return [float('nan') if x==0 else x for x in array]
+def bnb_data_transformed(n):
+    return np.loadtxt('./../Max2SAT_bnb/paired_transformed_counts_{}.txt'.format(n))
 
 
 def quantum_walk_data(n):
@@ -51,48 +41,50 @@ def adams_adiabatic_data(n):
     return np.array(b)
 
 
-def mask_data(data):
-    num_repeats = len(data[:, 0])
-    num_x_vals = len(data[0, :])
-    out = np.zeros((num_repeats-2, num_x_vals))
-    for x in range(num_x_vals):
-        vals = data[:, x]
-        vals1 = np.delete(vals, vals.argmin())
-        vals2 = np.delete(vals1, vals1.argmax())
-        out[:, x] = vals2
-    return out
-
-
-def bnb_data(n):
-    return np.genfromtxt('./../Max2SAT_quantum/bnb/mixbnb.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 4].astype(int)
+def get_satisfiable_list(n):
+    data = np.genfromtxt('./../instance_gen/m2s_pairs_satisfiable.csv', delimiter=',', skip_header=1, dtype=str)
+    satisfiable_data = data[:, 1]
+    m = n - 5
+    return satisfiable_data[m*10000:(m+1)*10000]
 
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=24)
+    plt.rc('font', size=26)
     plt.rcParams["figure.figsize"] = (6, 6)
 
     marker_size = 4
 
-    n = 15
+    n = 5
     fig, ax = plt.subplots()
 
-    x = adams_quantum_walk_data(n)
-    y = bnb_data(n)
+    x = bnb_data(n)
+    y = bnb_data_transformed(n)
+
+    satisfiable = get_satisfiable_list(n).astype(int)
+
+    x_av = np.mean(x)
+    y_av = np.mean(y)
+    x_err = np.std(x, ddof=1)/np.sqrt(len(x))
+    y_err = np.std(y, ddof=1)/np.sqrt(len(y))
+    print('average counts (untransformed): {} +- {}'.format(x_av, x_err))
+    print('average counts (transformed): {} +- {}'.format(y_av, y_err))
 
     min_x = np.min(x)
     min_y = np.min(y)
     max_x = np.max(x)
     max_y = np.max(y)
 
-    ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
+    colors = ['green', 'red']
+    from matplotlib.colors import ListedColormap
+
+    ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, c=satisfiable, cmap=ListedColormap(colors))
     # ax.set_xlim([8, 150])
     # ax.set_ylim([19, 34000])
-    ax.set_xlabel(r"$\overline{P}(0, 100)$")
-    ax.set_ylabel(r"$N_{calls}$")
-    ax.set_xscale('log', basex=2)
-    ax.set_yscale('log', basey=2)
+    ax.set_xlabel('Counts (untransformed instance)')
+    ax.set_ylabel('Counts (transformed instance)')
+    # ax.set_xscale('log', basex=2)
+    # ax.set_yscale('log', basey=2)
 
-    # plt.tight_layout()
-    # plt.show()
-    plt.savefig('n_'+str(n)+'_bnb_vs_QW.png', dpi=200)
+    plt.tight_layout()
+    plt.show()

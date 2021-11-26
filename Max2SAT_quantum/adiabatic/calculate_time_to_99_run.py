@@ -244,15 +244,22 @@ def run(instance_name, instances_folder, n, sparse_matrix=True, max_T=8192, n_st
     return T, success
 
 
+# if __name__ == '__main__':
+#     instance_names, instance_n_bits = get_instances()
+#
+#     # print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=True, max_T=65536, n_steps=200000))
+#
+#     i_nums = [,5902]
+#     # n=10 instances 949, 1248 too hard (max_T=32768)
+#     # n=11 instance 8571 too hard (max_T=32768)
+#     # n=12 instances 93, 2775, 3274 5160, 5354, 7385 too hard (max_T=32768)
+#     for i_num in i_nums:
+#         print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
+#               n_steps=1000000))
+
+
 if __name__ == '__main__':
     instance_names, instance_n_bits = get_instances()
 
-    # print(run(instance_names[0], "../../../instances_original/", 5, sparse_matrix=True, max_T=65536, n_steps=200000))
-
-    i_nums = [,5902]
-    # n=10 instances 949, 1248 too hard (max_T=32768)
-    # n=11 instance 8571 too hard (max_T=32768)
-    # n=12 instances 93, 2775, 3274 5160, 5354, 7385 too hard (max_T=32768)
-    for i_num in i_nums:
-        print("instance", i_num, run(instance_names[i_num + 7 * 10000], "../../../instances_original/", 12, sparse_matrix=True, max_T=32768,
+    print(run(instance_names[5 * 10000], "../../../instances_original/", 10, sparse_matrix=True, max_T=32768,
               n_steps=1000000))
