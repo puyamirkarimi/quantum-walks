@@ -4,12 +4,12 @@ import numpy as np
 
 
 def get_2sat_formula(instance_name):
-    out = np.loadtxt("./../../instances_pairs_adam_format_5/" + instance_name + ".txt")  # path of instance files in adam's format
+    out = np.loadtxt("./../../instances_pairs_adam_format/" + instance_name + ".txt")  # path of instance files in adam's format
     return out.astype(int)
 
 
 if __name__ == '__main__':
-    n = 5
+    n = 10
     num_instances = 10000
     out = np.zeros((num_instances, 2), dtype=(np.str_, 25))
 
@@ -29,4 +29,4 @@ if __name__ == '__main__':
         if i % 1000 == 0:
             print(i, 'done')
 
-    np.savetxt('m2s_pairs_satisfiable.csv', out, delimiter=',', fmt='%s', header='id,satisfiable')
+    np.savetxt('m2s_pairs_satisfiable_10.csv', out, delimiter=',', fmt='%s', header='id,satisfiable')

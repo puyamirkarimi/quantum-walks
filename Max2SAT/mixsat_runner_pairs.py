@@ -16,7 +16,7 @@ if __name__ == '__main__':
     states_count = np.zeros(10000)
     states_count_transformed = np.zeros(10000)
 
-    n = 5
+    n = 10
 
     num_instances = 10000
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         instance_name_transformed = str(n) + "_" + str(i) + "_transformed"
 
         time_start_inst = time.process_time()
-        result = subprocess.run(['./../../mixsat/complete', './../../instances_pairs_5/'+instance_name+'.gz'], stdout=subprocess.PIPE)
+        result = subprocess.run(['./../../mixsat/complete', './../../instances_pairs/'+instance_name+'.gz'], stdout=subprocess.PIPE)
         time_end_inst = time.process_time()
         runtime = time_end_inst - time_start_inst
         runtimes[i] = runtime

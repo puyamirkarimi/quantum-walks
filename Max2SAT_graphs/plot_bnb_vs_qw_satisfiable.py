@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n = 10
+    n = 20
     fig, ax = plt.subplots()
 
     x = adams_quantum_walk_data(n)

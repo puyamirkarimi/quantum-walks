@@ -23,10 +23,10 @@ if __name__ == '__main__':
     plt.rc('font', size=14)
 
 
-    n = 8
+    n = 20
     counts_list = []
 
-    num_bins = 60
+    num_bins = 50
 
     counts = counts_data(n)
     satisfiable_list = get_satisfiable_list(n)
@@ -42,10 +42,10 @@ if __name__ == '__main__':
     counts_list.append(np.array(satisfiable_counts))
     counts_list.append(np.array(unsatisfiable_counts))
 
-    min_runtime = np.min(counts_list[1])
-    max_runtime = np.max(counts_list[1])
+    min_runtime = np.min((np.min(counts_list[0]), np.min(counts_list[1])))
+    max_runtime = np.max((np.max(counts_list[0]), np.max(counts_list[1])))
 
-    x = np.linspace(min_runtime, max_runtime, num=num_bins)
+    x = np.linspace(min_runtime, max_runtime, num=num_bins+1)
 
     plt.figure()
     # for i_adam, n in enumerate(n_list):

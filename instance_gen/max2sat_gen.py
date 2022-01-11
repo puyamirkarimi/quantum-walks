@@ -141,7 +141,7 @@ def generate_max2sat_pair(nqubits, nclauses, ensure_unique_solution=True):
 
 
 def make_file(name, formula, num_var, num_cls):
-    with open("./../../instances_pairs_5/"+name+".gz", 'w') as file:
+    with open("./../../instances_pairs/"+name+".gz", 'w') as file:
         file.write('p cnf '+str(num_var)+' '+str(num_cls)+'\n')
         for clause in range(num_cls):
             sign_1 = formula[clause, 0]
@@ -152,7 +152,7 @@ def make_file(name, formula, num_var, num_cls):
 
 
 def make_file_wcnf(name, formula, num_var, num_cls):
-    with open("./../../instances_pairs_wcnf_5/"+name+'.txt', 'w') as file:    # path of output instance files in WCNF format
+    with open("./../../instances_pairs_wcnf/"+name+'.txt', 'w') as file:    # path of output instance files in WCNF format
         file.write('p wcnf '+str(num_var)+' '+str(num_cls)+'\n')
         for clause in range(num_cls):
             sign_1 = formula[clause, 0]
@@ -192,7 +192,7 @@ def make_file_wcnf(name, formula, num_var, num_cls):
 if __name__ == '__main__':
 
     num_instances = 10000
-    n = 5
+    n = 10
     num_clauses = 3 * n
 
     for i in range(num_instances):
@@ -203,8 +203,8 @@ if __name__ == '__main__':
         make_file(instance_name_transformed, instance_transformed, n, num_clauses)
         make_file_wcnf(instance_name, instance, n, num_clauses)
         make_file_wcnf(instance_name_transformed, instance_transformed, n, num_clauses)
-        np.savetxt("./../../instances_pairs_adam_format_5/" + instance_name + ".txt", instance)
-        np.savetxt("./../../instances_pairs_adam_format_5/" + instance_name_transformed + ".txt", instance_transformed)
+        np.savetxt("./../../instances_pairs_adam_format/" + instance_name + ".txt", instance)
+        np.savetxt("./../../instances_pairs_adam_format/" + instance_name_transformed + ".txt", instance_transformed)
         if i % 100 == 0:
             print(i)
     print("Done")

@@ -15,7 +15,7 @@ if __name__ == '__main__':
     runtimes = np.zeros(10000)
     runtimes_transformed = np.zeros(10000)
 
-    n = 5
+    n = 10
 
     num_instances = 10000
 
@@ -23,13 +23,13 @@ if __name__ == '__main__':
         instance_name = str(n) + "_" + str(i)
         instance_name_transformed = str(n) + "_" + str(i) + "_transformed"
 
-        wcnf = WCNF(from_file='./../../instances_pairs_wcnf_5/'+instance_name+'.txt')
+        wcnf = WCNF(from_file='./../../instances_pairs_wcnf/'+instance_name+'.txt')
         with RC2(wcnf) as rc2:
             rc2.compute()
             runtime = rc2.oracle_time()
         runtimes[i] = runtime
 
-        wcnf = WCNF(from_file='./../../instances_pairs_wcnf_5/'+instance_name_transformed+'.txt')
+        wcnf = WCNF(from_file='./../../instances_pairs_wcnf/'+instance_name_transformed+'.txt')
         with RC2(wcnf) as rc2:
             rc2.compute()
             runtime = rc2.oracle_time()

@@ -23,10 +23,10 @@ if __name__ == '__main__':
     plt.rc('font', size=14)
 
 
-    n = 20
+    n = 9
     counts_list = []
 
-    num_bins = 60
+    num_bins = 50
 
     counts = adams_quantum_walk_data(n)
     satisfiable_list = get_satisfiable_list(n)
@@ -42,11 +42,18 @@ if __name__ == '__main__':
     counts_list.append(np.array(satisfiable_counts))
     counts_list.append(np.array(unsatisfiable_counts))
 
-    min_runtime = np.min(counts_list[1])
-    max_runtime = np.max(counts_list[1])
-    max_runtime = 0.002
+    min_runtime = np.min((np.min(counts_list[0]), np.min(counts_list[1])))
+    max_runtime = np.max((np.max(counts_list[0]), np.max(counts_list[1])))
+    # max_runtime = 0.002
 
-    x = np.linspace(min_runtime, max_runtime, num=num_bins)
+    x = np.linspace(min_runtime, max_runtime, num=num_bins+1)
+
+    x_logarithmic = np.ones(num_bins+1) * min_runtime
+    multiply_factor = 2**((np.log(max_runtime)-np.log(min_runtime))/num_bins)
+    x_logarithmic = [x_logarithmic[i] * multiply_factor**i for i in range(len(x_logarithmic))]
+
+    sat_average = np.mean(counts_list[0])
+    unsat_average = np.mean(counts_list[1])
 
     plt.figure()
     # for i_adam, n in enumerate(n_list):
@@ -56,6 +63,8 @@ if __name__ == '__main__':
     # plt.ylim([0.6, 1e4])
     plt.hist(counts_list[0], x, color='red', align='mid', rwidth=0.5, density=True, label='satisfiable')
     plt.hist(counts_list[1], x, color='green', align='left', rwidth=0.5, density=True, label='unsatisfiable')
+    plt.vlines(sat_average, 0, 35, color='black')
+    plt.vlines(unsat_average, 0, 35, color='black', linestyle='--')
     # plt.yscale('log')
 
     plt.xlabel(r"$\overline{P}(0, 100)$")
@@ -68,3 +77,26 @@ if __name__ == '__main__':
     # plt.tight_layout()
     # plt.savefig('probability_histogram.png', dpi=200)
     plt.show()
+
+
+    # ############################ LOGARITHMIC PLOT ###############################
+    # plt.figure()
+    # # for i_adam, n in enumerate(n_list):
+    # #     plt.scatter(x, y_adam[i_adam], label="n="+str(n), marker='+')
+    # # plt.errorbar(x, runtimes_average, runtimes_standard_error)
+    # # plt.xlim([0, 100])
+    # # plt.ylim([0.6, 1e4])
+    # plt.hist(counts_list[0], x_logarithmic, color='red', align='mid', rwidth=0.5, density=True, label='satisfiable')
+    # plt.hist(counts_list[1], x_logarithmic, color='green', align='left', rwidth=0.5, density=True, label='unsatisfiable')
+    # plt.xscale('log')
+
+    # plt.xlabel(r"$\overline{P}(0, 100)$")
+    # plt.ylabel("Normalised probability")
+
+    # plt.legend()
+
+    # plt.tick_params(direction='in', top=True, right=True, which='both')
+    # # ax2.set_ylabel(r"$\overline{T}_{inst}$~/~$s$")
+    # # plt.tight_layout()
+    # # plt.savefig('probability_histogram.png', dpi=200)
+    # plt.show()

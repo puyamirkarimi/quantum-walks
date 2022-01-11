@@ -42,16 +42,15 @@ def adams_adiabatic_data(n):
 
 
 def get_satisfiable_list(n):
-    data = np.genfromtxt('./../instance_gen/m2s_pairs_satisfiable.csv', delimiter=',', skip_header=1, dtype=str)
+    data = np.genfromtxt('./../instance_gen/m2s_pairs_satisfiable_{}.csv'.format(n), delimiter=',', skip_header=1, dtype=str)
     satisfiable_data = data[:, 1]
-    m = n - 5
-    return satisfiable_data[m*10000:(m+1)*10000]
+    return satisfiable_data
 
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=26)
-    plt.rcParams["figure.figsize"] = (6, 6)
+    plt.rcParams["figure.figsize"] = (8, 6)
 
     marker_size = 4
 
@@ -81,10 +80,11 @@ if __name__ == '__main__':
     ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, c=satisfiable, cmap=ListedColormap(colors))
     # ax.set_xlim([8, 150])
     # ax.set_ylim([19, 34000])
-    ax.set_xlabel('Counts (untransformed instance)')
-    ax.set_ylabel('Counts (transformed instance)')
+    ax.set_xlabel('Calls (untransformed instance)')
+    ax.set_ylabel('Calls (transformed instance)')
     # ax.set_xscale('log', basex=2)
     # ax.set_yscale('log', basey=2)
 
     plt.tight_layout()
     plt.show()
+    # plt.savefig('bnb_instance_pairs_scatter_plot_5.png', dpi=200)

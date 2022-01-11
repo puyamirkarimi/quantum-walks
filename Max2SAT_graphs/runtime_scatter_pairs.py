@@ -35,11 +35,23 @@ def zero_to_nan(array):
 
 def runtimes_data(n, name):
     if name == "mixsat":
-        runtimes = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT/pairs_runtimes_"+str(n)+".txt").reshape((-1, 10000))
     elif name == "pysat":
-        runtimes = np.loadtxt("./../Max2SAT_pysat/adam_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_pysat/pairs_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
     elif name == "branch and bound":
-        runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_bnb/pairs_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+    else:
+        raise Exception
+    return average_data(runtimes)
+
+
+def runtimes_data_transformed(n, name):
+    if name == "mixsat":
+        runtimes = np.loadtxt("./../Max2SAT/pairs_transformed_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    elif name == "pysat":
+        runtimes = np.loadtxt("./../Max2SAT_pysat/pairs_transformed_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+    elif name == "branch and bound":
+        runtimes = np.loadtxt("./../Max2SAT_bnb/pairs_runtimes_transformed_processtime_" + str(n) + ".txt").reshape((-1, 10000))
     else:
         raise Exception
     return average_data(runtimes)
@@ -47,11 +59,23 @@ def runtimes_data(n, name):
 
 def runtimes_data_unaveraged(n, name):
     if name == "mixsat":
-        runtimes = np.loadtxt("./../Max2SAT/adam_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT/pairs_runtimes_"+str(n)+".txt").reshape((-1, 10000))
     elif name == "pysat":
-        runtimes = np.loadtxt("./../Max2SAT_pysat/adam_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_pysat/pairs_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
     elif name == "branch and bound":
-        runtimes = np.loadtxt("./../Max2SAT_bnb/adam_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+        runtimes = np.loadtxt("./../Max2SAT_bnb/pairs_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
+    else:
+        raise Exception
+    return runtimes
+
+
+def runtimes_data_unaveraged_transformed(n, name):
+    if name == "mixsat":
+        runtimes = np.loadtxt("./../Max2SAT/pairs_transformed_runtimes_"+str(n)+".txt").reshape((-1, 10000))
+    elif name == "pysat":
+        runtimes = np.loadtxt("./../Max2SAT_pysat/pairs_transformed_runtimes_" + str(n) + ".txt").reshape((-1, 10000))
+    elif name == "branch and bound":
+        runtimes = np.loadtxt("./../Max2SAT_bnb/pairs_transformed_runtimes_processtime_" + str(n) + ".txt").reshape((-1, 10000))
     else:
         raise Exception
     return runtimes
@@ -59,19 +83,28 @@ def runtimes_data_unaveraged(n, name):
 
 def counts_data(n, name):
     if name == "mixsat":
-        counts = np.loadtxt("./../Max2SAT/adam_counts_"+str(n)+".txt").reshape((-1, 10000))
+        counts = np.loadtxt("./../Max2SAT/pairs_counts_"+str(n)+".txt").reshape((-1, 10000))
     elif name == "branch and bound":
-        counts = np.loadtxt("./../Max2SAT_bnb/adam_counts_" + str(n) + ".txt").reshape((-1, 10000))
+        counts = np.loadtxt("./../Max2SAT_bnb/pairs_counts_" + str(n) + ".txt").reshape((-1, 10000))
+    else:
+        raise Exception
+    return average_data(counts)
+
+
+def counts_data_transformed(n, name):
+    if name == "mixsat":
+        counts = np.loadtxt("./../Max2SAT/pairs_transformed_counts_"+str(n)+".txt").reshape((-1, 10000))
+    elif name == "branch and bound":
+        counts = np.loadtxt("./../Max2SAT_bnb/pairs_transformed_counts_" + str(n) + ".txt").reshape((-1, 10000))
     else:
         raise Exception
     return average_data(counts)
 
 
 def get_satisfiable_list(n):
-    data = np.genfromtxt('./../instance_gen/m2s_satisfiable.csv', delimiter=',', skip_header=1, dtype=str)
+    data = np.genfromtxt('./../instance_gen/m2s_pairs_satisfiable_{}.csv'.format(n), delimiter=',', skip_header=1, dtype=str)
     satisfiable_data = data[:, 1]
-    m = n - 5
-    return satisfiable_data[m*10000:(m+1)*10000]
+    return satisfiable_data
 
 
 if __name__ == '__main__':
@@ -80,8 +113,8 @@ if __name__ == '__main__':
     plt.rcParams["figure.figsize"] = (10, 4.8)
 
     marker_size = 4
+    n = 5
 
-    n_list = [5, 20]
     x_solver = "pysat"
     y_solver = "mixsat"
     x_label = "RC2"
@@ -90,71 +123,105 @@ if __name__ == '__main__':
     # RUNTIMES SCATTER
     fig, (ax1, ax2) = plt.subplots(1, 2)
 
-    for n in n_list:
-        x_raw_unmasked = runtimes_data_unaveraged(n, x_solver)
-        y_raw_unmasked = runtimes_data_unaveraged(n, y_solver)
-        x_raw = mask_data(x_raw_unmasked)
-        y_raw = mask_data(y_raw_unmasked)
+    ######## LEFT PLOT
+    x_raw_unmasked = runtimes_data_unaveraged(n, x_solver)
+    y_raw_unmasked = runtimes_data_unaveraged(n, y_solver)
+    x_raw = mask_data(x_raw_unmasked)
+    y_raw = mask_data(y_raw_unmasked)
 
-        limit = 1000
-        r = np.corrcoef(np.swapaxes(x_raw, 0, 1)[:limit,:], np.swapaxes(y_raw, 0, 1)[:limit,:])[1, 0]
-        print(np.shape(np.swapaxes(x_raw, 0, 1)))
-        print("n=", n)
-        print("R:", r)
+    limit = 1000
+    r = np.corrcoef(np.swapaxes(x_raw, 0, 1)[:limit,:], np.swapaxes(y_raw, 0, 1)[:limit,:])[1, 0]
+    print(np.shape(np.swapaxes(x_raw, 0, 1)))
+    print("n=", n)
+    print("R:", r)
 
-        x = average_data(x_raw)[0]
-        y = average_data(y_raw)[0]
+    x = average_data(x_raw)[0]
+    y = average_data(y_raw)[0]
 
-        print(pearsonr(x, y))
+    print(pearsonr(x, y))
 
-        if n == 5:
-            min_x = np.min(x)
-        min_y = np.min(y)
-        max_x = np.max(x)
-        max_y = np.max(y)
+    min_x = np.min(x)
+    min_y = np.min(y)
+    max_x = np.max(x)
+    max_y = np.max(y)
 
-        x_satisfiable = []
-        y_satisfiable = []
-        x_unsatisfiable = []
-        y_unsatisfiable = []
+    x_satisfiable = []
+    y_satisfiable = []
+    x_unsatisfiable = []
+    y_unsatisfiable = []
 
-        satisfiable = get_satisfiable_list(n)
+    satisfiable = get_satisfiable_list(n)
 
-        for i in range(len(x)):
-            if int(satisfiable[i]) == 1:
-                x_satisfiable.append(x[i])
-                y_satisfiable.append(y[i])
-            elif int(satisfiable[i]) == 0:
-                x_unsatisfiable.append(x[i])
-                y_unsatisfiable.append(y[i])
+    for i in range(len(x)):
+        if int(satisfiable[i]) == 1:
+            x_satisfiable.append(x[i])
+            y_satisfiable.append(y[i])
+        elif int(satisfiable[i]) == 0:
+            x_unsatisfiable.append(x[i])
+            y_unsatisfiable.append(y[i])
 
+    ax1.scatter(x_satisfiable, y_satisfiable, label="n={} (satisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='red')
+    ax1.scatter(x_unsatisfiable, y_unsatisfiable, label="n={} (unsatisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='green')
+    # ax1.set_xlim([min_x, max_x])
+    # ax1.set_ylim([min_y, max_y])
+    ax1.set_xlabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + x_label + ")")
+    ax1.set_ylabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + y_label + ")")
+    # ax1.set_yticks([5e-3, 10e-2, 20e-2])
+    # plt.legend()
+    ax1.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
+    ax1.loglog()
 
-        if n == 5:
-            ax1.scatter(x_satisfiable, y_satisfiable, label="n={} (satisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='red')
-            ax1.scatter(x_unsatisfiable, y_unsatisfiable, label="n={} (unsatisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='green')
-            # ax1.set_xlim([min_x, max_x])
-            # ax1.set_ylim([min_y, max_y])
-            ax1.set_xlabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + x_label + ")")
-            ax1.set_ylabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + y_label + ")")
-            # ax1.set_yticks([5e-3, 10e-2, 20e-2])
-            # plt.legend()
-            ax1.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
-            ax1.loglog()
-        if n == 20:
-            max_y = 0.02
-            min_x = 3e-5
-            min_y = 4.5e-3
-            ax2.scatter(x_satisfiable, y_satisfiable, label="n={} (satisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='red')
-            ax2.scatter(x_unsatisfiable, y_unsatisfiable, label="n={} (unsatisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='green')
-            # ax1.set_xlim([min_x, max_x])
-            # ax1.set_ylim([min_y, max_y])
-            ax2.set_xlim([min_x, max_x])
-            ax2.set_ylim([min_y, max_y])
-            ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
-            ax2.set_xlabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + x_label + ")")
-            # ax2.set_ylabel(r"$\langle T_{inst} \rangle$~/~$s$~~" + "(" + y_label + ")")
-            # plt.legend()
-            ax2.loglog()
+    ###### RIGHT PLOT
+    x_raw_unmasked = runtimes_data_unaveraged_transformed(n, x_solver)
+    y_raw_unmasked = runtimes_data_unaveraged_transformed(n, y_solver)
+    x_raw = mask_data(x_raw_unmasked)
+    y_raw = mask_data(y_raw_unmasked)
+
+    limit = 1000
+    r = np.corrcoef(np.swapaxes(x_raw, 0, 1)[:limit,:], np.swapaxes(y_raw, 0, 1)[:limit,:])[1, 0]
+    print(np.shape(np.swapaxes(x_raw, 0, 1)))
+    print("n=", n)
+    print("R:", r)
+
+    x = average_data(x_raw)[0]
+    y = average_data(y_raw)[0]
+
+    print(pearsonr(x, y))
+
+    min_x = np.min(x)
+    min_y = np.min(y)
+    max_x = np.max(x)
+    max_y = np.max(y)
+
+    x_satisfiable = []
+    y_satisfiable = []
+    x_unsatisfiable = []
+    y_unsatisfiable = []
+
+    satisfiable = get_satisfiable_list(n)
+
+    for i in range(len(x)):
+        if int(satisfiable[i]) == 1:
+            x_satisfiable.append(x[i])
+            y_satisfiable.append(y[i])
+        elif int(satisfiable[i]) == 0:
+            x_unsatisfiable.append(x[i])
+            y_unsatisfiable.append(y[i])
+    
+    # max_y = 0.02
+    # min_x = 3e-5
+    # min_y = 4.5e-3
+    ax2.scatter(x_satisfiable, y_satisfiable, label="n={} (satisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='red')
+    ax2.scatter(x_unsatisfiable, y_unsatisfiable, label="n={} (unsatisfiable instances)".format(n), marker='.', s=marker_size, linewidths=0, color='green')
+    # ax1.set_xlim([min_x, max_x])
+    # ax1.set_ylim([min_y, max_y])
+    ax2.set_xlim([min_x, max_x])
+    ax2.set_ylim([min_y, max_y])
+    ax2.tick_params(direction='in', top=True, right=True, which='both', labelleft=False)
+    ax2.set_xlabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + x_label + ")")
+    # ax2.set_ylabel(r"$\langle T_{inst} \rangle$~/~$s$~~" + "(" + y_label + ")")
+    # plt.legend()
+    ax2.loglog()
 
     plt.tight_layout()
     plt.show()
