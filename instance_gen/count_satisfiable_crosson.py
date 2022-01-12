@@ -3,12 +3,6 @@ import time
 import numpy as np
 
 
-def get_instances():
-    """returns array of instance names, array of corresponding n"""
-    instance_data = np.genfromtxt('m2s_nqubits.csv', delimiter=',', skip_header=1, dtype=str)    # path of csv file
-    return instance_data[:, 0], instance_data[:, 1]
-
-
 def get_2sat_formula(instance_name):
     out = np.loadtxt("./../../instances_crosson/" + instance_name + ".m2s")  # path of instance files in adam's format
     return out.astype(int)
