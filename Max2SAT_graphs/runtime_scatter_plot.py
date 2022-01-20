@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats.stats import pearsonr
+from scipy.stats.stats import spearmanr
 
 
 def average_data(data):
@@ -74,7 +75,7 @@ if __name__ == '__main__':
 
     marker_size = 4
 
-    n_list = [10, 20]
+    n_list = [15, 20]
     x_solver = "pysat"
     y_solver = "mixsat"
     x_label = "RC2"
@@ -98,21 +99,22 @@ if __name__ == '__main__':
         x = average_data(x_raw)[0]
         y = average_data(y_raw)[0]
 
-        print(pearsonr(x, y))
+        print("Pearson correlation coeff:", pearsonr(x, y))
+        print("Spearman rank correlation coeff:", spearmanr(x, y))
 
-        if n == 10:
+        if n == 15:
             min_x = np.min(x)
         min_y = np.min(y)
         max_x = np.max(x)
         max_y = np.max(y)
 
-        if n == 10:
-            ax1.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, color='deeppink')
+        if n == 15:
+            ax1.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
             # ax1.set_xlim([min_x, max_x])
             # ax1.set_ylim([min_y, max_y])
             ax1.set_xlabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + x_label + ")")
             ax1.set_ylabel(r"$\overline{T}_{inst}$~/~$s$~~" + "(for " + y_label + ")")
-            ax1.set_yticks([5e-3, 10e-2, 20e-2])
+            # ax1.set_yticks([5e-3, 10e-2, 20e-2])
             # plt.legend()
             ax1.tick_params(direction='in', top=True, right=True, which='both')
             ax1.loglog()
@@ -120,7 +122,7 @@ if __name__ == '__main__':
             max_y = 0.02
             min_x = 3e-5
             min_y = 4.5e-3
-            ax2.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, color='mediumblue')
+            ax2.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0)
             ax1.set_xlim([min_x, max_x])
             ax1.set_ylim([min_y, max_y])
             ax2.set_xlim([min_x, max_x])
@@ -132,8 +134,8 @@ if __name__ == '__main__':
             ax2.loglog()
 
     plt.tight_layout()
+    plt.savefig('classical_runtimes_scatters.pdf', dpi=200)
     plt.show()
-    # plt.savefig('classical_runtimes_scatters.png', dpi=200)
 
 
 

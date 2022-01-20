@@ -2,6 +2,7 @@
 *.jpg
 *.txt
 *.csv
+*.pdf
 
 /.idea
 /__pycache__

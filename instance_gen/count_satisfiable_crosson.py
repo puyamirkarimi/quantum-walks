@@ -23,5 +23,5 @@ if __name__ == '__main__':
         if unsatisfied == 0:
             num_satisfiable += 1
         
-    print('The number of satisfiable instances for n={} is {}.'.format(n, num_satisfiable))
+    print('The number of satisfiable Crosson instances for is {}.'.format(num_satisfiable))
         

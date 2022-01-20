@@ -52,15 +52,15 @@ if __name__ == '__main__':
     num_bins = 20
 
     for i, n in enumerate(n_list):
-        qw_probs_list = []
+        qw_inverse_probs_list = []
         aqc_times_list = []
 
-        qw_probs = adams_quantum_walk_data(n)
+        qw_inverse_probs = 1 / adams_quantum_walk_data(n)
         aqc_times = adams_adiabatic_data(n)
         satisfiable_list = get_satisfiable_list(n).astype(int)
 
-        probs_satisfiable = np.delete(qw_probs, np.where(satisfiable_list == 0))
-        probs_unsatisfiable = np.delete(qw_probs, np.where(satisfiable_list == 1))
+        inverse_probs_satisfiable = np.delete(qw_inverse_probs, np.where(satisfiable_list == 0))
+        inverse_probs_unsatisfiable = np.delete(qw_inverse_probs, np.where(satisfiable_list == 1))
 
         times_satisfiable = np.delete(aqc_times, np.where(satisfiable_list == 0))
         times_unsatisfiable = np.delete(aqc_times, np.where(satisfiable_list == 1))
@@ -69,13 +69,13 @@ if __name__ == '__main__':
         times_satisfiable = np.delete(times_satisfiable, np.where(np.isnan(times_satisfiable)))
         times_unsatisfiable = np.delete(times_unsatisfiable, np.where(np.isnan(times_unsatisfiable)))
         
-        min_prob = np.min((np.min(probs_satisfiable), np.min(probs_unsatisfiable)))
-        max_prob = np.max((np.max(probs_satisfiable), np.max(probs_unsatisfiable)))
+        min_inverse_prob = np.min((np.min(inverse_probs_satisfiable), np.min(inverse_probs_unsatisfiable)))
+        max_inverse_prob = np.max((np.max(inverse_probs_satisfiable), np.max(inverse_probs_unsatisfiable)))
 
         min_time = np.min((np.min(times_satisfiable), np.min(times_unsatisfiable)))
         max_time = np.max((np.max(times_satisfiable), np.max(times_unsatisfiable)))
 
-        x_qw = np.linspace(min_prob-0.00001, max_prob+0.00001, num=num_bins+1)
+        x_qw = np.linspace(min_inverse_prob-0.1, max_inverse_prob+0.1, num=num_bins+1)
         x_aqc = np.linspace(min_time-0.1, max_time+0.1, num=num_bins+1)
 
         x_logarithmic = np.ones(num_bins+1) * min_time
@@ -84,21 +84,21 @@ if __name__ == '__main__':
         x_logarithmic[-1] += 1
         print(max_time)
 
-        sat_average_qw = np.median(probs_satisfiable)
-        unsat_average_qw = np.median(probs_unsatisfiable)
+        sat_average_qw = np.median(inverse_probs_satisfiable)
+        unsat_average_qw = np.median(inverse_probs_unsatisfiable)
 
         sat_average_aqc = np.median(times_satisfiable)
         unsat_average_aqc = np.median(times_unsatisfiable)
 
-        axs[i].hist(probs_unsatisfiable, x_qw, color='forestgreen', alpha=0.75, density=True, label='unsatisfiable')
-        axs[i].hist(probs_satisfiable, x_qw, color='red', alpha=0.75, density=True, label='satisfiable')
+        axs[i].hist(inverse_probs_unsatisfiable, x_qw, color='forestgreen', alpha=0.75, density=True, label='unsatisfiable')
+        axs[i].hist(inverse_probs_satisfiable, x_qw, color='red', alpha=0.75, density=True, label='satisfiable')
         ylim = axs[i].get_ylim()
         axs[i].vlines(sat_average_qw, 0, ylim[1], color='black', linestyle='--')
         axs[i].vlines(unsat_average_qw, 0, ylim[1], color='black')
         axs[i].set_ylim(ylim)
         axs[i].set_xlabel(r"$\overline{P}(0, 100)$")
         axs[0].set_ylabel("Probability density")
-        axs[i].set_xlim((min_prob, max_prob))
+        axs[i].set_xlim((min_inverse_prob, max_inverse_prob))
         # axs[i].legend()
 
 
@@ -131,5 +131,5 @@ if __name__ == '__main__':
 
     plt.tick_params(direction='in', top=True, right=True, which='both')
     plt.tight_layout()
-    plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable.pdf', dpi=200)
+    # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable.pdf', dpi=200)
     plt.show()

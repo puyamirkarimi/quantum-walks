@@ -157,8 +157,8 @@ if __name__ == '__main__':
             ax2.loglog()
 
     plt.tight_layout()
-    plt.show()
     # plt.savefig('classical_runtimes_scatters.png', dpi=200)
+    plt.show()
 
 
 

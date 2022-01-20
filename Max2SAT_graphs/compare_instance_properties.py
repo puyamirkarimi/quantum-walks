@@ -301,12 +301,12 @@ def get_2sat_formula(instance_name):
 
 
 def adams_quantum_walk_data(n):
-    return np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 2].astype(float)
+    return np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str).astype(float)
 
 
 def adams_adiabatic_data(n):
     '''returns time required to get 0.99 success probability'''
-    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', missing_values='', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 10]
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', missing_values='', skip_header=1+(n-5)*10000, usecols=10, max_rows=10000, dtype=str)
     b = []
     skipped = 0
     for i, element in enumerate(a):
@@ -440,28 +440,24 @@ small_occurance_fraction_crosson = fraction_of_formulae_with_small_occurance_var
 # %%
 # plot small occurance graphs
 
-plt.figure()
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
 for decile in deciles:
-    plt.plot(n_array_qw, small_occurance_fraction_qw_deciles[decile, :], color=decile_colors_1[decile])
-plt.plot(n_array_qw, small_occurance_fraction_qw_hardest, color='blue')
-plt.plot(n_array_qw, small_occurance_fraction_qw_easiest, color='gold')
-plt.scatter(20, small_occurance_fraction_crosson, color='red')
-plt.xlabel(r'$n$')
-plt.ylabel(r'Fraction of instances with a\\variable that only shows up once')
-plt.tight_layout()
-plt.savefig('single_occurance_variable_fraction_qw.jpg', dpi=200)
-plt.show()
+    ax1.plot(n_array_qw, small_occurance_fraction_qw_deciles[decile, :], color=decile_colors_1[decile])
+ax1.plot(n_array_qw, small_occurance_fraction_qw_hardest, color='blue')
+ax1.plot(n_array_qw, small_occurance_fraction_qw_easiest, color='gold')
+ax1.scatter(20, small_occurance_fraction_crosson, color='red')
+ax1.set_xlabel(r'$n$')
+ax1.set_ylabel(r'Fraction of instances with a\\variable that only shows up once')
 
-plt.figure()
 for decile in deciles:
-    plt.plot(n_array_aqc, small_occurance_fraction_aqc_deciles[decile, :], color=decile_colors_1[decile])
-plt.plot(n_array_aqc, small_occurance_fraction_aqc_hardest, color='blue')
-plt.plot(n_array_aqc, small_occurance_fraction_aqc_easiest, color='gold')
-plt.scatter(20, small_occurance_fraction_crosson, color='red')
-plt.xlabel(r'n')
-plt.ylabel(r'Fraction of instances with a\\variable that only shows up once')
+    ax2.plot(n_array_aqc, small_occurance_fraction_aqc_deciles[decile, :], color=decile_colors_1[decile])
+ax2.plot(n_array_aqc, small_occurance_fraction_aqc_hardest, color='blue')
+ax2.plot(n_array_aqc, small_occurance_fraction_aqc_easiest, color='gold')
+ax2.scatter(20, small_occurance_fraction_crosson, color='red')
+ax2.set_xlabel(r'n')
+# ax2.set_ylabel(r'Fraction of instances with a\\variable that only shows up once')
 plt.tight_layout()
-plt.savefig('single_occurance_variable_fraction_aqc.jpg', dpi=200)
+plt.savefig('single_occurance_variable_fraction.pdf', dpi=200)
 plt.show()
 
 # # %%
@@ -511,28 +507,23 @@ small_differences_fraction_crosson = fraction_small_differences_many_formulae(cr
 # %%
 # plot small differences graphs
 
-plt.figure()
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
 for decile in deciles:
-    plt.plot(n_array_qw, small_differences_fraction_qw_deciles[decile, :], color=decile_colors_1[decile])
-plt.plot(n_array_qw, small_differences_fraction_qw_hardest, color='blue')
-plt.plot(n_array_qw, small_differences_fraction_qw_easiest, color='gold')
-plt.scatter(20, small_differences_fraction_crosson, color='red')
-plt.xlabel(r'$n$')
-plt.ylabel(r"Fraction of variables which are\\'balanced' up to a difference of 1")
-plt.tight_layout()
-plt.savefig('balanced_variable_fraction_qw.jpg', dpi=200)
-plt.show()
+    ax1.plot(n_array_qw, small_differences_fraction_qw_deciles[decile, :], color=decile_colors_1[decile])
+ax1.plot(n_array_qw, small_differences_fraction_qw_hardest, color='blue')
+ax1.plot(n_array_qw, small_differences_fraction_qw_easiest, color='gold')
+ax1.scatter(20, small_differences_fraction_crosson, color='red')
+ax1.set_xlabel(r'$n$')
+ax1.set_ylabel(r"Fraction of variables which are\\'balanced' up to a difference of 1")
 
-plt.figure()
 for decile in deciles:
-    plt.plot(n_array_aqc, small_differences_fraction_aqc_deciles[decile, :], color=decile_colors_1[decile])
-plt.plot(n_array_aqc, small_differences_fraction_aqc_hardest, color='blue')
-plt.plot(n_array_aqc, small_differences_fraction_aqc_easiest, color='gold')
-plt.scatter(20, small_differences_fraction_crosson, color='red')
-plt.xlabel(r'$n$')
-plt.ylabel(r"Fraction of variables which are\\'balanced' up to a difference of 1")
+    ax2.plot(n_array_aqc, small_differences_fraction_aqc_deciles[decile, :], color=decile_colors_1[decile])
+ax2.plot(n_array_aqc, small_differences_fraction_aqc_hardest, color='blue')
+ax2.plot(n_array_aqc, small_differences_fraction_aqc_easiest, color='gold')
+ax2.scatter(20, small_differences_fraction_crosson, color='red')
+ax2.set_xlabel(r'$n$')
 plt.tight_layout()
-plt.savefig('balanced_variable_fraction_aqc.jpg', dpi=200)
+plt.savefig('balanced_variable_fraction.pdf', dpi=200)
 plt.show()
 
 
@@ -586,24 +577,19 @@ for i, n in enumerate(n_array_energy_spreads):
 # %%
 # plot energy spreads graphs
 
-plt.figure()
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
 for decile in deciles:
-    plt.plot(n_array_energy_spreads, average_energy_spreads_qw_deciles[decile, :], color=decile_colors_1[decile])
-plt.plot(n_array_energy_spreads, average_energy_spreads_qw_hardest, color='blue')
-plt.plot(n_array_energy_spreads, average_energy_spreads_qw_easiest, color='gold')
-plt.xlabel(r'$n$')
-plt.ylabel(r'$\left\langle E^{(P)}_{N-1} - E^{(P)}_0 \right\rangle$ (QW deciles)')
-plt.tight_layout()
-plt.savefig('instance_energy_spread_qw.jpg', dpi=200)
-plt.show()
+    ax1.plot(n_array_energy_spreads, average_energy_spreads_qw_deciles[decile, :], color=decile_colors_1[decile])
+ax1.plot(n_array_energy_spreads, average_energy_spreads_qw_hardest, color='blue')
+ax1.plot(n_array_energy_spreads, average_energy_spreads_qw_easiest, color='gold')
+ax1.set_xlabel(r'$n$')
+ax1.set_ylabel(r'$\left\langle E^{(P)}_{N-1} - E^{(P)}_0 \right\rangle$')
 
-plt.figure()
 for decile in deciles:
-    plt.plot(n_array_energy_spreads, average_energy_spreads_aqc_deciles[decile, :], color=decile_colors_1[decile])
-plt.plot(n_array_energy_spreads, average_energy_spreads_aqc_hardest, color='blue')
-plt.plot(n_array_energy_spreads, average_energy_spreads_aqc_easiest, color='gold')
-plt.xlabel(r'$n$')
-plt.ylabel(r'$\left\langle E^{(P)}_{N-1} - E^{(P)}_0 \right\rangle$ (AQC deciles)')
+    ax2.plot(n_array_energy_spreads, average_energy_spreads_aqc_deciles[decile, :], color=decile_colors_1[decile])
+ax2.plot(n_array_energy_spreads, average_energy_spreads_aqc_hardest, color='blue')
+ax2.plot(n_array_energy_spreads, average_energy_spreads_aqc_easiest, color='gold')
+ax2.set_xlabel(r'$n$')
 plt.tight_layout()
-plt.savefig('instance_energy_spread_aqc.jpg', dpi=200)
+plt.savefig('instance_energy_spread.pdf', dpi=200)
 plt.show()

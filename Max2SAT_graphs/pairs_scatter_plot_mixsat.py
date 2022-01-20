@@ -100,8 +100,8 @@ if __name__ == '__main__':
     ax.scatter(x, y, label="n=" + str(n), marker='.', s=marker_size, linewidths=0, c=satisfiable, cmap=ListedColormap(colors))
     # ax.set_xlim([8, 150])
     # ax.set_ylim([19, 34000])
-    ax.set_xlabel('RC2 runtime (untransformed instance)')
-    ax.set_ylabel('RC2 runtime (transformed instance)')
+    ax.set_xlabel('MIXSAT runtime (untransformed instance)')
+    ax.set_ylabel('MIXSAT runtime (transformed instance)')
     # ax.set_xscale('log', basex=2)
     # ax.set_yscale('log', basey=2)
 

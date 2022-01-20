@@ -67,12 +67,12 @@ def get_satisfiable_list(n):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=26)
-    plt.rcParams["figure.figsize"] = (6, 6)
+    plt.rc('font', size=18)
+    plt.rcParams["figure.figsize"] = (6, 5)
 
     marker_size = 4
 
-    n = 5
+    n = 10
     fig, ax = plt.subplots()
 
     x_raw_unmasked = runtimes_data_unaveraged(n, 'pysat')
@@ -106,5 +106,6 @@ if __name__ == '__main__':
     # ax.set_yscale('log', basey=2)
 
     plt.tight_layout()
+    plt.savefig(f'pysat_instance_pairs_scatter_plot_n_{n}.png', dpi=200)
     plt.show()
-    # plt.savefig('pysat_instance_pairs_scatter_plot_5.png', dpi=200)
+    
