@@ -96,7 +96,7 @@ if __name__ == '__main__':
         axs[i].vlines(sat_average_qw, 0, ylim[1], color='black', linestyle='--')
         axs[i].vlines(unsat_average_qw, 0, ylim[1], color='black')
         axs[i].set_ylim(ylim)
-        axs[i].set_xlabel(r"$\overline{P}(0, 100)$")
+        axs[i].set_xlabel(r"$1/\overline{P}(0, 100)$")
         axs[0].set_ylabel("Probability density")
         axs[i].set_xlim((min_inverse_prob, max_inverse_prob))
         # axs[i].legend()
