@@ -302,7 +302,8 @@ for n in n_array_aqc_reduced:
 crosson_formulae = get_crosson_formulae()
 
 crosson_probs = adams_quantum_walk_data_crosson()
-av_crosson_prob = np.mean(crosson_probs)
+mean_crosson_prob = np.mean(crosson_probs)
+median_crosson_prob = np.median(crosson_probs)
 
 # %%
 # get decile boundary success probabilities and durations
@@ -571,7 +572,7 @@ for decile in decile_boundaries:
 
     axs[0, 0].scatter(n_array_qw, success_probabilities_qw_decile_boundaries[decile, :], color=decile_colors_1[decile])
     axs[0, 0].plot(n_array_qw, fit, color=decile_colors_1[decile])
-    axs[0, 0].scatter(20, av_crosson_prob, color='red')
+    axs[0, 0].scatter(20, median_crosson_prob, color='red')
 
 y = np.log2(success_probabilities_qw_hardest_fraction_boundary)
 par, cov = optimize.curve_fit(line, n_array_qw, y)
@@ -581,7 +582,7 @@ fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_qw])
 axs[0, 0].scatter(n_array_qw, success_probabilities_qw_hardest_fraction_boundary, color='blue')
 axs[0, 0].plot(n_array_qw, fit, color='blue')
 axs[0, 0].set_yscale('log', base=2)
-axs[0, 0].set_ylabel('$\mathrm{DecileBoundary}(\overline{P}(0, 100))$')
+axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
 axs[0, 0].set_xlabel('$n$')
 
 axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='forestgreen')
@@ -611,7 +612,7 @@ fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
 axs[1, 0].scatter(n_array_aqc_reduced, durations_aqc_hardest_fraction_boundary, color='blue')
 axs[1, 0].plot(n_array_aqc_reduced, fit, color='blue')
 axs[1, 0].set_yscale('log', base=2)
-axs[1, 0].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+axs[1, 0].set_ylabel('$T_{0.99}$')
 axs[1, 0].set_xlabel('$n$')
 
 axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='forestgreen')
@@ -647,5 +648,5 @@ axs[1, 1].set_xlabel('Hardness percentile')
 # axs[2, 1].plot(decile_boundaries+1, scalings)
 # axs[2, 1].set_ylabel(r'$\kappa$')
 
-plt.savefig('qw_aqc_decile_boundaries.pdf', dpi=200)
+# plt.savefig('qw_aqc_decile_boundaries.pdf', dpi=200)
 plt.show()
