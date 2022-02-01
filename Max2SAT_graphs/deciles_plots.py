@@ -362,16 +362,22 @@ qw_deciled_indices = []    # list of arrays of indices arrays
 for n in n_array_qw:
     qw_deciled_indices.append(get_deciled_formulae_qw(n, return_indices=True))
 
+qw_hardest_fraction_indices = get_hardest_formulae_qw(n, fraction, return_indices=True)
+
 # AQC
 aqc_deciled_indices = []   # list of arrays of indices arrays
 for n in n_array_aqc_reduced:
     aqc_deciled_indices.append(get_deciled_formulae_aqc(n, return_indices=True))
 
+aqc_hardest_fraction_indices = get_hardest_formulae_aqc(n, fraction, return_indices=True)
+
 # %%
-# get decile boundary success probabilities and durations
+# get mean/median decile success probabilities and durations (and for hardest fractions)
 
 mean_success_probabilities_qw_deciles = np.zeros((10, len(n_array_qw)))
 median_success_probabilities_qw_deciles = np.zeros((10, len(n_array_qw)))
+mean_success_probabilities_qw_hardest_fraction = np.zeros(len(n_array_qw))
+median_success_probabilities_qw_hardest_fraction = np.zeros(len(n_array_qw))
 
 for i, n in enumerate(n_array_qw):
     success_probs = adams_quantum_walk_data(n)
@@ -380,13 +386,23 @@ for i, n in enumerate(n_array_qw):
         mean_success_probabilities_qw_deciles[decile, i] = np.mean(qw_decile_success_probs)
         median_success_probabilities_qw_deciles[decile, i] = np.median(qw_decile_success_probs)
 
+    qw_hardest_success_probs = success_probs[qw_hardest_fraction_indices[i]]
+    mean_success_probabilities_qw_hardest_fraction[i] = np.mean(qw_hardest_success_probs)
+    median_success_probabilities_qw_hardest_fraction[i] = np.median(qw_hardest_success_probs)
+
 mean_success_probabilities_aqc_deciles = np.zeros((10, len(n_array_aqc_reduced)))
 median_success_probabilities_aqc_deciles = np.zeros((10, len(n_array_aqc_reduced)))
+mean_success_probabilities_aqc_hardest_fraction = np.zeros(len(n_array_aqc_reduced))
+median_success_probabilities_aqc_hardest_fraction = np.zeros(len(n_array_aqc_reduced))
 
 mean_durations_qw_deciles = np.zeros((10, len(n_array_aqc_reduced)))
 median_durations_qw_deciles = np.zeros((10, len(n_array_aqc_reduced)))
 mean_durations_aqc_deciles = np.zeros((10, len(n_array_aqc_reduced)))
 median_durations_aqc_deciles = np.zeros((10, len(n_array_aqc_reduced)))
+mean_durations_qw_hardest_fraction = np.zeros(len(n_array_aqc_reduced))
+median_durations_qw_hardest_fraction = np.zeros(len(n_array_aqc_reduced))
+mean_durations_aqc_hardest_fraction = np.zeros(len(n_array_aqc_reduced))
+median_durations_aqc_hardest_fraction = np.zeros(len(n_array_aqc_reduced))
 
 for i, n in enumerate(n_array_aqc_reduced):
     success_probs = adams_quantum_walk_data(n)
@@ -405,6 +421,18 @@ for i, n in enumerate(n_array_aqc_reduced):
         aqc_decile_durations = aqc_decile_durations[np.logical_not(np.isnan(aqc_decile_durations))] # remove NaN values
         mean_durations_aqc_deciles[decile, i] = np.mean(aqc_decile_durations)
         median_durations_aqc_deciles[decile, i] = np.median(aqc_decile_durations)
+    
+    aqc_hardest_success_probs = success_probs[aqc_hardest_fraction_indices[i]]
+    mean_success_probabilities_aqc_hardest_fraction[i] = np.mean(aqc_hardest_success_probs)
+    median_success_probabilities_aqc_hardest_fraction[i] = np.median(aqc_hardest_success_probs)
+
+    qw_hardest_durations = durations[qw_hardest_fraction_indices[i]]
+    mean_durations_qw_hardest_fraction[i] = np.mean(qw_hardest_durations)
+    median_durations_qw_hardest_fraction[i] = np.median(qw_hardest_durations)
+
+    aqc_hardest_durations = durations[aqc_hardest_fraction_indices[i]]
+    mean_durations_aqc_hardest_fraction[i] = np.mean(aqc_hardest_durations)
+    median_durations_aqc_hardest_fraction[i] = np.median(aqc_hardest_durations)
 
 # %%
 # plot
@@ -589,7 +617,7 @@ axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='forestgreen')
 axs[0, 1].scatter(10 * 9.99, scaling_hardest, color='blue')
 axs[0, 1].plot(10 * (decile_boundaries+1), scalings, color='forestgreen', linestyle='--')
 axs[0, 1].set_ylabel(r'$\kappa$')
-axs[0, 1].set_xlabel('Hardness percentile')
+axs[0, 1].set_xlabel('QW hardness percentile')
 
 # log-linear plot of AQC durations/AQC deciles using boundary values
 
@@ -619,7 +647,7 @@ axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='forestgreen')
 axs[1, 1].scatter(10*9.99, scaling_hardest, color='blue')
 axs[1, 1].plot(10*(decile_boundaries+1), scalings, color='forestgreen', linestyle='--')
 axs[1, 1].set_ylabel(r'$\kappa$')
-axs[1, 1].set_xlabel('Hardness percentile')
+axs[1, 1].set_xlabel('AQC hardness percentile')
 
 # # log-linear plot of QW probabilities/AQC deciles using boundary values
 
@@ -649,4 +677,96 @@ axs[1, 1].set_xlabel('Hardness percentile')
 # axs[2, 1].set_ylabel(r'$\kappa$')
 
 # plt.savefig('qw_aqc_decile_boundaries.pdf', dpi=200)
+plt.show()
+
+# %%
+
+fig, axs = plt.subplots(2, 2, figsize=(14, 10))
+
+# log-linear plot of QW probabilities/AQC deciles using median values
+
+scalings = np.zeros_like(deciles, dtype=np.float64)
+for decile in deciles:
+    y = np.log2(median_success_probabilities_aqc_deciles[decile, :])
+    par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+    m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+    fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+    scalings[decile] = m[0]
+
+    axs[0, 0].scatter(n_array_aqc_reduced, median_success_probabilities_aqc_deciles[decile, :], color=decile_colors_1[decile])
+    axs[0, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+y = np.log2(median_success_probabilities_aqc_hardest_fraction)
+par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+scaling_hardest = m[0]
+fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+axs[0, 0].scatter(n_array_aqc_reduced, median_success_probabilities_aqc_hardest_fraction, color='blue')
+# axs[0, 0].plot(n_array_aqc_reduced, fit, color='blue')
+axs[0, 0].set_yscale('log', base=2)
+axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
+axs[0, 0].set_xlabel('$n$')
+
+axs[0, 1].scatter(deciles+1, scalings, color='forestgreen')
+axs[0, 1].plot(deciles+1, scalings, color='forestgreen', linestyle='--')
+axs[0, 1].set_ylabel(r'$\kappa$')
+axs[0, 1].set_xlabel('AQC hardness decile')
+
+# log-linear plot of AQC durations/QW deciles using median values
+
+scalings = np.zeros_like(deciles, dtype=np.float64)
+for decile in deciles:
+    y = np.log2(median_durations_qw_deciles[decile, :])
+    par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+    m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+    fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+    scalings[decile] = m[0]
+
+    axs[1, 0].scatter(n_array_aqc_reduced, median_durations_qw_deciles[decile, :], color=decile_colors_1[decile])
+    axs[1, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+y = np.log2(median_durations_qw_hardest_fraction)
+par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+scaling_hardest = m[0]
+fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+axs[1, 0].scatter(n_array_aqc_reduced, median_durations_qw_hardest_fraction, color='blue')
+# axs[1, 0].plot(n_array_aqc_reduced, fit, color='blue')
+axs[1, 0].set_yscale('log', base=2)
+axs[1, 0].set_ylabel('$T_{0.99}$')
+axs[1, 0].set_xlabel('$n$')
+
+axs[1, 1].scatter(deciles+1, scalings, color='forestgreen')
+axs[1, 1].plot(deciles+1, scalings, color='forestgreen', linestyle='--')
+axs[1, 1].set_ylabel(r'$\kappa$')
+axs[1, 1].set_xlabel('QW hardness decile')
+
+# # log-linear plot of QW probabilities/AQC deciles using boundary values
+
+# scalings = np.zeros_like(decile_boundaries, dtype=np.float64)
+# for decile in decile_boundaries:
+#     y = np.log2(success_probabilities_aqc_decile_boundaries[decile, :])
+#     par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+#     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+#     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+#     scalings[decile] = m[0]
+
+#     axs[2, 0].scatter(n_array_aqc_reduced, success_probabilities_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
+#     axs[2, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+# y = np.log2(success_probabilities_aqc_hardest_fraction_boundary)
+# par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+# m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+# fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+# axs[2, 0].scatter(n_array_aqc_reduced, success_probabilities_aqc_hardest_fraction_boundary, color='blue')
+# axs[2, 0].plot(n_array_aqc_reduced, fit, color='blue')
+# axs[2, 0].set_yscale('log', base=2)
+# axs[2, 0].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+# axs[2, 0].set_xlabel('$n$')
+
+# axs[2, 1].scatter(decile_boundaries+1, scalings)
+# axs[2, 1].plot(decile_boundaries+1, scalings)
+# axs[2, 1].set_ylabel(r'$\kappa$')
+
+plt.savefig('qw_aqc_deciles_cross_comparison.pdf', dpi=200)
 plt.show()
