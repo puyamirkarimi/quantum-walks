@@ -36,12 +36,12 @@ def get_satisfiable_list(n):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=14)
+    plt.rc('font', size=13)
 
     fig = plt.figure()
 
     gs = GridSpec(2, 2, width_ratios=[1, 1], height_ratios=[1, 1])
-    gs.update(hspace=0.37)
+    gs.update(hspace=0.45, wspace=0.4)
     axs = list()
     axs.append(fig.add_subplot(gs[0]))
     axs.append(fig.add_subplot(gs[1]))
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         axs[i].vlines(unsat_average_qw, 0, ylim[1], color='black')
         axs[i].set_ylim(ylim)
         axs[i].set_xlabel(r"$\overline{P}(0, 100)$")
-        axs[0].set_ylabel("Probability density")
+        axs[i].set_ylabel(r"$p(\overline{P}(0, 100))$")
         axs[i].set_xlim((min_prob, max_prob))
         # axs[i].legend()
 
@@ -109,8 +109,8 @@ if __name__ == '__main__':
             axs[i+2].vlines(sat_average_aqc, 0, ylim[1], color='black', linestyle='--')
             axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
-            axs[i+2].set_xlabel(r'$\langle T_{0.99} \rangle$')
-            axs[i+2].set_ylabel("Probability density")
+            axs[i+2].set_xlabel(r'$T_{0.99}$')
+            axs[i+2].set_ylabel(r'$p(T_{0.99})$')
             axs[i+2].set_xlim((min_time, max_time))
             # axs[i].legend()
         else:
@@ -124,8 +124,8 @@ if __name__ == '__main__':
             axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
             axs[i+2].set_xscale('log')
-            axs[i+2].set_xlabel(r'$\langle T_{0.99} \rangle$')
-            # axs[i+2].set_ylabel("Probability density")
+            axs[i+2].set_xlabel(r'$T_{0.99}$')
+            axs[i+2].set_ylabel(r'$p(T_{0.99})$')
             axs[i+2].set_xlim((min_time, max_time))
 
 
