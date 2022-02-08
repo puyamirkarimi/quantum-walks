@@ -18,6 +18,7 @@ plt.rc('font', size=14)
 # %%
 # function definitions
 
+
 def get_all_formulae(n):
     '''returns all instances of a given n'''
     print(f'Getting all the formulae of size n={n}')
@@ -30,7 +31,8 @@ def get_all_formulae(n):
 
 def get_hardest_formulae_qw(n, frac, return_indices=False):
     '''returns the hardest "frac" fraction of instances for QW at a given n'''
-    print(f'Getting the hardest {frac} fraction of formulae of size n={n} for QW')
+    print(
+        f'Getting the hardest {frac} fraction of formulae of size n={n} for QW')
     success_probs = adams_quantum_walk_data(n)
     instance_names = get_instance_names(n)
     num_instances = int(frac * 10000)
@@ -46,7 +48,8 @@ def get_hardest_formulae_qw(n, frac, return_indices=False):
 
 def get_easiest_formulae_qw(n, frac, return_indices=False):
     '''returns the easiest "frac" fraction of instances for QW at a given n'''
-    print(f'Getting the easiest {frac} fraction of formulae of size n={n} for QW')
+    print(
+        f'Getting the easiest {frac} fraction of formulae of size n={n} for QW')
     success_probs = adams_quantum_walk_data(n)
     instance_names = get_instance_names(n)
     num_instances = int(frac * 10000)
@@ -113,7 +116,8 @@ def get_decile_boundary_formulae_qw(n, return_indices=False):
 
 def get_hardest_formulae_aqc(n, frac, return_indices=False):
     '''returns the hardest "frac" fraction of instances for AQC at a given n'''
-    print(f'Getting the hardest {frac} fraction of formulae of size n={n} for AQC')
+    print(
+        f'Getting the hardest {frac} fraction of formulae of size n={n} for AQC')
     durations = adams_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
@@ -130,7 +134,8 @@ def get_hardest_formulae_aqc(n, frac, return_indices=False):
 
 def get_easiest_formulae_aqc(n, frac, return_indices=False):
     '''returns the easiest "frac" fraction of instances for AQC at a given n'''
-    print(f'Getting the easiest {frac} fraction of formulae of size n={n} for AQC')
+    print(
+        f'Getting the easiest {frac} fraction of formulae of size n={n} for AQC')
     durations = adams_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
@@ -204,7 +209,8 @@ def get_crosson_formulae():
     instances = []
     for i in range(137):
         instance_name = str(i)
-        instances.append(np.loadtxt("./../../instances_crosson/" + instance_name + ".m2s").astype(int))
+        instances.append(np.loadtxt(
+            "./../../instances_crosson/" + instance_name + ".m2s").astype(int))
     return np.array(instances)
 
 
@@ -214,12 +220,14 @@ def get_instance_names(n):
 
 def get_instances():
     """returns array of instance names, array of corresponding n"""
-    instance_data = np.genfromtxt('m2s_nqubits.csv', delimiter=',', skip_header=1, dtype=str)    # path of csv file
+    instance_data = np.genfromtxt(
+        'm2s_nqubits.csv', delimiter=',', skip_header=1, dtype=str)    # path of csv file
     return instance_data[:, 0], instance_data[:, 1]
 
 
 def get_2sat_formula(instance_name):
-    out = np.loadtxt("./../../instances_original/" + instance_name + ".m2s")  # path of instance files in adam's format
+    # path of instance files in adam's format
+    out = np.loadtxt("./../../instances_original/" + instance_name + ".m2s")
     return out.astype(int)
 
 
@@ -229,7 +237,7 @@ def adams_quantum_walk_data(n):
 
 def adams_quantum_walk_data_crosson():
     '''average success prob from T=0 to T=100 for the crosson instances'''
-    return np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug_crosson.csv', delimiter=',', skip_header=1, dtype=str)[:,2].astype(float)
+    return np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug_crosson.csv', delimiter=',', skip_header=1, dtype=str)[:, 2].astype(float)
 
 
 def get_instance_success_prob(n, instance):
@@ -238,7 +246,8 @@ def get_instance_success_prob(n, instance):
 
 def adams_adiabatic_data(n):
     '''returns time required to get 0.99 success probability'''
-    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', missing_values='', skip_header=1+(n-5)*10000, usecols=10, max_rows=10000, dtype=str)
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',',
+                      missing_values='', skip_header=1+(n-5)*10000, usecols=10, max_rows=10000, dtype=str)
     b = []
     skipped = 0
     for i, element in enumerate(a):
@@ -252,22 +261,27 @@ def adams_adiabatic_data(n):
 
 
 def get_instance_duration(n, instance):
-    val = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', missing_values='', skip_header=1+(n-5)*10000+instance, usecols=10, max_rows=1, dtype=str)
+    val = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',',
+                        missing_values='', skip_header=1+(n-5)*10000+instance, usecols=10, max_rows=1, dtype=str)
     if val != '':
         return float(val)
     return float('nan')
 
 
 def adams_mixbnb_data(n):
-    costs = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb.csv', delimiter=',', skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str).astype(float)
-    mix_iters = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb.csv', delimiter=',', skip_header=1+(n-5)*10000, usecols=4, max_rows=10000, dtype=str).astype(float)
+    costs = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb.csv', delimiter=',',
+                          skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str).astype(float)
+    mix_iters = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb.csv', delimiter=',',
+                              skip_header=1+(n-5)*10000, usecols=4, max_rows=10000, dtype=str).astype(float)
     n_calls = costs + mix_iters
     return n_calls
 
 
 def adams_mixbnb_data_crosson():
-    costs = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb_crosson.csv', delimiter=',', skip_header=1, usecols=2, dtype=str).astype(float)
-    mix_iters = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb_crosson.csv', delimiter=',', skip_header=1, usecols=4, dtype=str).astype(float)
+    costs = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb_crosson.csv',
+                          delimiter=',', skip_header=1, usecols=2, dtype=str).astype(float)
+    mix_iters = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/mixbnb_crosson.csv',
+                              delimiter=',', skip_header=1, usecols=4, dtype=str).astype(float)
     n_calls = costs + mix_iters
     return n_calls
 
@@ -290,8 +304,8 @@ qw = adams_quantum_walk_data(n)
 hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Greens')
 vals = hex.get_array()
 centres = hex.get_offsets()
-x_min, x_max = np.min(centres[:,0]), np.max(centres[:,0])
-y_min, y_max = np.min(centres[:,1]), np.max(centres[:,1])
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 cb = plt.colorbar()
 cb.ax.tick_params(labelsize=17, size=5)
@@ -313,11 +327,12 @@ plt.subplot(gs1[1])
 bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
-hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Greens', bins='log')
+hex = plt.hexbin(np.log10(qw), np.log10(
+    bnb), gridsize=50, cmap='Greens', bins='log')
 vals = hex.get_array()
 centres = hex.get_offsets()
-x_min, x_max = np.min(centres[:,0]), np.max(centres[:,0])
-y_min, y_max = np.min(centres[:,1]), np.max(centres[:,1])
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 cb = plt.colorbar()
 cb.ax.tick_params(labelsize=17, size=5)
@@ -344,8 +359,8 @@ bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Greens')
 vals = hex.get_array()
 centres = hex.get_offsets()
-x_min, x_max = np.min(centres[:,0]), np.max(centres[:,0])
-y_min, y_max = np.min(centres[:,1]), np.max(centres[:,1])
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 cb = plt.colorbar()
 cb.ax.tick_params(labelsize=17, size=5)
@@ -373,11 +388,12 @@ aqc = adams_adiabatic_data(n)
 
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Greens', bins='log')
+hex = plt.hexbin(np.log10(aqc), np.log10(
+    bnb), gridsize=50, cmap='Greens', bins='log')
 vals = hex.get_array()
 centres = hex.get_offsets()
-x_min, x_max = np.min(centres[:,0]), np.max(centres[:,0])
-y_min, y_max = np.min(centres[:,1]), np.max(centres[:,1])
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 cb = plt.colorbar()
 cb.ax.tick_params(labelsize=17, size=5)
@@ -401,7 +417,7 @@ plt.show()
 # histogram of MIXBnB calls (Adam's way)
 # I think Adam's way of doing this means the probability density is changed and depends on the base of the exponent?
 
-n=20
+n = 20
 bnb = adams_mixbnb_data(n)
 bnb_crosson = adams_mixbnb_data_crosson()
 
@@ -410,30 +426,31 @@ print(np.max(bnb))
 fig = plt.figure(figsize=(8, 5.5))
 plt.subplot()
 
-h,b=np.histogram(np.log10(bnb), bins='auto', density=True)
-db=b[1:]-b[:-1]
-b=(b[1:]+b[:-1])/2
-htot=np.dot(h,db)
-h=(h/htot)
-plt.bar(b,h,width=db*1.0,alpha=0.75,color='green',label='$\mathrm{MAX2SAT}$')
+h, b = np.histogram(np.log10(bnb), bins='auto', density=True)
+db = b[1:]-b[:-1]
+b = (b[1:]+b[:-1])/2
+htot = np.dot(h, db)
+h = (h/htot)
+plt.bar(b, h, width=db*1.0, alpha=0.75,
+        color='green', label='$\mathrm{MAX2SAT}$')
 
-h,b=np.histogram(np.log10(bnb_crosson),bins='auto', density=True)
-db=b[1:]-b[:-1]
-b=(b[1:]+b[:-1])/2
-htot=np.dot(h,db)
-h=(h/htot)
-plt.bar(b,h,width=db*1.0,alpha=0.75,color='red')
+h, b = np.histogram(np.log10(bnb_crosson), bins='auto', density=True)
+db = b[1:]-b[:-1]
+b = (b[1:]+b[:-1])/2
+htot = np.dot(h, db)
+h = (h/htot)
+plt.bar(b, h, width=db*1.0, alpha=0.75, color='red')
 
-plt.xlabel('$N_\mathrm{calls}$',fontsize=20)
-plt.ylabel('$p(N_\mathrm{calls})$',fontsize=20)
+plt.xlabel('$N_\mathrm{calls}$', fontsize=20)
+plt.ylabel('$p(N_\mathrm{calls})$', fontsize=20)
 xt = np.arange(2, 5, 1)
 xtl = ['$10^{'+f'{x}'+'}$' for x in xt]
-plt.xticks(xt, xtl,fontsize=17)
-plt.xlim(1.7,4.8)
+plt.xticks(xt, xtl, fontsize=17)
+plt.xlim(1.7, 4.8)
 yt = np.arange(0, 2.5, 0.5)
 ytl = [f'${y:.1f}$' for y in yt]
-plt.yticks(yt, ytl,fontsize=17)
-plt.tick_params(direction='in',size=5)
+plt.yticks(yt, ytl, fontsize=17)
+plt.tick_params(direction='in', size=5)
 plt.tight_layout()
 
 # plt.savefig('mixbnb20hist.pdf', bbox_inches='tight')
@@ -442,7 +459,7 @@ plt.show()
 # %%
 # histogram of MIXBnB calls (My way)
 
-n=20
+n = 20
 
 bnb = adams_mixbnb_data(n)
 bnb_crosson = adams_mixbnb_data_crosson()
@@ -458,7 +475,8 @@ x[-1] += 1
 
 num_bins_crosson = 15
 x_crosson = np.ones(num_bins_crosson+1) * min_calls
-multiply_factor = 10**((np.log10(max_calls)-np.log10(min_calls))/num_bins_crosson)
+multiply_factor = 10**((np.log10(max_calls) -
+                       np.log10(min_calls))/num_bins_crosson)
 x_crosson = [x_crosson[i] * multiply_factor**i for i in range(len(x_crosson))]
 x_crosson[-1] += 1
 
