@@ -486,5 +486,8 @@ plt.hist(bnb, x, alpha=0.75, color='green', density=True)
 plt.hist(bnb_crosson, x_crosson, alpha=0.75, color='red', density=True)
 plt.xscale('log')
 
+plt.xlabel('$N_\mathrm{calls}$', fontsize=20)
+plt.ylabel('$p(N_\mathrm{calls})$', fontsize=20)
+
 plt.tight_layout()
 plt.show()
