@@ -90,7 +90,7 @@ if __name__ == '__main__':
         sat_average_aqc = np.median(times_satisfiable)
         unsat_average_aqc = np.median(times_unsatisfiable)
 
-        axs[i].hist(probs_unsatisfiable, x_qw, color='forestgreen', alpha=0.75, density=True, label='unsatisfiable')
+        axs[i].hist(probs_unsatisfiable, x_qw, color='green', alpha=0.75, density=True, label='unsatisfiable')
         axs[i].hist(probs_satisfiable, x_qw, color='red', alpha=0.75, density=True, label='satisfiable')
         ylim = axs[i].get_ylim()
         axs[i].vlines(sat_average_qw, 0, ylim[1], color='black', linestyle='--')
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
 
         if i == 0:
-            axs[i+2].hist(times_unsatisfiable, x_aqc, color='forestgreen', alpha=0.75, density=True, label='unsatisfiable')
+            axs[i+2].hist(times_unsatisfiable, x_aqc, color='green', alpha=0.75, density=True, label='unsatisfiable')
             axs[i+2].hist(times_satisfiable, x_aqc, color='red', alpha=0.75, density=True, label='satisfiable')
             ylim = axs[i+2].get_ylim()
             axs[i+2].vlines(sat_average_aqc, 0, ylim[1], color='black', linestyle='--')
@@ -115,21 +115,33 @@ if __name__ == '__main__':
             # axs[i].legend()
         else:
             # ############################ LOGARITHMIC PLOT ###############################
-            # axs[i+2].hist(times_satisfiable, x_logarithmic, color='red', align='mid', rwidth=0.5, density=True, label='satisfiable')
-            # axs[i+2].hist(times_unsatisfiable, x_logarithmic, color='forestgreen', align='right', rwidth=0.5, density=True, label='unsatisfiable')
-            axs[i+2].hist(times_unsatisfiable, x_logarithmic, color='forestgreen', alpha=0.75, density=True, label='unsatisfiable')
-            axs[i+2].hist(times_satisfiable, x_logarithmic, color='red', alpha=0.75, density=True, label='satisfiable')
+            h, b = np.histogram(np.log10(times_unsatisfiable), bins=num_bins, density=True)
+            db = b[1:]-b[:-1]
+            b = (b[1:]+b[:-1])/2
+            htot = np.dot(h, db)
+            h = (h/htot)
+            plt.bar(b, h, width=db*1.0, alpha=0.75,
+                    color='green', label='unsatisfaiable')
+
+            h, b = np.histogram(np.log10(times_satisfiable), bins=num_bins, density=True)
+            db = b[1:]-b[:-1]
+            b = (b[1:]+b[:-1])/2
+            htot = np.dot(h, db)
+            h = (h/htot)
+            plt.bar(b, h, width=db*1.0, alpha=0.75,
+                    color='red', label='satisfiable')
+             
             ylim = axs[i+2].get_ylim()
-            axs[i+2].vlines(sat_average_aqc, 0, ylim[1], color='black', linestyle='--')
-            axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
+            axs[i+2].vlines(np.log10(sat_average_aqc), 0, ylim[1], color='black', linestyle='--')
+            axs[i+2].vlines(np.log10(unsat_average_aqc), 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
-            axs[i+2].set_xscale('log')
-            axs[i+2].set_xlabel(r'$T_{0.99}$')
-            axs[i+2].set_ylabel(r'$p(T_{0.99})$')
-            axs[i+2].set_xlim((min_time, max_time))
+            # axs[i+2].set_xscale('log')
+            axs[i+2].set_xlabel(r'$\log_{10}(T_{0.99})$')
+            axs[i+2].set_ylabel(r'$p(\log_{10}(T_{0.99}))$')
+            axs[i+2].set_xlim((np.log10(min_time), np.log10(max_time)))
 
 
     plt.tick_params(direction='in', top=True, right=True, which='both')
     plt.tight_layout()
-    plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable.pdf', dpi=200)
+    # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable.pdf', dpi=200)
     plt.show()
