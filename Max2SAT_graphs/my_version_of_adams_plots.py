@@ -421,8 +421,6 @@ n = 20
 bnb = adams_mixbnb_data(n)
 bnb_crosson = adams_mixbnb_data_crosson()
 
-print(np.max(bnb))
-
 fig = plt.figure(figsize=(8, 5.5))
 plt.subplot()
 
@@ -432,7 +430,7 @@ b = (b[1:]+b[:-1])/2
 htot = np.dot(h, db)
 h = (h/htot)
 plt.bar(b, h, width=db*1.0, alpha=0.75,
-        color='green', label='$\mathrm{MAX2SAT}$')
+        color='green')
 
 h, b = np.histogram(np.log10(bnb_crosson), bins='auto', density=True)
 db = b[1:]-b[:-1]
@@ -441,10 +439,10 @@ htot = np.dot(h, db)
 h = (h/htot)
 plt.bar(b, h, width=db*1.0, alpha=0.75, color='red')
 
-plt.xlabel('$N_\mathrm{calls}$', fontsize=20)
-plt.ylabel('$p(N_\mathrm{calls})$', fontsize=20)
+plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=20)
+plt.ylabel('$p(\log_{10}(N_\mathrm{calls}))$', fontsize=20)
 xt = np.arange(2, 5, 1)
-xtl = ['$10^{'+f'{x}'+'}$' for x in xt]
+xtl = [f'${x}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=17)
 plt.xlim(1.7, 4.8)
 yt = np.arange(0, 2.5, 0.5)
@@ -457,7 +455,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# histogram of MIXBnB calls (My way)
+# histogram of MIXBnB calls (my way)
 
 n = 20
 
@@ -491,3 +489,5 @@ plt.ylabel('$p(N_\mathrm{calls})$', fontsize=20)
 
 plt.tight_layout()
 plt.show()
+
+# %%
