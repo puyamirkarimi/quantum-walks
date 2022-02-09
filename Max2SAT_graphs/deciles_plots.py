@@ -77,9 +77,10 @@ def get_easiest_formulae_qw(n, frac, return_indices=False):
 
 
 def get_hardest_boundary_formula_qw(n, frac, return_index=False):
+    '''returns the instance where exactly "frac" fraction of instances are harder for QW'''
     success_probs = adams_quantum_walk_data(n)
     instance_names = get_instance_names(n)
-    instance = int(frac * 10000 - 1)
+    instance = int(frac * 10000)
     boundary_index = np.argsort(success_probs)[instance]
     if return_index:
         return boundary_index
@@ -110,7 +111,8 @@ def get_deciled_formulae_qw(n, return_indices=False):
 
 
 def get_decile_boundary_formulae_qw(n, return_indices=False):
-    '''returns the nine formulae on the boundaries of the QW deciles'''
+    '''returns the nine formulae just below the boundaries of the QW deciles
+       (i.e. the hardest formula of each decile, other than decile 10)'''
     print(f'Getting the QW decile boundary formulae of size n={n}')
     success_probs = adams_quantum_walk_data(n)
     instance_names = get_instance_names(n)
@@ -164,10 +166,11 @@ def get_easiest_formulae_aqc(n, frac, return_indices=False):
 
 
 def get_hardest_boundary_formula_aqc(n, frac, return_index=False):
+    '''returns the instance where exactly "frac" fraction of instances are harder for AQC'''
     durations = adams_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
     instance_names = get_instance_names(n)
-    instance = int(frac * 10000 - 1)
+    instance = int(frac * 10000)
     boundary_index = np.argsort(durations)[9999-instance]
     if return_index:
         return boundary_index
@@ -199,7 +202,8 @@ def get_deciled_formulae_aqc(n, return_indices=False):
 
 
 def get_decile_boundary_formulae_aqc(n, return_indices=False):
-    '''returns the nine formulae on the boundaries of the AQC deciles'''
+    '''returns the nine formulae just below the boundaries of the AQC deciles
+       (i.e. the hardest formula of each decile, other than decile 10)'''
     print(f'Getting the AQC decile boundary formulae of size n={n}')
     durations = adams_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
@@ -208,7 +212,7 @@ def get_decile_boundary_formulae_aqc(n, return_indices=False):
     boundary_instances = []
     for decile in range(9):
         print(f'Doing decile {decile+1}')
-        boundary = int((decile + 1) * (10000/10))
+        boundary = int((decile + 1) * (10000/10) - 1)
         index = indices_by_hardness[boundary]
         if return_indices:
             boundary_instances.append(index)
@@ -281,7 +285,7 @@ def get_instance_duration(n, instance):
     return float('nan')
 
 
-def nan_to_largest(x, addition=0):
+def nan_to_largest(x, addition=1):
     max = np.max(x[np.logical_not(np.isnan(x))])
     return np.nan_to_num(x, nan=max+addition)
 
@@ -343,8 +347,7 @@ for i, n in enumerate(n_array_qw):
         success_probabilities_qw_decile_boundaries[decile, i] = get_instance_success_prob(
             n, qw_decile_boundary_indices[i][decile])
 
-success_probabilities_aqc_decile_boundaries = np.zeros(
-    (9, len(n_array_aqc_reduced)))
+success_probabilities_aqc_decile_boundaries = np.zeros((9, len(n_array_aqc_reduced)))
 
 durations_qw_decile_boundaries = np.zeros((9, len(n_array_aqc_reduced)))
 durations_aqc_decile_boundaries = np.zeros((9, len(n_array_aqc_reduced)))
@@ -367,8 +370,7 @@ for i, n in enumerate(n_array_qw):
         n, qw_hardest_fraction_boundary_indices[i])
 
 
-success_probabilities_aqc_hardest_fraction_boundary = np.zeros(
-    len(n_array_aqc_reduced))
+success_probabilities_aqc_hardest_fraction_boundary = np.zeros(len(n_array_aqc_reduced))
 
 durations_qw_hardest_fraction_boundary = np.zeros(len(n_array_aqc_reduced))
 durations_aqc_hardest_fraction_boundary = np.zeros(len(n_array_aqc_reduced))
@@ -733,9 +735,7 @@ scaling_hardest = m[0]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
 axs[0, 0].scatter(n_array_aqc_reduced,
                   median_success_probabilities_aqc_hardest_fraction, color='blue')
-axs[0, 0].plot(n_array_aqc_reduced,
-               median_success_probabilities_aqc_hardest_fraction, color='blue', linestyle='--')
-# axs[0, 0].plot(n_array_aqc_reduced, fit, color='blue')
+axs[0, 0].plot(n_array_aqc_reduced, fit, color='blue')
 axs[0, 0].set_yscale('log', base=2)
 axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
 axs[0, 0].set_xlabel('$n$')
@@ -760,16 +760,13 @@ for decile in deciles:
     axs[1, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
 
 y = np.log2(median_durations_qw_hardest_fraction)
-print(durations_qw_hardest_fraction[-1, :])
 par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 scaling_hardest = m[0]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
 axs[1, 0].scatter(n_array_aqc_reduced,
                   median_durations_qw_hardest_fraction, color='blue')
-axs[1, 0].plot(n_array_aqc_reduced,
-               median_durations_qw_hardest_fraction, color='blue', linestyle='--')
-# axs[1, 0].plot(n_array_aqc_reduced, fit, color='blue')
+axs[1, 0].plot(n_array_aqc_reduced, fit, color='blue')
 axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$')
 axs[1, 0].set_xlabel('$n$')
