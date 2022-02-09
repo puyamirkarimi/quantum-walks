@@ -12,6 +12,8 @@ n_array_qw = np.arange(5, 21)
 n_array_aqc = np.arange(5, 16)
 n_array_aqc_reduced = np.arange(5, 12)
 
+line = lambda x, m, c: m*x + c
+
 deciles = np.arange(10, dtype=int)
 decile_boundaries = np.arange(9, dtype=int)
 
@@ -481,160 +483,6 @@ for i, n in enumerate(n_array_aqc_reduced):
     median_durations_aqc_hardest_fraction[i] = np.median(nan_to_pos_inf(aqc_hardest_durations))
 
 # %%
-# plot to check difference between decile boundary and mean
-
-fig, axs = plt.subplots(3, 2, figsize=(14, 15))
-
-line = lambda x, m, c: m*x + c
-
-# log-linear plot using averages
-
-for decile in deciles:
-    y = np.log2(mean_durations_aqc_deciles[decile, :])
-    par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
-    m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-    print(f'EXP {decile+1}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}')
-    fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
-
-    axs[0, 0].scatter(n_array_aqc_reduced,
-                      mean_durations_aqc_deciles[decile, :], color=decile_colors_1[decile])
-    axs[0, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
-
-axs[0, 0].set_yscale('log', base=2)
-
-axs[0, 0].set_ylabel('$\mathrm{Mean}(T_{0.99})$')
-axs[0, 0].set_xlabel('$n$')
-
-# log-log plot using averages
-
-for decile in deciles:
-    y = np.log2(mean_durations_aqc_deciles[decile, :])
-    x = np.log2(n_array_aqc_reduced)
-    par, cov = optimize.curve_fit(line, x, y)
-    m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-    # fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
-    fit = 2**c[0] * n_array_aqc_reduced**m[0]
-    axs[0, 1].scatter(n_array_aqc_reduced,
-                      mean_durations_aqc_deciles[decile, :], color=decile_colors_1[decile])
-    axs[0, 1].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
-
-axs[0, 1].set_xscale('log', base=2)
-axs[0, 1].set_yscale('log', base=2)
-
-x_ticks = np.arange(5, 12)
-x_tick_labels = [f'${x}$' for x in x_ticks]
-axs[0, 1].set_xticks(x_ticks)
-axs[0, 1].set_xticklabels(x_tick_labels)
-
-axs[0, 1].set_ylabel('$\mathrm{Mean}(T_{0.99})$')
-axs[0, 1].set_xlabel('$n$')
-
-# log-linear plot using boundary values
-
-for decile in decile_boundaries:
-    y = np.log2(durations_aqc_decile_boundaries[decile, :])
-    par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
-    m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-    print(f'EXP {decile+1}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}')
-    fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
-
-    axs[1, 0].scatter(n_array_aqc_reduced,
-                      durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
-    axs[1, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
-
-y = np.log2(durations_aqc_hardest_fraction_boundary)
-par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
-m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
-axs[1, 0].scatter(n_array_aqc_reduced,
-                  durations_aqc_hardest_fraction_boundary, color='blue')
-axs[1, 0].plot(n_array_aqc_reduced, fit, color='blue')
-
-axs[1, 0].set_yscale('log', base=2)
-
-axs[1, 0].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
-axs[1, 0].set_xlabel('$n$')
-
-# log-log plot using boundary values
-
-for decile in decile_boundaries:
-    y = np.log2(durations_aqc_decile_boundaries[decile, :])
-    x = np.log2(n_array_aqc_reduced)
-    par, cov = optimize.curve_fit(line, x, y)
-    m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-    # fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
-    fit = 2**c[0] * n_array_aqc_reduced**m[0]
-    axs[1, 1].scatter(n_array_aqc_reduced,
-                      durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
-    axs[1, 1].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
-
-y = np.log2(durations_aqc_hardest_fraction_boundary)
-x = np.log2(n_array_aqc_reduced)
-par, cov = optimize.curve_fit(line, x, y)
-m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-# fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
-fit = 2**c[0] * n_array_aqc_reduced**m[0]
-axs[1, 1].scatter(n_array_aqc_reduced,
-                  durations_aqc_hardest_fraction_boundary, color='blue')
-axs[1, 1].plot(n_array_aqc_reduced, fit, color='blue')
-
-axs[1, 1].set_xscale('log', base=2)
-axs[1, 1].set_yscale('log', base=2)
-
-x_ticks = np.arange(5, 12)
-x_tick_labels = [f'${x}$' for x in x_ticks]
-axs[1, 1].set_xticks(x_ticks)
-axs[1, 1].set_xticklabels(x_tick_labels)
-
-axs[1, 1].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
-axs[1, 1].set_xlabel('$n$')
-
-# log-linear plot of median
-
-decile = 4
-
-y = np.log2(durations_aqc_decile_boundaries[decile, :])
-par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
-m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-print(f'EXP {decile+1}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}')
-fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
-
-axs[2, 0].scatter(n_array_aqc_reduced,
-                  durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
-axs[2, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
-
-axs[2, 0].set_yscale('log', base=2)
-
-axs[2, 0].set_ylabel('$\mathrm{Median}(T_{0.99})$')
-axs[2, 0].set_xlabel('$n$')
-
-# log-log plot of median
-
-y = np.log2(durations_aqc_decile_boundaries[decile, :])
-x = np.log2(n_array_aqc_reduced)
-par, cov = optimize.curve_fit(line, x, y)
-m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
-# fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
-fit = 2**c[0] * n_array_aqc_reduced**m[0]
-axs[2, 1].scatter(n_array_aqc_reduced,
-                  durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
-axs[2, 1].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
-
-axs[2, 1].set_xscale('log', base=2)
-axs[2, 1].set_yscale('log', base=2)
-
-x_ticks = np.arange(5, 12)
-x_tick_labels = [f'${x}$' for x in x_ticks]
-axs[2, 1].set_xticks(x_ticks)
-axs[2, 1].set_xticklabels(x_tick_labels)
-
-axs[2, 1].set_ylabel('$\mathrm{Median}(T_{0.99})$')
-axs[2, 1].set_xlabel('$n$')
-
-# plt.savefig('aqc_deciles_plots.pdf', dpi=200)
-plt.show()
-
-# %%
 # percentile plots for QW/AQC using corresponding hardness
 
 fig, axs = plt.subplots(2, 2, figsize=(14, 10))
@@ -666,10 +514,10 @@ axs[0, 0].set_yscale('log', base=2)
 axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
 axs[0, 0].set_xlabel('$n$')
 
-axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='forestgreen')
+axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='green')
 axs[0, 1].scatter(10 * 9.99, scaling_hardest, color='blue')
 axs[0, 1].plot(10 * (decile_boundaries+1), scalings,
-               color='forestgreen', linestyle='--')
+               color='green', linestyle='--')
 axs[0, 1].set_ylabel(r'$\kappa$')
 axs[0, 1].set_xlabel('QW hardness percentile')
 
@@ -699,10 +547,10 @@ axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$')
 axs[1, 0].set_xlabel('$n$')
 
-axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='forestgreen')
+axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='green')
 axs[1, 1].scatter(10*9.99, scaling_hardest, color='blue')
 axs[1, 1].plot(10*(decile_boundaries+1), scalings,
-               color='forestgreen', linestyle='--')
+               color='green', linestyle='--')
 axs[1, 1].set_ylabel(r'$\kappa$')
 axs[1, 1].set_xlabel('AQC hardness percentile')
 
@@ -740,8 +588,8 @@ axs[0, 0].set_yscale('log', base=2)
 axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
 axs[0, 0].set_xlabel('$n$')
 
-axs[0, 1].scatter(deciles+1, scalings, color='forestgreen')
-axs[0, 1].plot(deciles+1, scalings, color='forestgreen', linestyle='--')
+axs[0, 1].scatter(deciles+1, scalings, color='green')
+axs[0, 1].plot(deciles+1, scalings, color='green', linestyle='--')
 axs[0, 1].set_ylabel(r'$\kappa$')
 axs[0, 1].set_xlabel('AQC hardness decile')
 
@@ -771,37 +619,164 @@ axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$')
 axs[1, 0].set_xlabel('$n$')
 
-axs[1, 1].scatter(deciles+1, scalings, color='forestgreen')
-axs[1, 1].plot(deciles+1, scalings, color='forestgreen', linestyle='--')
+axs[1, 1].scatter(deciles+1, scalings, color='green')
+axs[1, 1].plot(deciles+1, scalings, color='green', linestyle='--')
 axs[1, 1].set_ylabel(r'$\kappa$')
 axs[1, 1].set_xlabel('QW hardness decile')
 
-# # log-linear plot of QW probabilities/AQC deciles using boundary values
+# plt.savefig('qw_aqc_deciles_cross_comparison.pdf', dpi=200)
+plt.show()
 
-# scalings = np.zeros_like(decile_boundaries, dtype=np.float64)
-# for decile in decile_boundaries:
-#     y = np.log2(success_probabilities_aqc_decile_boundaries[decile, :])
+# %%
+# plot to check difference between decile boundary and mean
+
+# fig, axs = plt.subplots(3, 2, figsize=(14, 15))
+
+# line = lambda x, m, c: m*x + c
+
+# # log-linear plot using averages
+
+# for decile in deciles:
+#     y = np.log2(mean_durations_aqc_deciles[decile, :])
 #     par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
 #     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+#     print(f'EXP {decile+1}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}')
 #     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
-#     scalings[decile] = m[0]
 
-#     axs[2, 0].scatter(n_array_aqc_reduced, success_probabilities_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
-#     axs[2, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+#     axs[0, 0].scatter(n_array_aqc_reduced,
+#                       mean_durations_aqc_deciles[decile, :], color=decile_colors_1[decile])
+#     axs[0, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
 
-# y = np.log2(success_probabilities_aqc_hardest_fraction_boundary)
+# axs[0, 0].set_yscale('log', base=2)
+
+# axs[0, 0].set_ylabel('$\mathrm{Mean}(T_{0.99})$')
+# axs[0, 0].set_xlabel('$n$')
+
+# # log-log plot using averages
+
+# for decile in deciles:
+#     y = np.log2(mean_durations_aqc_deciles[decile, :])
+#     x = np.log2(n_array_aqc_reduced)
+#     par, cov = optimize.curve_fit(line, x, y)
+#     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+#     # fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
+#     fit = 2**c[0] * n_array_aqc_reduced**m[0]
+#     axs[0, 1].scatter(n_array_aqc_reduced,
+#                       mean_durations_aqc_deciles[decile, :], color=decile_colors_1[decile])
+#     axs[0, 1].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+# axs[0, 1].set_xscale('log', base=2)
+# axs[0, 1].set_yscale('log', base=2)
+
+# x_ticks = np.arange(5, 12)
+# x_tick_labels = [f'${x}$' for x in x_ticks]
+# axs[0, 1].set_xticks(x_ticks)
+# axs[0, 1].set_xticklabels(x_tick_labels)
+
+# axs[0, 1].set_ylabel('$\mathrm{Mean}(T_{0.99})$')
+# axs[0, 1].set_xlabel('$n$')
+
+# # log-linear plot using boundary values
+
+# for decile in decile_boundaries:
+#     y = np.log2(durations_aqc_decile_boundaries[decile, :])
+#     par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+#     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+#     print(f'EXP {decile+1}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}')
+#     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+
+#     axs[1, 0].scatter(n_array_aqc_reduced,
+#                       durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
+#     axs[1, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+# y = np.log2(durations_aqc_hardest_fraction_boundary)
 # par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
 # m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 # fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
-# axs[2, 0].scatter(n_array_aqc_reduced, success_probabilities_aqc_hardest_fraction_boundary, color='blue')
-# axs[2, 0].plot(n_array_aqc_reduced, fit, color='blue')
+# axs[1, 0].scatter(n_array_aqc_reduced,
+#                   durations_aqc_hardest_fraction_boundary, color='blue')
+# axs[1, 0].plot(n_array_aqc_reduced, fit, color='blue')
+
+# axs[1, 0].set_yscale('log', base=2)
+
+# axs[1, 0].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+# axs[1, 0].set_xlabel('$n$')
+
+# # log-log plot using boundary values
+
+# for decile in decile_boundaries:
+#     y = np.log2(durations_aqc_decile_boundaries[decile, :])
+#     x = np.log2(n_array_aqc_reduced)
+#     par, cov = optimize.curve_fit(line, x, y)
+#     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+#     # fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
+#     fit = 2**c[0] * n_array_aqc_reduced**m[0]
+#     axs[1, 1].scatter(n_array_aqc_reduced,
+#                       durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
+#     axs[1, 1].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+# y = np.log2(durations_aqc_hardest_fraction_boundary)
+# x = np.log2(n_array_aqc_reduced)
+# par, cov = optimize.curve_fit(line, x, y)
+# m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+# # fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
+# fit = 2**c[0] * n_array_aqc_reduced**m[0]
+# axs[1, 1].scatter(n_array_aqc_reduced,
+#                   durations_aqc_hardest_fraction_boundary, color='blue')
+# axs[1, 1].plot(n_array_aqc_reduced, fit, color='blue')
+
+# axs[1, 1].set_xscale('log', base=2)
+# axs[1, 1].set_yscale('log', base=2)
+
+# x_ticks = np.arange(5, 12)
+# x_tick_labels = [f'${x}$' for x in x_ticks]
+# axs[1, 1].set_xticks(x_ticks)
+# axs[1, 1].set_xticklabels(x_tick_labels)
+
+# axs[1, 1].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+# axs[1, 1].set_xlabel('$n$')
+
+# # log-linear plot of median
+
+# decile = 4
+
+# y = np.log2(durations_aqc_decile_boundaries[decile, :])
+# par, cov = optimize.curve_fit(line, n_array_aqc_reduced, y)
+# m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+# print(f'EXP {decile+1}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}')
+# fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc_reduced])
+
+# axs[2, 0].scatter(n_array_aqc_reduced,
+#                   durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
+# axs[2, 0].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
 # axs[2, 0].set_yscale('log', base=2)
-# axs[2, 0].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+
+# axs[2, 0].set_ylabel('$\mathrm{Median}(T_{0.99})$')
 # axs[2, 0].set_xlabel('$n$')
 
-# axs[2, 1].scatter(decile_boundaries+1, scalings)
-# axs[2, 1].plot(decile_boundaries+1, scalings)
-# axs[2, 1].set_ylabel(r'$\kappa$')
+# # log-log plot of median
 
-# plt.savefig('qw_aqc_deciles_cross_comparison.pdf', dpi=200)
-plt.show()
+# y = np.log2(durations_aqc_decile_boundaries[decile, :])
+# x = np.log2(n_array_aqc_reduced)
+# par, cov = optimize.curve_fit(line, x, y)
+# m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+# # fit = 2**np.array([line(x, m[0], c[0]) for x in np.log2(n_array_aqc_reduced)])
+# fit = 2**c[0] * n_array_aqc_reduced**m[0]
+# axs[2, 1].scatter(n_array_aqc_reduced,
+#                   durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
+# axs[2, 1].plot(n_array_aqc_reduced, fit, color=decile_colors_1[decile])
+
+# axs[2, 1].set_xscale('log', base=2)
+# axs[2, 1].set_yscale('log', base=2)
+
+# x_ticks = np.arange(5, 12)
+# x_tick_labels = [f'${x}$' for x in x_ticks]
+# axs[2, 1].set_xticks(x_ticks)
+# axs[2, 1].set_xticklabels(x_tick_labels)
+
+# axs[2, 1].set_ylabel('$\mathrm{Median}(T_{0.99})$')
+# axs[2, 1].set_xlabel('$n$')
+
+# # plt.savefig('aqc_deciles_plots.pdf', dpi=200)
+# plt.show()
