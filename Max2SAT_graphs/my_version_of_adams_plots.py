@@ -8,10 +8,6 @@ import matplotlib.gridspec as gridspec
 # %%
 # initialisations
 
-# n_array_qw = np.arange(5, 21)
-# n_array_aqc = np.arange(5, 16)
-# n_array_aqc_reduced = np.arange(5, 12)
-
 plt.rc('text', usetex=True)
 plt.rc('font', size=14)
 
@@ -414,7 +410,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# histogram of MIXBnB calls (Adam's way)
+# histogram of MIXBnB calls (plotting the log on a linear x-axis)
 # I think Adam's way of doing this means the probability density is changed and depends on the base of the exponent?
 
 n = 20
@@ -455,7 +451,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# histogram of MIXBnB calls (my way)
+# histogram of MIXBnB calls (plotting on a logarithmic x-axis)
 
 n = 20
 
@@ -489,5 +485,3 @@ plt.ylabel('$p(N_\mathrm{calls})$', fontsize=20)
 
 plt.tight_layout()
 plt.show()
-
-# %%
