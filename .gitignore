@@ -3,6 +3,7 @@
 *.txt
 *.csv
 *.pdf
+*.pkl
 
 /.idea
 /__pycache__
