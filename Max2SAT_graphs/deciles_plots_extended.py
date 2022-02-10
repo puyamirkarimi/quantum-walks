@@ -4,6 +4,7 @@
 from scipy import optimize
 from matplotlib import pyplot as plt
 import numpy as np
+import pickle as pkl
 
 # %%
 # initialisations
@@ -489,6 +490,75 @@ for i, n in enumerate(n_array_aqc):
     median_durations_aqc_hardest_fraction[i] = np.median(nan_to_pos_inf(aqc_hardest_durations))
     if median_durations_aqc_hardest_fraction[i] == float('inf'):
         median_durations_aqc_hardest_fraction[i] = float('nan')
+
+# %%
+# pickle the important data
+
+data = [mean_crosson_prob,
+        median_crosson_prob,
+        success_probabilities_qw_decile_boundaries,
+        success_probabilities_aqc_decile_boundaries,
+        durations_qw_decile_boundaries,
+        durations_aqc_decile_boundaries,
+        success_probabilities_qw_hardest_fraction_boundary,
+        success_probabilities_aqc_hardest_fraction_boundary,
+        durations_qw_hardest_fraction_boundary,
+        durations_aqc_hardest_fraction_boundary,
+        mean_success_probabilities_qw_deciles,
+        median_success_probabilities_qw_deciles,
+        mean_success_probabilities_qw_hardest_fraction,
+        median_success_probabilities_qw_hardest_fraction,
+        mean_success_probabilities_aqc_deciles,
+        median_success_probabilities_aqc_deciles,
+        mean_success_probabilities_aqc_hardest_fraction,
+        median_success_probabilities_aqc_hardest_fraction,
+        mean_durations_qw_deciles,
+        median_durations_qw_deciles,
+        mean_durations_aqc_deciles,
+        median_durations_aqc_deciles,
+        mean_durations_qw_hardest_fraction,
+        median_durations_qw_hardest_fraction,
+        mean_durations_aqc_hardest_fraction,
+        median_durations_aqc_hardest_fraction,
+        success_probabilities_aqc_hardest_fraction,
+        durations_qw_hardest_fraction
+        ]
+
+with open('decile_plots_extended.pkl', 'wb') as f:
+    pkl.dump(data, f)
+
+# %%
+# unpickle the important data
+
+with open('decile_plots_extended.pkl', 'rb') as f:
+    (mean_crosson_prob,
+    median_crosson_prob,
+    success_probabilities_qw_decile_boundaries,
+    success_probabilities_aqc_decile_boundaries,
+    durations_qw_decile_boundaries,
+    durations_aqc_decile_boundaries,
+    success_probabilities_qw_hardest_fraction_boundary,
+    success_probabilities_aqc_hardest_fraction_boundary,
+    durations_qw_hardest_fraction_boundary,
+    durations_aqc_hardest_fraction_boundary,
+    mean_success_probabilities_qw_deciles,
+    median_success_probabilities_qw_deciles,
+    mean_success_probabilities_qw_hardest_fraction,
+    median_success_probabilities_qw_hardest_fraction,
+    mean_success_probabilities_aqc_deciles,
+    median_success_probabilities_aqc_deciles,
+    mean_success_probabilities_aqc_hardest_fraction,
+    median_success_probabilities_aqc_hardest_fraction,
+    mean_durations_qw_deciles,
+    median_durations_qw_deciles,
+    mean_durations_aqc_deciles,
+    median_durations_aqc_deciles,
+    mean_durations_qw_hardest_fraction,
+    median_durations_qw_hardest_fraction,
+    mean_durations_aqc_hardest_fraction,
+    median_durations_aqc_hardest_fraction,
+    success_probabilities_aqc_hardest_fraction,
+    durations_qw_hardest_fraction) = pkl.load(f)
 
 # %%
 # percentile plots for QW/AQC using corresponding hardness
