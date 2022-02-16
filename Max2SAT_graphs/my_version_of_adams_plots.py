@@ -410,7 +410,71 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# histogram of MIXBnB calls (plotting the log on a linear x-axis)
+# plot AQC duration against QW success probability
+
+n = 15
+qw = adams_quantum_walk_data(n)
+aqc = adams_adiabatic_data(n)
+
+qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
+
+fig = plt.figure(figsize=(8, 5.5))
+plt.subplot()
+
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, cmap='Greens')
+vals = hex.get_array()
+centres = hex.get_offsets()
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
+
+cb = plt.colorbar()
+cb.ax.tick_params(labelsize=17, size=5)
+plt.xlabel(r'$\bar{P}(0, 100)$', fontsize=22)
+plt.ylabel(r'$T_{0.99}$', fontsize=22)
+xt = np.arange(-2.5, -1, 0.5)
+xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
+plt.xticks(xt, xtl, fontsize=17)
+yt = np.arange(1.5, 4, 0.5)
+ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
+plt.yticks(yt, ytl, fontsize=17)
+plt.tick_params(direction='in', size=5)
+plt.xlim(x_min, x_max)
+plt.ylim(y_min, y_max)
+
+# xr_tmp, yr_tmp = np.argsort(np.log2(x)), np.argsort(np.log2(y))
+# xr, yr = np.empty_like(xr_tmp), np.empty_like(yr_tmp)
+# xr[xr_tmp], yr[yr_tmp] = np.arange(len(x)), np.arange(len(y))
+# covr = np.cov(xr, yr)
+# sr = covr[1, 0]/(np.std(xr)*np.std(yr))
+
+# line = lambda x, m, c: (x*m)+c
+# par, cov = spo.curve_fit(line, np.log2(x), np.log2(y))
+# m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+# print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
+# fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(x)])
+
+# plt.figure(figsize=(8, 5))
+# plt.hexbin(np.log2(x), np.log2(y), gridsize=50, cmap='Greens')
+# cb = plt.colorbar()
+# cb.ax.tick_params(labelsize=17, size=5)
+# plt.xlabel(r'$\bar{P}(0, 100)$', fontsize=22)
+# plt.ylabel(r'$T_{0.99}$', fontsize=22)
+# xt = np.arange(-9, -4, 1)
+# xtl = ['$2^{' + f'{x}' + '}$' for x in xt]
+# plt.xticks(xt, xtl, fontsize=17)
+# yt = np.arange(5, 13, 1)
+# ytl = ['$2^{' + f'{y}' + '}$' for y in yt]
+# plt.yticks(yt, ytl, fontsize=17)
+# plt.tick_params(direction='in', size=5)
+# plt.xlim(-9.5, -4.8)
+# plt.ylim(4.55, 12)
+
+plt.tight_layout()
+# plt.savefig('aqcqw_hexbin.pdf', bbox_inches='tight')
+plt.show()
+
+# %%
+# probability density histogram of MIXBnB calls (plotting the log on a linear x-axis)
 # I think Adam's way of doing this means the probability density is changed and depends on the base of the exponent?
 
 n = 20
@@ -442,6 +506,48 @@ xtl = [f'${x}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=17)
 plt.xlim(1.7, 4.8)
 yt = np.arange(0, 2.5, 0.5)
+ytl = [f'${y:.1f}$' for y in yt]
+plt.yticks(yt, ytl, fontsize=17)
+plt.tick_params(direction='in', size=5)
+plt.tight_layout()
+
+# plt.savefig('mixbnb20hist.pdf', bbox_inches='tight')
+plt.show()
+
+# %%
+# probabilitiy histogram of MIXBnB calls (plotting the log on a linear x-axis)
+
+n = 20
+bnb = adams_mixbnb_data(n)
+bnb_crosson = adams_mixbnb_data_crosson()
+
+fig = plt.figure(figsize=(8, 5.5))
+plt.subplot()
+
+h, b = np.histogram(np.log10(bnb), bins='auto')
+db = b[1:]-b[:-1]
+b = (b[1:]+b[:-1])/2
+htot = np.dot(h, db)
+# h = (h/htot)
+h = h/10000
+plt.bar(b, h, width=db*1.0, alpha=0.75,
+        color='green')
+
+h, b = np.histogram(np.log10(bnb_crosson), bins='auto')
+db = b[1:]-b[:-1]
+b = (b[1:]+b[:-1])/2
+htot = np.dot(h, db)
+# h = (h/htot)
+h = h/127
+plt.bar(b, h, width=db*1.0, alpha=0.75, color='red')
+
+plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=20)
+plt.ylabel('$P(\log_{10}(N_\mathrm{calls}))$', fontsize=20)
+xt = np.arange(2, 5, 1)
+xtl = [f'${x}$' for x in xt]
+plt.xticks(xt, xtl, fontsize=17)
+plt.xlim(1.7, 4.8)
+yt = np.arange(0, 0.35, 0.05)
 ytl = [f'${y:.1f}$' for y in yt]
 plt.yticks(yt, ytl, fontsize=17)
 plt.tick_params(direction='in', size=5)
