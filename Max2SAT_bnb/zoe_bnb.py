@@ -169,6 +169,10 @@ def prob_array_paired_instances(filename):
     return np.loadtxt('./../../instances_pairs_adam_format_5/'+filename+".txt")
 
 
+def prob_array_crosson(filename):
+    return np.loadtxt('./../../instances_crosson/'+filename+".m2s")
+
+
 # if __name__ == '__main__':
 #     instance_names, instance_n_bits = get_instances()
 
@@ -207,31 +211,40 @@ def prob_array_paired_instances(filename):
 #         np.savetxt(f, counts)
 
 
-if __name__ == '__main__':
-    '''running for the paired instances'''
+# if __name__ == '__main__':
+#     '''running for the paired instances'''
 
-    counts = np.zeros(10000)
-    counts_transformed = np.zeros(10000)
+#     counts = np.zeros(10000)
+#     counts_transformed = np.zeros(10000)
 
-    n = 5
+#     n = 5
 
-    num_instances = 10000
+#     num_instances = 10000
 
-    for i in range(num_instances):
-        instance_name = str(n) + "_" + str(i)
-        instance_name_transformed = str(n) + "_" + str(i) + "_transformed"
-        solution = solve_m2s(n, prob_array_paired_instances(instance_name))
-        solution_transformed = solve_m2s(n, prob_array_paired_instances(instance_name_transformed))
-        counts[i] = solution['calls']
-        counts_transformed[i] = solution_transformed['calls']
-        if i % 100 == 0:
-            print("loop:", i)
+#     for i in range(num_instances):
+#         instance_name = str(n) + "_" + str(i)
+#         instance_name_transformed = str(n) + "_" + str(i) + "_transformed"
+#         solution = solve_m2s(n, prob_array_paired_instances(instance_name))
+#         solution_transformed = solve_m2s(n, prob_array_paired_instances(instance_name_transformed))
+#         counts[i] = solution['calls']
+#         counts_transformed[i] = solution_transformed['calls']
+#         if i % 100 == 0:
+#             print("loop:", i)
 
-    with open("paired_counts_"+str(n)+".txt", "ab") as f:         # saves counts
-        f.write(b"\n")
-        np.savetxt(f, counts)
+#     with open("paired_counts_"+str(n)+".txt", "ab") as f:         # saves counts
+#         f.write(b"\n")
+#         np.savetxt(f, counts)
     
-    with open("paired_transformed_counts_"+str(n)+".txt", "ab") as f:         # saves counts
-        f.write(b"\n")
-        np.savetxt(f, counts_transformed)
+#     with open("paired_transformed_counts_"+str(n)+".txt", "ab") as f:         # saves counts
+#         f.write(b"\n")
+#         np.savetxt(f, counts_transformed)
 
+
+if __name__ == '__main__':
+    '''For testing Crosson instances'''
+
+    n = 20
+    for name in range(137):
+        instance_name = str(name)
+        solution = solve_m2s(n, prob_array_crosson(instance_name))
+        print(solution['sol'])
