@@ -5,6 +5,7 @@ from scipy import optimize
 from matplotlib import pyplot as plt
 import numpy as np
 import pickle as pkl
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # %%
 # initialisations
@@ -568,12 +569,14 @@ fig, axs = plt.subplots(2, 2, figsize=(14, 10))
 # log-linear plot of QW probabilities/QW deciles using boundary values
 
 scalings = np.zeros_like(decile_boundaries, dtype=np.float64)
+scalings_error = np.zeros_like(decile_boundaries, dtype=np.float64)
 for decile in decile_boundaries:
     y = np.log2(success_probabilities_qw_decile_boundaries[decile, :])
     par, cov = optimize.curve_fit(line, n_array_qw, y)
     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_qw])
     scalings[decile] = m[0]
+    scalings_error[decile] = m[1]
 
     axs[0, 0].scatter(
         n_array_qw, success_probabilities_qw_decile_boundaries[decile, :], color=decile_colors_1[decile])
@@ -584,6 +587,7 @@ y = np.log2(success_probabilities_qw_hardest_fraction_boundary)
 par, cov = optimize.curve_fit(line, n_array_qw, y)
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 scaling_hardest = m[0]
+scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_qw])
 axs[0, 0].scatter(
     n_array_qw, success_probabilities_qw_hardest_fraction_boundary, color='blue')
@@ -593,21 +597,30 @@ axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
 axs[0, 0].set_xlabel('$n$')
 
 axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='green')
+axs[0, 1].errorbar(10*(decile_boundaries+1), scalings, yerr=scalings_error, capsize=4.0, fmt='none', ecolor='green')
 axs[0, 1].scatter(10 * 9.99, scaling_hardest, color='blue')
+axs[0, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=4.0, fmt='none', ecolor='blue')
 axs[0, 1].plot(10 * (decile_boundaries+1), scalings,
                color='green', linestyle='--')
 axs[0, 1].set_ylabel(r'$\kappa$')
 axs[0, 1].set_xlabel('QW hardness percentile')
 
+print('Scaling exponents for QW deciles:')
+for i in range(len(deciles)-1):
+    print(f'{scalings[i]} +- {scalings_error[i]}')
+print(f'Scaling exponent for the 99th QW percentile: {scaling_hardest} +- {scaling_hardest_error}')
+
 # log-linear plot of AQC durations/AQC deciles using boundary values
 
 scalings = np.zeros_like(decile_boundaries, dtype=np.float64)
+scalings_error = np.zeros_like(decile_boundaries, dtype=np.float64)
 for decile in decile_boundaries:
     y = np.log2(durations_aqc_decile_boundaries[decile, :])
     par, cov = optimize.curve_fit(line, n_array_aqc, y)
     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
     scalings[decile] = m[0]
+    scalings_error[decile] = m[1]
 
     axs[1, 0].scatter(n_array_aqc,
                       durations_aqc_decile_boundaries[decile, :], color=decile_colors_1[decile])
@@ -618,6 +631,7 @@ y = y[~np.isnan(y)]
 par, cov = optimize.curve_fit(line, n_array_aqc[:len(y)], y)
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 scaling_hardest = m[0]
+scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
 axs[1, 0].scatter(n_array_aqc,
                   durations_aqc_hardest_fraction_boundary, color='blue')
@@ -626,12 +640,19 @@ axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$')
 axs[1, 0].set_xlabel('$n$')
 
+axs[1, 1].errorbar(10*(decile_boundaries+1), scalings, yerr=scalings_error, capsize=4.0, fmt='none', ecolor='green')
 axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='green')
+axs[1, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=4.0, fmt='none', ecolor='blue')
 axs[1, 1].scatter(10*9.99, scaling_hardest, color='blue')
 axs[1, 1].plot(10*(decile_boundaries+1), scalings,
                color='green', linestyle='--')
 axs[1, 1].set_ylabel(r'$\kappa$')
 axs[1, 1].set_xlabel('AQC hardness percentile')
+
+print('\nScaling exponents for AQC deciles:')
+for i in range(len(deciles)-1):
+    print(f'{scalings[i]} +- {scalings_error[i]}')
+print(f'Scaling exponent for the 99th AQC percentile: {scaling_hardest} +- {scaling_hardest_error}')
 
 # plt.savefig('qw_aqc_decile_boundaries.pdf', dpi=200)
 plt.show()
@@ -644,12 +665,14 @@ fig, axs = plt.subplots(2, 2, figsize=(14, 10))
 # log-linear plot of QW probabilities/AQC deciles using median values
 
 scalings = np.zeros_like(deciles, dtype=np.float64)
+scalings_error = np.zeros_like(deciles, dtype=np.float64)
 for decile in deciles:
     y = np.log2(median_success_probabilities_aqc_deciles[decile, :])
     par, cov = optimize.curve_fit(line, n_array_aqc, y)
     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
     scalings[decile] = m[0]
+    scalings_error[decile] = m[1]
 
     axs[0, 0].scatter(n_array_aqc,
                       median_success_probabilities_aqc_deciles[decile, :], color=decile_colors_1[decile])
@@ -659,6 +682,7 @@ y = np.log2(median_success_probabilities_aqc_hardest_fraction)
 par, cov = optimize.curve_fit(line, n_array_aqc, y)
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 scaling_hardest = m[0]
+scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
 axs[0, 0].scatter(n_array_aqc,
                   median_success_probabilities_aqc_hardest_fraction, color='blue')
@@ -667,20 +691,42 @@ axs[0, 0].set_yscale('log', base=2)
 axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
 axs[0, 0].set_xlabel('$n$')
 
+axs[0, 1].errorbar(deciles+1, scalings, yerr=scalings_error, capsize=4.0, fmt='none', ecolor='green')
 axs[0, 1].scatter(deciles+1, scalings, color='green')
 axs[0, 1].plot(deciles+1, scalings, color='green', linestyle='--')
 axs[0, 1].set_ylabel(r'$\kappa$')
 axs[0, 1].set_xlabel('AQC hardness decile')
+axs[0, 1].set_xticks(range(1, 11, 2))
+ylims = (-0.6367678176658794, -0.38279156420532306)
+axs[0, 1].set_ylim(ylims)
+
+# divider for hardest 1%
+divider = make_axes_locatable(axs[0, 1])
+ax2 = divider.append_axes("right", size="10%", pad=0)
+axs[0, 1].figure.add_axes(ax2)
+ax2.scatter(1, scaling_hardest, color='blue')
+ax2.errorbar(1, scaling_hardest, yerr=scaling_hardest_error, capsize=4.0, fmt='none', ecolor='blue')
+ax2.set_ylim(ylims)
+ax2.set_xticks([1])
+ax2.set_xticklabels(['Top 1\%'], rotation=45)
+ax2.set_yticks([])
+
+print('\nScaling exponents for the deciles (top plot):')
+for i in range(len(deciles)-1):
+    print(f'{scalings[i]} +- {scalings_error[i]}')
+print(f'Scaling exponent for the hardest 1% (top plot): {scaling_hardest} +- {scaling_hardest_error}')
 
 # log-linear plot of AQC durations/QW deciles using median values
 
 scalings = np.zeros_like(deciles, dtype=np.float64)
+scalings_error = np.zeros_like(deciles, dtype=np.float64)
 for decile in deciles:
     y = np.log2(median_durations_qw_deciles[decile, :])
     par, cov = optimize.curve_fit(line, n_array_aqc, y)
     m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
     fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
     scalings[decile] = m[0]
+    scalings_error[decile] = m[1]
 
     axs[1, 0].scatter(n_array_aqc,
                       median_durations_qw_deciles[decile, :], color=decile_colors_1[decile])
@@ -690,6 +736,7 @@ y = np.log2(median_durations_qw_hardest_fraction)
 par, cov = optimize.curve_fit(line, n_array_aqc, y)
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 scaling_hardest = m[0]
+scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
 axs[1, 0].scatter(n_array_aqc,
                   median_durations_qw_hardest_fraction, color='blue')
@@ -698,10 +745,30 @@ axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$')
 axs[1, 0].set_xlabel('$n$')
 
+axs[1, 1].errorbar(deciles+1, scalings, yerr=scalings_error, capsize=4.0, fmt='none', ecolor='green')
 axs[1, 1].scatter(deciles+1, scalings, color='green')
 axs[1, 1].plot(deciles+1, scalings, color='green', linestyle='--')
 axs[1, 1].set_ylabel(r'$\kappa$')
 axs[1, 1].set_xlabel('QW hardness decile')
+axs[1, 1].set_xticks(range(1, 11, 2))
+ylims = (0.04496672626920124, 0.49903791178845647)
+axs[1, 1].set_ylim(ylims)
+
+# divider for hardest 1%
+divider = make_axes_locatable(axs[1, 1])
+ax2 = divider.append_axes("right", size="10%", pad=0)
+axs[1, 1].figure.add_axes(ax2)
+ax2.scatter(1, scaling_hardest, color='blue')
+ax2.errorbar(1, scaling_hardest, yerr=scaling_hardest_error, capsize=4.0, fmt='none', ecolor='blue')
+ax2.set_ylim(ylims)
+ax2.set_xticks([1])
+ax2.set_xticklabels(['Top 1\%'], rotation=45)
+ax2.set_yticks([])
+
+print('\nScaling exponents for the deciles (bottom plot):')
+for i in range(len(deciles)-1):
+    print(f'{scalings[i]} +- {scalings_error[i]}')
+print(f'Scaling exponent for the hardest 1% (bottom plot): {scaling_hardest} +- {scaling_hardest_error}')
 
 # plt.savefig('qw_aqc_deciles_cross_comparison.pdf', dpi=200)
 plt.show()
