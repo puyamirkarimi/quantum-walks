@@ -4,6 +4,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
+from scipy.optimize import curve_fit
 
 # %%
 # initialisations
@@ -410,7 +411,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# plot AQC duration against QW success probability
+# plot AQC duration against QW success probability for n = 15
 
 n = 15
 qw = adams_quantum_walk_data(n)
@@ -468,6 +469,105 @@ plt.ylim(y_min, y_max)
 # plt.tick_params(direction='in', size=5)
 # plt.xlim(-9.5, -4.8)
 # plt.ylim(4.55, 12)
+
+plt.tight_layout()
+plt.show()
+
+# %%
+# plot AQC duration against QW success probability for n = 5, 15
+
+fig = plt.figure(figsize=(16, 6))
+axs = []
+gs1 = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 0.04])
+# gs1.update(wspace=0.25)
+
+# n = 5 plot
+axs.append(plt.subplot(gs1[0]))
+n = 5
+
+qw = adams_quantum_walk_data(n)
+aqc = adams_adiabatic_data(n)
+
+qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
+
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens')
+vals = hex.get_array()
+centres = hex.get_offsets()
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
+
+plt.xlabel(r'$\bar{P}(0, 100)$', fontsize=22)
+plt.ylabel(r'$T_{0.99}$', fontsize=22)
+xt = np.arange(-0.8, -0.4, 0.1)
+xtl = ['$10^{' + f'{np.round(x,3)}' + '}$' for x in xt]
+plt.xticks(xt, xtl, fontsize=17)
+yt = np.arange(1.2, 2.4, 0.2)
+ytl = ['$10^{' + f'{np.round(y,3)}' + '}$' for y in yt]
+plt.yticks(yt, ytl, fontsize=17)
+plt.tick_params(direction='in', size=5)
+plt.xlim(x_min, x_max)
+plt.ylim(y_min, y_max)
+
+xr_tmp, yr_tmp = np.argsort(np.log2(qw)), np.argsort(np.log2(aqc))
+xr, yr = np.empty_like(xr_tmp), np.empty_like(yr_tmp)
+xr[xr_tmp], yr[yr_tmp] = np.arange(len(qw)), np.arange(len(aqc))
+covr = np.cov(xr, yr)
+sr = covr[1, 0]/(np.std(xr)*np.std(yr))
+
+line = lambda x, m, c: (x*m)+c
+par, cov = curve_fit(line, np.log2(qw), np.log2(aqc))
+m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
+fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(qw)])
+
+# n = 15 plot
+axs.append(plt.subplot(gs1[1]))
+n = 15
+
+qw = adams_quantum_walk_data(n)
+aqc = adams_adiabatic_data(n)
+
+qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
+
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens')
+vals = hex.get_array()
+centres = hex.get_offsets()
+x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
+y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
+
+plt.xlabel(r'$\bar{P}(0, 100)$', fontsize=22)
+plt.ylabel(r'$T_{0.99}$', fontsize=22)
+xt = np.arange(-2.5, -1, 0.5)
+xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
+plt.xticks(xt, xtl, fontsize=17)
+yt = np.arange(1.5, 4, 0.5)
+ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
+plt.yticks(yt, ytl, fontsize=17)
+plt.tick_params(direction='in', size=5)
+plt.xlim(x_min, x_max)
+plt.ylim(y_min, y_max)
+
+ax = fig.add_subplot(gs1[2])
+# plt.axis('off')
+cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
+cb.ax.tick_params(labelsize=17, size=5)
+# pos = ax.get_position()
+# points = pos.get_points()
+# print(points)
+# pos.set_points(points)
+# ax.set_position(pos)
+
+xr_tmp, yr_tmp = np.argsort(np.log2(qw)), np.argsort(np.log2(aqc))
+xr, yr = np.empty_like(xr_tmp), np.empty_like(yr_tmp)
+xr[xr_tmp], yr[yr_tmp] = np.arange(len(qw)), np.arange(len(aqc))
+covr = np.cov(xr, yr)
+sr = covr[1, 0]/(np.std(xr)*np.std(yr))
+
+line = lambda x, m, c: (x*m)+c
+par, cov = curve_fit(line, np.log2(qw), np.log2(aqc))
+m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
+fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(qw)])
 
 plt.tight_layout()
 # plt.savefig('aqcqw_hexbin.pdf', bbox_inches='tight')
