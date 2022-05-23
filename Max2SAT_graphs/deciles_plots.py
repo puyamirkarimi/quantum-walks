@@ -593,8 +593,9 @@ axs[0, 0].scatter(
     n_array_qw, success_probabilities_qw_hardest_fraction_boundary, color='blue')
 axs[0, 0].plot(n_array_qw, fit, color='blue')
 axs[0, 0].set_yscale('log', base=2)
-axs[0, 0].set_ylabel('$\overline{P}(0, 100)$')
-axs[0, 0].set_xlabel('$n$')
+axs[0, 0].set_ylabel('$\overline{P}(0, 100)$', fontsize=35)
+axs[0, 0].set_xlabel('$n$', fontsize=35)
+axs[0, 0].tick_params(axis='both', labelsize=30)
 
 axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='green')
 axs[0, 1].errorbar(10*(decile_boundaries+1), scalings, yerr=scalings_error, capsize=4.0, fmt='none', ecolor='green')
@@ -602,8 +603,9 @@ axs[0, 1].scatter(10 * 9.99, scaling_hardest, color='blue')
 axs[0, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=4.0, fmt='none', ecolor='blue')
 axs[0, 1].plot(10 * (decile_boundaries+1), scalings,
                color='green', linestyle='--')
-axs[0, 1].set_ylabel(r'$\kappa$')
-axs[0, 1].set_xlabel('QW hardness percentile')
+axs[0, 1].set_ylabel(r'$\kappa$', fontsize=35)
+axs[0, 1].set_xlabel('QW hardness percentile', fontsize=35)
+axs[0, 1].tick_params(axis='both', labelsize=30)
 
 print('Scaling exponents for QW deciles:')
 for i in range(len(deciles)-1):
@@ -637,8 +639,9 @@ axs[1, 0].scatter(n_array_aqc,
                   durations_aqc_hardest_fraction_boundary, color='blue')
 axs[1, 0].plot(n_array_aqc, fit, color='blue')
 axs[1, 0].set_yscale('log', base=2)
-axs[1, 0].set_ylabel('$T_{0.99}$')
-axs[1, 0].set_xlabel('$n$')
+axs[1, 0].set_ylabel('$T_{0.99}$', fontsize=35)
+axs[1, 0].set_xlabel('$n$', fontsize=35)
+axs[1, 0].tick_params(axis='both', labelsize=30)
 
 axs[1, 1].errorbar(10*(decile_boundaries+1), scalings, yerr=scalings_error, capsize=4.0, fmt='none', ecolor='green')
 axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='green')
@@ -646,15 +649,17 @@ axs[1, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize
 axs[1, 1].scatter(10*9.99, scaling_hardest, color='blue')
 axs[1, 1].plot(10*(decile_boundaries+1), scalings,
                color='green', linestyle='--')
-axs[1, 1].set_ylabel(r'$\kappa$')
-axs[1, 1].set_xlabel('AQC hardness percentile')
+axs[1, 1].set_ylabel(r'$\kappa$', fontsize=35)
+axs[1, 1].set_xlabel('AQC hardness percentile', fontsize=35)
+axs[1, 1].tick_params(axis='both', labelsize=30)
 
 print('\nScaling exponents for AQC deciles:')
 for i in range(len(deciles)-1):
     print(f'{scalings[i]} +- {scalings_error[i]}')
 print(f'Scaling exponent for the 99th AQC percentile: {scaling_hardest} +- {scaling_hardest_error}')
 
-# plt.savefig('qw_aqc_decile_boundaries.pdf', dpi=200)
+fig.tight_layout()
+# plt.savefig('qw_aqc_decile_boundaries_windows.pdf', dpi=200)
 plt.show()
 
 # %%
