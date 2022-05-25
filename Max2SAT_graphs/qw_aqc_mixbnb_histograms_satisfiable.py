@@ -45,12 +45,12 @@ def get_satisfiable_list(n):
 
 if __name__ == '__main__':
     plt.rc('text', usetex=True)
-    plt.rc('font', size=13)
+    plt.rc('font', size=14)
 
-    fig = plt.figure(figsize=(5.5, 6.5))
+    fig = plt.figure(figsize=(6, 7))
 
     gs = GridSpec(3, 2, width_ratios=[1, 1], height_ratios=[1, 1, 1])
-    gs.update(hspace=0.45, wspace=0.4)
+    # gs.update(hspace=0.45, wspace=0.4)
     axs = list()
     axs.append(fig.add_subplot(gs[0]))
     axs.append(fig.add_subplot(gs[1]))
@@ -117,9 +117,10 @@ if __name__ == '__main__':
         axs[i].vlines(sat_average_qw, 0, ylim[1], color='black', linestyle='--')
         axs[i].vlines(unsat_average_qw, 0, ylim[1], color='black')
         axs[i].set_ylim(ylim)
-        axs[i].set_xlabel(r"$\overline{P}(0, 100)$")
-        axs[i].set_ylabel(r"$p(\overline{P}(0, 100))$")
+        axs[i].set_xlabel(r"$\overline{P}(0, 100)$", fontsize=15)
+        axs[i].set_ylabel(r"$p(\overline{P}(0, 100))$", fontsize=15)
         axs[i].set_xlim((min_prob, max_prob))
+        axs[i].tick_params(axis='both', labelsize=13)
 
         if i == 0:
             axs[i+2].hist(times_unsatisfiable, x_aqc, color='green', alpha=0.75, density=True, label='unsatisfiable')
@@ -128,9 +129,10 @@ if __name__ == '__main__':
             axs[i+2].vlines(sat_average_aqc, 0, ylim[1], color='black', linestyle='--')
             axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
-            axs[i+2].set_xlabel(r'$T_{0.99}$')
-            axs[i+2].set_ylabel(r'$p(T_{0.99})$')
+            axs[i+2].set_xlabel(r'$T_{0.99}$', fontsize=15)
+            axs[i+2].set_ylabel(r'$p(T_{0.99})$', fontsize=15)
             axs[i+2].set_xlim((min_time, max_time))
+            axs[i+2].tick_params(axis='both', labelsize=13)
             
             axs[i+4].hist(calls_unsatisfiable, x_mixbnb, color='green', alpha=0.75, density=True, label='unsatisfiable')
             axs[i+4].hist(calls_satisfiable, x_mixbnb, color='red', alpha=0.75, density=True, label='satisfiable')
@@ -138,9 +140,10 @@ if __name__ == '__main__':
             axs[i+4].vlines(sat_average_mixbnb, 0, ylim[1], color='black', linestyle='--')
             axs[i+4].vlines(unsat_average_mixbnb, 0, ylim[1], color='black')
             axs[i+4].set_ylim(ylim)
-            axs[i+4].set_xlabel(r"$N_{\mathrm{calls}}$")
-            axs[i+4].set_ylabel(r"$p(N_{\mathrm{calls}})$")
+            axs[i+4].set_xlabel(r"$N_{\mathrm{calls}}$", fontsize=15)
+            axs[i+4].set_ylabel(r"$p(N_{\mathrm{calls}})$", fontsize=15)
             axs[i+4].set_xlim((min_calls, max_calls))
+            axs[i+4].tick_params(axis='both', labelsize=13)
         else:
             # ############################ LOGARITHMIC PLOTS ###############################
             h, b = np.histogram(np.log10(times_unsatisfiable), bins=num_bins, density=True)
@@ -162,9 +165,10 @@ if __name__ == '__main__':
             axs[i+2].vlines(np.log10(unsat_average_aqc), 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
             # axs[i+2].set_xscale('log')
-            axs[i+2].set_xlabel(r'$\log_{10}(T_{0.99})$')
-            axs[i+2].set_ylabel(r'$p(\log_{10}(T_{0.99}))$')
+            axs[i+2].set_xlabel(r'$\log_{10}(T_{0.99})$', fontsize=15)
+            axs[i+2].set_ylabel(r'$p(\log_{10}(T_{0.99}))$', fontsize=15)
             axs[i+2].set_xlim((np.log10(min_time), np.log10(max_time)))
+            axs[i+2].tick_params(axis='both', labelsize=13)
 
             h, b = np.histogram(np.log10(calls_unsatisfiable), bins=num_bins, density=True)
             db = b[1:]-b[:-1]
@@ -185,11 +189,11 @@ if __name__ == '__main__':
             axs[i+4].vlines(np.log10(unsat_average_mixbnb), 0, ylim[1], color='black')
             axs[i+4].set_ylim(ylim)
             # axs[i+2].set_xscale('log')
-            axs[i+4].set_xlabel(r'$\log_{10}(N_{\mathrm{calls}})$')
-            axs[i+4].set_ylabel(r'$p(\log_{10}(N_{\mathrm{calls}}))$')
+            axs[i+4].set_xlabel(r'$\log_{10}(N_{\mathrm{calls}})$', fontsize=15)
+            axs[i+4].set_ylabel(r'$p(\log_{10}(N_{\mathrm{calls}}))$', fontsize=15)
             axs[i+4].set_xlim((np.log10(min_calls), np.log10(max_calls)))
+            axs[i+4].tick_params(axis='both', labelsize=13)
 
-    plt.tick_params(direction='in', top=True, right=True, which='both')
-    plt.tight_layout()
-    # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable.pdf', dpi=200)
+    fig.tight_layout()
+    # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable_windows.pdf', dpi=200)
     plt.show()
