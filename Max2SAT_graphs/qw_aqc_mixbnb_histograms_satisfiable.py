@@ -118,7 +118,6 @@ if __name__ == '__main__':
         axs[i].vlines(unsat_average_qw, 0, ylim[1], color='black')
         axs[i].set_ylim(ylim)
         axs[i].set_xlabel(r"$\overline{P}(0, 100)$", fontsize=15)
-        axs[i].set_ylabel(r"$p(\overline{P}(0, 100))$", fontsize=15)
         axs[i].set_xlim((min_prob, max_prob))
         axs[i].tick_params(axis='both', labelsize=13)
 
@@ -130,7 +129,6 @@ if __name__ == '__main__':
             axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
             axs[i+2].set_xlabel(r'$T_{0.99}$', fontsize=15)
-            axs[i+2].set_ylabel(r'$p(T_{0.99})$', fontsize=15)
             axs[i+2].set_xlim((min_time, max_time))
             axs[i+2].tick_params(axis='both', labelsize=13)
             
@@ -141,7 +139,6 @@ if __name__ == '__main__':
             axs[i+4].vlines(unsat_average_mixbnb, 0, ylim[1], color='black')
             axs[i+4].set_ylim(ylim)
             axs[i+4].set_xlabel(r"$N_{\mathrm{calls}}$", fontsize=15)
-            axs[i+4].set_ylabel(r"$p(N_{\mathrm{calls}})$", fontsize=15)
             axs[i+4].set_xlim((min_calls, max_calls))
             axs[i+4].tick_params(axis='both', labelsize=13)
         else:
@@ -166,7 +163,6 @@ if __name__ == '__main__':
             axs[i+2].set_ylim(ylim)
             # axs[i+2].set_xscale('log')
             axs[i+2].set_xlabel(r'$\log_{10}(T_{0.99})$', fontsize=15)
-            axs[i+2].set_ylabel(r'$p(\log_{10}(T_{0.99}))$', fontsize=15)
             axs[i+2].set_xlim((np.log10(min_time), np.log10(max_time)))
             axs[i+2].tick_params(axis='both', labelsize=13)
 
@@ -190,9 +186,20 @@ if __name__ == '__main__':
             axs[i+4].set_ylim(ylim)
             # axs[i+2].set_xscale('log')
             axs[i+4].set_xlabel(r'$\log_{10}(N_{\mathrm{calls}})$', fontsize=15)
-            axs[i+4].set_ylabel(r'$p(\log_{10}(N_{\mathrm{calls}}))$', fontsize=15)
             axs[i+4].set_xlim((np.log10(min_calls), np.log10(max_calls)))
             axs[i+4].tick_params(axis='both', labelsize=13)
+
+    # axes:
+    xlims = axs[0].get_xlim()
+    axs[0].set_xlim(xlims[1], xlims[0])
+    axs[0].yaxis.tick_right()
+    xlims = axs[1].get_xlim()
+    axs[1].set_xlim(xlims[1], xlims[0])
+    axs[1].set_ylabel(r"$p$", fontsize=15)
+    axs[1].yaxis.tick_right()
+    axs[1].yaxis.set_label_position("right")
+    axs[2].set_ylabel(r'$p$', fontsize=15)
+    axs[4].set_ylabel(r'$p$', fontsize=15)
 
     fig.tight_layout()
     # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable_windows.pdf', dpi=200)
