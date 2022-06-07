@@ -258,57 +258,65 @@ for i, n in enumerate(n_array_aqc):
     median_aqc_durations_unsatisfiable[i] = np.median(nan_to_largest(aqc_durations_unsatisfiable))
 
     errors_aqc_satisfiable[i] = np.std(aqc_durations_satisfiable, ddof=1) / np.sqrt(len(aqc_durations_satisfiable))
-    errors_qw_unsatisfiable[i] = np.std(aqc_durations_unsatisfiable, ddof=1) / np.sqrt(len(aqc_durations_unsatisfiable))
+    errors_aqc_unsatisfiable[i] = np.std(aqc_durations_unsatisfiable, ddof=1) / np.sqrt(len(aqc_durations_unsatisfiable))
 
 # %%
 # plot scaling graphs on log-linear and log-log
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-fig = plt.figure(figsize=(12, 9))
+fig = plt.figure(figsize=(6, 4.75))
+
+m_size = 15
+m_size_res = 35
+
 gs1 = gridspec.GridSpec(2, 2, height_ratios=[1, 1])
-gs1.update(hspace=0.25)
+# gs1.update(hspace=0.25)
 
 # plot QW scaling log-linear
-plt.subplot(gs1[0])
+ax = plt.subplot(gs1[0])
 par,cov=optimize.curve_fit(line, n_array_qw, np.log2(median_qw_probs_satisfiable))
 m_satisfiable=par[0],np.sqrt(cov[0,0])
 c_satisfiable=par[1],np.sqrt(cov[1,1])
 par,cov=optimize.curve_fit(line, n_array_qw, np.log2(median_qw_probs_unsatisfiable))
 m_unsatisfiable=par[0],np.sqrt(cov[0,0])
 c_unsatisfiable=par[1],np.sqrt(cov[1,1])
-plt.scatter(n_array_qw, np.log2(median_qw_probs_satisfiable), color='red')
-plt.scatter(n_array_qw, np.log2(median_qw_probs_unsatisfiable), color='green')
+plt.scatter(n_array_qw, np.log2(median_qw_probs_satisfiable), color='red', s=m_size)
+plt.scatter(n_array_qw, np.log2(median_qw_probs_unsatisfiable), color='green', s=m_size)
 plt.plot(n_array_qw, line(n_array_qw, m_satisfiable[0], c_satisfiable[0]), color='red')
 plt.plot(n_array_qw, line(n_array_qw, m_unsatisfiable[0], c_unsatisfiable[0]), color='green')
-x_ticks = np.arange(6, 21, 2)
+x_ticks = np.arange(5, 25, 5)
 x_tick_labels = ['${}$'.format(x) for x in x_ticks]
 plt.xticks(x_ticks, x_tick_labels)
-y_ticks = np.arange(-9, -1)
+y_ticks = np.arange(-9, 0, 2)
 y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
 plt.yticks(y_ticks, y_tick_labels)
-plt.xlabel(r'$n$')
-plt.ylabel(r"$\mathrm{median}(\overline{P}(0, 100))$")
+# ax.set_xlabel(r'$n$', fontsize=15)
+ax.set_ylabel(r"$\mathrm{median}(\overline{P}(0, 100))$", fontsize=15)
+ax.tick_params(axis='both', labelsize=13)
+ax.set_ylim((-9.378, -0.821))
 
 # plot QW scaling log-log
-plt.subplot(gs1[1])
+ax = plt.subplot(gs1[1])
 par,cov=optimize.curve_fit(line, np.log10(n_array_qw), np.log2(median_qw_probs_satisfiable))
 m_satisfiable=par[0],np.sqrt(cov[0,0])
 c_satisfiable=par[1],np.sqrt(cov[1,1])
 par,cov=optimize.curve_fit(line, np.log10(n_array_qw), np.log2(median_qw_probs_unsatisfiable))
 m_unsatisfiable=par[0],np.sqrt(cov[0,0])
 c_unsatisfiable=par[1],np.sqrt(cov[1,1])
-plt.scatter(np.log10(n_array_qw), np.log2(median_qw_probs_satisfiable), color='red')
-plt.scatter(np.log10(n_array_qw), np.log2(median_qw_probs_unsatisfiable), color='green')
+plt.scatter(np.log10(n_array_qw), np.log2(median_qw_probs_satisfiable), color='red', s=m_size)
+plt.scatter(np.log10(n_array_qw), np.log2(median_qw_probs_unsatisfiable), color='green', s=m_size)
 plt.plot(np.log10(n_array_qw), line(np.log10(n_array_qw), m_satisfiable[0], c_satisfiable[0]), color='red')
 plt.plot(np.log10(n_array_qw), line(np.log10(n_array_qw), m_unsatisfiable[0], c_unsatisfiable[0]), color='green')
 x_tick_labels = ['${}$'.format(x) for x in x_ticks]
-x_ticks = np.log10(np.arange(6, 21, 2))
+x_ticks = np.log10(np.arange(5, 25, 5))
 plt.xticks(x_ticks, x_tick_labels)
-y_ticks = np.arange(-9, -1)
+y_ticks = np.arange(-9, 0, 2)
 y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
 plt.yticks(y_ticks, y_tick_labels)
-plt.xlabel(r'$n$')
-plt.ylabel(r"$\mathrm{median}(\overline{P}(0, 100))$")
+# ax.set_xlabel(r'$n$', fontsize=15)
+# ax.set_ylabel(r"$\mathrm{median}(\overline{P}(0, 100))$", fontsize=15)
+ax.tick_params(axis='both', labelsize=13)
+ax.set_ylim((-9.378, -0.821))
 
 # plot AQC scaling log-linear
 ax = plt.subplot(gs1[2])
@@ -318,15 +326,20 @@ c_satisfiable=par[1],np.sqrt(cov[1,1])
 par,cov=optimize.curve_fit(line, n_array_aqc, np.log2(median_aqc_durations_unsatisfiable))
 m_unsatisfiable=par[0],np.sqrt(cov[0,0])
 c_unsatisfiable=par[1],np.sqrt(cov[1,1])
-plt.scatter(n_array_aqc, np.log2(median_aqc_durations_satisfiable), color='red')
-plt.scatter(n_array_aqc, np.log2(median_aqc_durations_unsatisfiable), color='green')
+plt.scatter(n_array_aqc, np.log2(median_aqc_durations_satisfiable), color='red', s=m_size)
+plt.scatter(n_array_aqc, np.log2(median_aqc_durations_unsatisfiable), color='green', s=m_size)
 plt.plot(n_array_aqc, line(n_array_aqc, m_satisfiable[0], c_satisfiable[0]), color='red')
 plt.plot(n_array_aqc, line(n_array_aqc, m_unsatisfiable[0], c_unsatisfiable[0]), color='green')
-y_ticks = np.arange(4.5, 7, 0.5)
+x_ticks = np.arange(5, 20, 5)
+x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
+plt.xticks(x_ticks, x_tick_labels)
+y_ticks = np.arange(5, 7, 1)
 y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
 plt.yticks(y_ticks, y_tick_labels)
-plt.ylabel(r"$\mathrm{median}(T_{0.99})$")
+ax.set_ylabel(r"$\mathrm{median}(T_{0.99})$", fontsize=15)
+ax.tick_params(axis='both', labelsize=13)
 # plt.xticklabels([])
+ax.set_ylim((4.345, 6.563))
 
 # residuals
 divider = make_axes_locatable(ax)
@@ -338,15 +351,19 @@ ax2.set_xlim(x_limits)
 residuals_satisfiable = np.log2(median_aqc_durations_satisfiable) - line(n_array_aqc, m_satisfiable[0], c_satisfiable[0])
 residuals_unsatisfiable = np.log2(median_aqc_durations_unsatisfiable) - line(n_array_aqc, m_unsatisfiable[0], c_unsatisfiable[0])
 # frame2.set_ylim([,])
-ax2.scatter(n_array_aqc, residuals_satisfiable, color='red', marker='+')
-ax2.scatter(n_array_aqc, residuals_unsatisfiable, color='green', marker='+')
+ax2.scatter(n_array_aqc, residuals_satisfiable, color='red', marker='+', s=m_size_res)
+ax2.scatter(n_array_aqc, residuals_unsatisfiable, color='green', marker='+', s=m_size_res)
 ax2.plot(n_array_aqc, residuals_satisfiable, color='red', linestyle='--')
 ax2.plot(n_array_aqc, residuals_unsatisfiable, color='green', linestyle='--')
-ax2.set_xlabel(r'$n$')
-ax2.set_ylabel(r"$\mathrm{Residual}$")
-x_ticks = np.arange(5, 17, 2)
-x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 17, 2)]
+ax2.set_xlabel(r'$n$', fontsize=15)
+ax2.set_ylabel(r"$\mathrm{Residual}$", fontsize=15)
+ax2.tick_params(axis='both', labelsize=13)
+x_ticks = np.arange(5, 20, 5)
+x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
 plt.xticks(x_ticks, x_tick_labels)
+res_ylim = 0.085
+ax2.set_ylim((-res_ylim, res_ylim))
+ax2.set_yticks([-0.05, 0.05])
 
 # plot AQC scaling log-log
 ax = plt.subplot(gs1[3])
@@ -356,16 +373,21 @@ c_satisfiable=par[1],np.sqrt(cov[1,1])
 par,cov=optimize.curve_fit(line, np.log10(n_array_aqc), np.log2(median_aqc_durations_unsatisfiable))
 m_unsatisfiable=par[0],np.sqrt(cov[0,0])
 c_unsatisfiable=par[1],np.sqrt(cov[1,1])
-plt.scatter(np.log10(n_array_aqc), np.log2(median_aqc_durations_satisfiable), color='red')
-plt.scatter(np.log10(n_array_aqc), np.log2(median_aqc_durations_unsatisfiable), color='green')
+plt.scatter(np.log10(n_array_aqc), np.log2(median_aqc_durations_satisfiable), color='red', s=m_size)
+plt.scatter(np.log10(n_array_aqc), np.log2(median_aqc_durations_unsatisfiable), color='green', s=m_size)
 plt.plot(np.log10(n_array_aqc), line(np.log10(n_array_aqc), m_satisfiable[0], c_satisfiable[0]), color='red')
 plt.plot(np.log10(n_array_aqc), line(np.log10(n_array_aqc), m_unsatisfiable[0], c_unsatisfiable[0]), color='green')
-y_ticks = np.arange(4.5, 7, 0.5)
+x_ticks = np.log10(np.arange(5, 20, 5))
+x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
+plt.xticks(x_ticks, x_tick_labels)
+y_ticks = np.arange(5, 7, 1)
 y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
 plt.yticks(y_ticks, y_tick_labels)
-plt.xlabel(r'$n$')
-plt.ylabel(r"$\mathrm{median}(T_{0.99})$")
+ax.set_xlabel(r'$n$', fontsize=15)
+# ax.set_ylabel(r"$\mathrm{median}(T_{0.99})$", fontsize=15)
+ax.tick_params(axis='both', labelsize=13)
 # plt.xticklabels([])
+ax.set_ylim((4.345, 6.563))
 
 # residuals
 divider = make_axes_locatable(ax)
@@ -377,15 +399,19 @@ ax2.set_xlim(x_limits)
 residuals_satisfiable = np.log2(median_aqc_durations_satisfiable) - line(np.log10(n_array_aqc), m_satisfiable[0], c_satisfiable[0])
 residuals_unsatisfiable = np.log2(median_aqc_durations_unsatisfiable) - line(np.log10(n_array_aqc), m_unsatisfiable[0], c_unsatisfiable[0])
 # frame2.set_ylim([,])
-ax2.scatter(np.log10(n_array_aqc), residuals_satisfiable, color='red', marker='+')
-ax2.scatter(np.log10(n_array_aqc), residuals_unsatisfiable, color='green', marker='+')
+ax2.scatter(np.log10(n_array_aqc), residuals_satisfiable, color='red', marker='+', s=m_size_res)
+ax2.scatter(np.log10(n_array_aqc), residuals_unsatisfiable, color='green', marker='+', s=m_size_res)
 ax2.plot(np.log10(n_array_aqc), residuals_satisfiable, color='red', linestyle='--')
 ax2.plot(np.log10(n_array_aqc), residuals_unsatisfiable, color='green', linestyle='--')
-ax2.set_xlabel(r'$n$')
-ax2.set_ylabel(r"$\mathrm{Residual}$")
-x_ticks = np.log10(np.arange(5, 17, 2))
-x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 17, 2)]
+ax2.set_xlabel(r'$n$', fontsize=15)
+# ax2.set_ylabel(r"$\mathrm{Residual}$", fontsize=15)
+ax2.tick_params(axis='both', labelsize=13)
+x_ticks = np.log10(np.arange(5, 20, 5))
+x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
 plt.xticks(x_ticks, x_tick_labels)
+ax2.set_ylim((-res_ylim, res_ylim))
+ax2.set_yticks([-0.05, 0.05])
 
-# plt.savefig('scalings_satisfiable_vs_unsatisfiable.pdf', dpi=200)
+fig.tight_layout()
+# plt.savefig('scalings_satisfiable_vs_unsatisfiable_windows.pdf', dpi=200)
 plt.show()
