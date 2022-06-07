@@ -310,9 +310,9 @@ plt.plot(np.log10(n_array_qw), line(np.log10(n_array_qw), m_unsatisfiable[0], c_
 x_tick_labels = ['${}$'.format(x) for x in x_ticks]
 x_ticks = np.log10(np.arange(5, 25, 5))
 plt.xticks(x_ticks, x_tick_labels)
-y_ticks = np.arange(-9, 0, 2)
-y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
-plt.yticks(y_ticks, y_tick_labels)
+# y_ticks = np.arange(-9, 0, 2)
+# y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
+plt.yticks([], [])
 # ax.set_xlabel(r'$n$', fontsize=15)
 # ax.set_ylabel(r"$\mathrm{median}(\overline{P}(0, 100))$", fontsize=15)
 ax.tick_params(axis='both', labelsize=13)
@@ -380,9 +380,9 @@ plt.plot(np.log10(n_array_aqc), line(np.log10(n_array_aqc), m_unsatisfiable[0], 
 x_ticks = np.log10(np.arange(5, 20, 5))
 x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
 plt.xticks(x_ticks, x_tick_labels)
-y_ticks = np.arange(5, 7, 1)
-y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
-plt.yticks(y_ticks, y_tick_labels)
+# y_ticks = np.arange(5, 7, 1)
+# y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
+plt.yticks([], [])
 ax.set_xlabel(r'$n$', fontsize=15)
 # ax.set_ylabel(r"$\mathrm{median}(T_{0.99})$", fontsize=15)
 ax.tick_params(axis='both', labelsize=13)
@@ -410,7 +410,7 @@ x_ticks = np.log10(np.arange(5, 20, 5))
 x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
 plt.xticks(x_ticks, x_tick_labels)
 ax2.set_ylim((-res_ylim, res_ylim))
-ax2.set_yticks([-0.05, 0.05])
+ax2.set_yticks([])
 
 fig.tight_layout()
 # plt.savefig('scalings_satisfiable_vs_unsatisfiable_windows.pdf', dpi=200)
