@@ -285,100 +285,106 @@ def adams_mixbnb_data_crosson():
 
 # %%
 # plot MIXBnB calls against QW probability and AQC duration
+from matplotlib.colors import LogNorm
 
 n = 15
 
-fig = plt.figure(figsize=(16, 11))
-gs1 = gridspec.GridSpec(2, 2)
-gs1.update(hspace=0.25)
+fig = plt.figure(figsize=(6, 4.75))
+axs = []
+gs1 = gridspec.GridSpec(2, 6, width_ratios=[1, 0.04, 0.05, 1, 0.04, 0.05])
+gs1.update(wspace=0.25)
+gs1.update(hspace=0.45)
 
 # plot MIXBnB against QW
-plt.subplot(gs1[0])
+axs.append(plt.subplot(gs1[0]))
 
 bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
-hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Greens')
+hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Greens', vmax=77, linewidths=0.05)
 vals = hex.get_array()
+print('max:', np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-cb = plt.colorbar()
-cb.ax.tick_params(labelsize=17, size=5)
-plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=22)
-plt.ylabel(r'$N_\mathrm{calls}$', fontsize=22)
+# cb = plt.colorbar()
+# cb.ax.tick_params(labelsize=13, size=5)
+plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
+plt.ylabel(r'$N_\mathrm{calls}$', fontsize=15)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 yt = np.arange(2, 5, 1)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
-plt.tick_params(direction='in', size=5)
+plt.yticks(yt, ytl, fontsize=13)
+plt.tick_params(direction='in')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
 # plot MIXBnB against QW logarithmic
-plt.subplot(gs1[1])
+axs.append(plt.subplot(gs1[3]))
 
 bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
 hex = plt.hexbin(np.log10(qw), np.log10(
-    bnb), gridsize=50, cmap='Greens', bins='log')
+    bnb), gridsize=50, cmap='Greens', norm=LogNorm(vmax=78), linewidths=0.05)
 vals = hex.get_array()
+print('max:', np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-cb = plt.colorbar()
-cb.ax.tick_params(labelsize=17, size=5)
-plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=22)
-plt.ylabel(r'$N_\mathrm{calls}$', fontsize=22)
+# cb = plt.colorbar()
+# cb.ax.tick_params(labelsize=13, size=5)
+plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 yt = np.arange(2, 5, 1)
-ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
-plt.tick_params(direction='in', size=5)
+# ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
+plt.yticks(yt, [], fontsize=13)
+plt.tick_params(direction='in')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
 # plot MIXBnB against AQC
-plt.subplot(gs1[2])
+axs.append(plt.subplot(gs1[6]))
 
 bnb = adams_mixbnb_data(n)
 aqc = adams_adiabatic_data(n)
 
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Greens')
+hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Greens', vmax=77, linewidths=0.05)
 vals = hex.get_array()
+print('max:', np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-cb = plt.colorbar()
-cb.ax.tick_params(labelsize=17, size=5)
-plt.xlabel(r'$T_{0.99}$', fontsize=22)
-plt.ylabel(r'$N_\mathrm{calls}$', fontsize=22)
-xt = np.arange(1.5, 4, 0.5)
+plt.xlabel(r'$T_{0.99}$', fontsize=15)
+plt.ylabel(r'$N_\mathrm{calls}$', fontsize=15)
+xt = np.arange(1.5, 4.5, 1)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 yt = np.arange(2, 5, 1)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
-plt.tick_params(direction='in', size=5)
+plt.yticks(yt, ytl, fontsize=13)
+plt.tick_params(direction='in')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
+x0, x1, y0, y1 = plt.axis()
+print(x0, x1, y0, y1)
+plt.axis((x0,x1,y0,y1))
 
-vals = hex.get_array()
-print(np.min(vals))
-print(np.max(vals))
+ax = fig.add_subplot(gs1[:, 1])
+cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
+cb.ax.tick_params(labelsize=13)
 
 # plot MIXBnB against AQC
-plt.subplot(gs1[3])
+plt.subplot(gs1[9])
 
 bnb = adams_mixbnb_data(n)
 aqc = adams_adiabatic_data(n)
@@ -386,28 +392,31 @@ aqc = adams_adiabatic_data(n)
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
 hex = plt.hexbin(np.log10(aqc), np.log10(
-    bnb), gridsize=50, cmap='Greens', bins='log')
+    bnb), gridsize=50, cmap='Greens', norm=LogNorm(vmax=78), linewidths=0.05)
 vals = hex.get_array()
+print('max:', np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-cb = plt.colorbar()
-cb.ax.tick_params(labelsize=17, size=5)
-plt.xlabel(r'$T_{0.99}$', fontsize=22)
-plt.ylabel(r'$N_\mathrm{calls}$', fontsize=22)
-xt = np.arange(1.5, 4, 0.5)
+plt.xlabel(r'$T_{0.99}$', fontsize=15)
+# plt.ylabel(r'$N_\mathrm{calls}$', fontsize=15)
+xt = np.arange(1.5, 4.5, 1)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 yt = np.arange(2, 5, 1)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
-plt.tick_params(direction='in', size=5)
+plt.yticks(yt, [], fontsize=13)
+plt.tick_params(direction='in')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
-# plt.savefig('aqcqwmixbnb_hexbins.pdf', bbox_inches='tight')
-plt.tight_layout()
+ax = fig.add_subplot(gs1[:, 4])
+cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
+cb.ax.tick_params(labelsize=13)
+
+# gs1.tight_layout(fig)
+# plt.savefig('aqcqwmixbnb_hexbins_windows.pdf', bbox_inches='tight')
 plt.show()
 
 # %%
@@ -429,15 +438,15 @@ x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 cb = plt.colorbar()
-cb.ax.tick_params(labelsize=17, size=5)
-plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=22)
-plt.ylabel(r'$T_{0.99}$', fontsize=22)
+cb.ax.tick_params(labelsize=13, size=5)
+plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
+plt.ylabel(r'$T_{0.99}$', fontsize=15)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 yt = np.arange(1.5, 4, 0.5)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
+plt.yticks(yt, ytl, fontsize=13)
 plt.tick_params(direction='in', size=5)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
@@ -457,15 +466,15 @@ plt.ylim(y_min, y_max)
 # plt.figure(figsize=(8, 5))
 # plt.hexbin(np.log2(x), np.log2(y), gridsize=50, cmap='Greens')
 # cb = plt.colorbar()
-# cb.ax.tick_params(labelsize=17, size=5)
-# plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=22)
-# plt.ylabel(r'$T_{0.99}$', fontsize=22)
+# cb.ax.tick_params(labelsize=13, size=5)
+# plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
+# plt.ylabel(r'$T_{0.99}$', fontsize=15)
 # xt = np.arange(-9, -4, 1)
 # xtl = ['$2^{' + f'{x}' + '}$' for x in xt]
-# plt.xticks(xt, xtl, fontsize=17)
+# plt.xticks(xt, xtl, fontsize=13)
 # yt = np.arange(5, 13, 1)
 # ytl = ['$2^{' + f'{y}' + '}$' for y in yt]
-# plt.yticks(yt, ytl, fontsize=17)
+# plt.yticks(yt, ytl, fontsize=13)
 # plt.tick_params(direction='in', size=5)
 # plt.xlim(-9.5, -4.8)
 # plt.ylim(4.55, 12)
@@ -573,14 +582,13 @@ print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
 fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(qw)])
 
 plt.tight_layout()
-# plt.savefig('aqcqw_hexbin_windows.pdf', bbox_inches='tight')
 plt.show()
 
 # %%
 # plot AQC duration against QW success probability for n = 5, 15
 # vertical
 
-fig = plt.figure(figsize=(10, 16))
+fig = plt.figure(figsize=(9, 14.4))
 axs = []
 gs1 = gridspec.GridSpec(2, 2, width_ratios=[1, 0.04])
 # gs1.update(wspace=0.25)
@@ -609,7 +617,7 @@ axs[0].tick_params(axis='x', which='major', pad=12)
 yt = np.arange(1.2, 2.4, 0.4)
 ytl = ['$10^{' + f'{np.round(y,3)}' + '}$' for y in yt]
 plt.yticks(yt, ytl, fontsize=35)
-plt.tick_params(direction='in', size=5)
+plt.tick_params(direction='in', size=10)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
@@ -649,14 +657,14 @@ axs[1].tick_params(axis='x', which='major', pad=12)
 yt = np.arange(1.5, 4, 0.5)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
 plt.yticks(yt, ytl, fontsize=35)
-plt.tick_params(direction='in', size=5)
+plt.tick_params(direction='in', size=10)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
 ax = fig.add_subplot(gs1[:, 1])
 # plt.axis('off')
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
-cb.ax.tick_params(labelsize=35, size=5)
+cb.ax.tick_params(labelsize=35, size=10)
 # pos = ax.get_position()
 # points = pos.get_points()
 # print(points)
@@ -709,11 +717,11 @@ plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=20)
 plt.ylabel('$p(\log_{10}(N_\mathrm{calls}))$', fontsize=20)
 xt = np.arange(2, 5, 1)
 xtl = [f'${x}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 plt.xlim(1.7, 4.8)
 yt = np.arange(0, 2.5, 0.5)
 ytl = [f'${y:.1f}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
+plt.yticks(yt, ytl, fontsize=13)
 plt.tick_params(direction='in', size=5)
 plt.tight_layout()
 
@@ -751,11 +759,11 @@ plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=20)
 plt.ylabel('$P(\log_{10}(N_\mathrm{calls}))$', fontsize=20)
 xt = np.arange(2, 5, 1)
 xtl = [f'${x}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=17)
+plt.xticks(xt, xtl, fontsize=13)
 plt.xlim(1.7, 4.8)
 yt = np.arange(0, 0.35, 0.05)
 ytl = [f'${y:.1f}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=17)
+plt.yticks(yt, ytl, fontsize=13)
 plt.tick_params(direction='in', size=5)
 plt.tight_layout()
 
