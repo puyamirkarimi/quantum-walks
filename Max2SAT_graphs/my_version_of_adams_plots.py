@@ -588,7 +588,7 @@ plt.show()
 # plot AQC duration against QW success probability for n = 5, 15
 # vertical
 
-fig = plt.figure(figsize=(9, 14.4))
+fig = plt.figure(figsize=(7, 11.2))
 axs = []
 gs1 = gridspec.GridSpec(2, 2, width_ratios=[1, 0.04])
 # gs1.update(wspace=0.25)
@@ -602,22 +602,22 @@ aqc = adams_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens')
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens', linewidths=0.2)
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=40)
-plt.ylabel(r'$T_{0.99}$', fontsize=40)
+# plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=27)
+plt.ylabel(r'$T_{0.99}$', fontsize=27)
 xt = np.arange(-0.8, -0.4, 0.1)
 xtl = ['$10^{' + f'{np.round(x,3)}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=35)
+plt.xticks(xt, xtl, fontsize=23.8)
 axs[0].tick_params(axis='x', which='major', pad=12)
 yt = np.arange(1.2, 2.4, 0.4)
 ytl = ['$10^{' + f'{np.round(y,3)}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=35)
-plt.tick_params(direction='in', size=10)
+plt.yticks(yt, ytl, fontsize=23.8)
+plt.tick_params(direction='in', size=5)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
@@ -642,29 +642,29 @@ aqc = adams_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens')
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens', linewidths=0.2)
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=40)
-plt.ylabel(r'$T_{0.99}$', fontsize=40)
+plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=27)
+plt.ylabel(r'$T_{0.99}$', fontsize=27)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=35)
+plt.xticks(xt, xtl, fontsize=23.8)
 axs[1].tick_params(axis='x', which='major', pad=12)
 yt = np.arange(1.5, 4, 0.5)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=35)
-plt.tick_params(direction='in', size=10)
+plt.yticks(yt, ytl, fontsize=23.8)
+plt.tick_params(direction='in', size=5)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
 ax = fig.add_subplot(gs1[:, 1])
 # plt.axis('off')
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
-cb.ax.tick_params(labelsize=35, size=10)
+cb.ax.tick_params(labelsize=23.8, size=5)
 # pos = ax.get_position()
 # points = pos.get_points()
 # print(points)
@@ -695,7 +695,7 @@ n = 20
 bnb = adams_mixbnb_data(n)
 bnb_crosson = adams_mixbnb_data_crosson()
 
-fig = plt.figure(figsize=(8, 5.5))
+fig = plt.figure(figsize=(6, 4.2))
 plt.subplot()
 
 h, b = np.histogram(np.log10(bnb), bins='auto', density=True)
@@ -713,8 +713,8 @@ htot = np.dot(h, db)
 h = (h/htot)
 plt.bar(b, h, width=db*1.0, alpha=0.75, color='red')
 
-plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=20)
-plt.ylabel('$p(\log_{10}(N_\mathrm{calls}))$', fontsize=20)
+plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=15)
+plt.ylabel('$p(\log_{10}(N_\mathrm{calls}))$', fontsize=15)
 xt = np.arange(2, 5, 1)
 xtl = [f'${x}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=13)
@@ -722,10 +722,10 @@ plt.xlim(1.7, 4.8)
 yt = np.arange(0, 2.5, 0.5)
 ytl = [f'${y:.1f}$' for y in yt]
 plt.yticks(yt, ytl, fontsize=13)
-plt.tick_params(direction='in', size=5)
-plt.tight_layout()
+plt.tick_params(direction='in', size=4)
+fig.tight_layout()
 
-# plt.savefig('mixbnb20hist.pdf', bbox_inches='tight')
+# plt.savefig('mixbnb20hist_windows.pdf', bbox_inches='tight')
 plt.show()
 
 # %%
@@ -735,7 +735,7 @@ n = 20
 bnb = adams_mixbnb_data(n)
 bnb_crosson = adams_mixbnb_data_crosson()
 
-fig = plt.figure(figsize=(8, 5.5))
+fig = plt.figure(figsize=(6, 4.125))
 plt.subplot()
 
 h, b = np.histogram(np.log10(bnb), bins='auto')
@@ -765,9 +765,8 @@ yt = np.arange(0, 0.35, 0.05)
 ytl = [f'${y:.1f}$' for y in yt]
 plt.yticks(yt, ytl, fontsize=13)
 plt.tick_params(direction='in', size=5)
-plt.tight_layout()
+fig.tight_layout()
 
-# plt.savefig('mixbnb20hist.pdf', bbox_inches='tight')
 plt.show()
 
 # %%
