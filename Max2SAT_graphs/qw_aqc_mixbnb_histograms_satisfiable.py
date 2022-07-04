@@ -201,6 +201,9 @@ if __name__ == '__main__':
     axs[2].set_ylabel(r'$p$', fontsize=15)
     axs[4].set_ylabel(r'$p$', fontsize=15)
 
+    for ax in axs:
+        ax.tick_params(direction='in', which='both')
+
     fig.tight_layout()
     # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable_windows.pdf', dpi=200)
     plt.show()

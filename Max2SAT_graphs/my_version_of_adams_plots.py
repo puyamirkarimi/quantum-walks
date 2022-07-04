@@ -711,7 +711,7 @@ db = b[1:]-b[:-1]
 b = (b[1:]+b[:-1])/2
 htot = np.dot(h, db)
 h = (h/htot)
-plt.bar(b, h, width=db*1.0, alpha=0.75, color='red')
+plt.bar(b, h, width=db*1.0, alpha=0.75, color='darkorange')
 
 plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=15)
 plt.ylabel('$p(\log_{10}(N_\mathrm{calls}))$', fontsize=15)
@@ -725,7 +725,7 @@ plt.yticks(yt, ytl, fontsize=13)
 plt.tick_params(direction='in', size=4)
 fig.tight_layout()
 
-# plt.savefig('mixbnb20hist_windows.pdf', bbox_inches='tight')
+# plt.savefig('mixbnb20hist_windows.pdf', dpi=200)
 plt.show()
 
 # %%

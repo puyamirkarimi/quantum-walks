@@ -30,7 +30,7 @@ def first_eigvec(A):
 def hypercube(n_dim):
     sigma_x = np.array([[0, 1],
                         [1, 0]])
-    A = sigma_i(sigma_x, 0, n)
+    A = sigma_i(sigma_x, 0, n_dim)
 
     for i in range(1, n_dim):
         A += sigma_i(sigma_x, i, n_dim)
@@ -89,7 +89,6 @@ def hamiltonian_2sat(n, formula):
         sign_2 = -1 * clause[2]
         out += (1/4) * (sign_1*sign_2*sigma_z_i[v_1]*sigma_z_i[v_2]
                         + sign_1*sigma_z_i[v_1] + sign_2*sigma_z_i[v_2] + sigma_identity)
-    print(out)
     return out
 
 
@@ -214,5 +213,5 @@ if __name__ == '__main__':
         plot_nearest_qubit_prob_2(timesteps, data, axs[i], colors[i])
         # plot_prob_heatmap(data, n, timesteps)
 
-    plt.savefig('inst_success_probs_n_5_10.png', dpi=200)
-    # plt.show()
+    # plt.savefig('inst_success_probs_n_5_10.png', dpi=200)
+    plt.show()

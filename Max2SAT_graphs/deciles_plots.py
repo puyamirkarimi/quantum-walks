@@ -581,7 +581,7 @@ for decile in decile_boundaries:
     axs[0, 0].scatter(
         n_array_qw, success_probabilities_qw_decile_boundaries[decile, :], color=decile_colors_1[decile], s=10)
     axs[0, 0].plot(n_array_qw, fit, color=decile_colors_1[decile], linewidth=1)
-    axs[0, 0].scatter(20, median_crosson_prob, color='red', s=10)
+    axs[0, 0].scatter(20, median_crosson_prob, color='darkorange', s=10)
 
 y = np.log2(success_probabilities_qw_hardest_fraction_boundary)
 par, cov = optimize.curve_fit(line, n_array_qw, y)
