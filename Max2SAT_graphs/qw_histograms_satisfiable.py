@@ -22,6 +22,9 @@ if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', size=14)
 
+    blue = '#0072B2'
+    orange = '#EF6900'
+    green = '#009E73'
 
     n = 9
     counts_list = []
@@ -61,8 +64,8 @@ if __name__ == '__main__':
     # plt.errorbar(x, runtimes_average, runtimes_standard_error)
     # plt.xlim([0, 100])
     # plt.ylim([0.6, 1e4])
-    plt.hist(counts_list[0], x, color='red', align='mid', rwidth=0.5, density=True, label='satisfiable')
-    plt.hist(counts_list[1], x, color='green', align='left', rwidth=0.5, density=True, label='unsatisfiable')
+    plt.hist(counts_list[0], x, color=orange, align='mid', rwidth=0.5, density=True, label='satisfiable')
+    plt.hist(counts_list[1], x, color=green, align='left', rwidth=0.5, density=True, label='unsatisfiable')
     plt.vlines(sat_average, 0, 35, color='black')
     plt.vlines(unsat_average, 0, 35, color='black', linestyle='--')
     # plt.yscale('log')
@@ -86,8 +89,8 @@ if __name__ == '__main__':
     # # plt.errorbar(x, runtimes_average, runtimes_standard_error)
     # # plt.xlim([0, 100])
     # # plt.ylim([0.6, 1e4])
-    # plt.hist(counts_list[0], x_logarithmic, color='red', align='mid', rwidth=0.5, density=True, label='satisfiable')
-    # plt.hist(counts_list[1], x_logarithmic, color='green', align='left', rwidth=0.5, density=True, label='unsatisfiable')
+    # plt.hist(counts_list[0], x_logarithmic, color=orange, align='mid', rwidth=0.5, density=True, label='satisfiable')
+    # plt.hist(counts_list[1], x_logarithmic, color=green, align='left', rwidth=0.5, density=True, label='unsatisfiable')
     # plt.xscale('log')
 
     # plt.xlabel(r"$\overline{P}(0, 100)$")

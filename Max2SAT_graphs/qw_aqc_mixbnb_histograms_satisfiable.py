@@ -49,6 +49,10 @@ if __name__ == '__main__':
 
     fig = plt.figure(figsize=(6, 7))
 
+    blue = '#0072B2'
+    orange = '#EF6900'
+    green = '#009E73'
+
     gs = GridSpec(3, 2, width_ratios=[1, 1], height_ratios=[1, 1, 1])
     # gs.update(hspace=0.45, wspace=0.4)
     axs = list()
@@ -111,8 +115,8 @@ if __name__ == '__main__':
         sat_average_mixbnb = np.median(calls_satisfiable)
         unsat_average_mixbnb = np.median(calls_unsatisfiable)
 
-        axs[i].hist(probs_unsatisfiable, x_qw, color='green', alpha=0.75, density=True, label='unsatisfiable')
-        axs[i].hist(probs_satisfiable, x_qw, color='red', alpha=0.75, density=True, label='satisfiable')
+        axs[i].hist(probs_unsatisfiable, x_qw, color=blue, alpha=0.75, density=True, label='unsatisfiable')
+        axs[i].hist(probs_satisfiable, x_qw, color=orange, alpha=0.75, density=True, label='satisfiable')
         ylim = axs[i].get_ylim()
         axs[i].vlines(sat_average_qw, 0, ylim[1], color='black', linestyle='--')
         axs[i].vlines(unsat_average_qw, 0, ylim[1], color='black')
@@ -122,8 +126,8 @@ if __name__ == '__main__':
         axs[i].tick_params(axis='both', labelsize=13)
 
         if i == 0:
-            axs[i+2].hist(times_unsatisfiable, x_aqc, color='green', alpha=0.75, density=True, label='unsatisfiable')
-            axs[i+2].hist(times_satisfiable, x_aqc, color='red', alpha=0.75, density=True, label='satisfiable')
+            axs[i+2].hist(times_unsatisfiable, x_aqc, color=blue, alpha=0.75, density=True, label='unsatisfiable')
+            axs[i+2].hist(times_satisfiable, x_aqc, color=orange, alpha=0.75, density=True, label='satisfiable')
             ylim = axs[i+2].get_ylim()
             axs[i+2].vlines(sat_average_aqc, 0, ylim[1], color='black', linestyle='--')
             axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
@@ -132,8 +136,8 @@ if __name__ == '__main__':
             axs[i+2].set_xlim((min_time, max_time))
             axs[i+2].tick_params(axis='both', labelsize=13)
             
-            axs[i+4].hist(calls_unsatisfiable, x_mixbnb, color='green', alpha=0.75, density=True, label='unsatisfiable')
-            axs[i+4].hist(calls_satisfiable, x_mixbnb, color='red', alpha=0.75, density=True, label='satisfiable')
+            axs[i+4].hist(calls_unsatisfiable, x_mixbnb, color=blue, alpha=0.75, density=True, label='unsatisfiable')
+            axs[i+4].hist(calls_satisfiable, x_mixbnb, color=orange, alpha=0.75, density=True, label='satisfiable')
             ylim = axs[i+4].get_ylim()
             axs[i+4].vlines(sat_average_mixbnb, 0, ylim[1], color='black', linestyle='--')
             axs[i+4].vlines(unsat_average_mixbnb, 0, ylim[1], color='black')
@@ -149,14 +153,14 @@ if __name__ == '__main__':
             htot = np.dot(h, db)
             h = (h/htot)
             axs[i+2].bar(b, h, width=db*1.0, alpha=0.75,
-                    color='green', label='unsatisfaiable')
+                    color=blue, label='unsatisfaiable')
             h, b = np.histogram(np.log10(times_satisfiable), bins=num_bins, density=True)
             db = b[1:]-b[:-1]
             b = (b[1:]+b[:-1])/2
             htot = np.dot(h, db)
             h = (h/htot)
             axs[i+2].bar(b, h, width=db*1.0, alpha=0.75,
-                    color='red', label='satisfiable')
+                    color=orange, label='satisfiable')
             ylim = axs[i+2].get_ylim()
             axs[i+2].vlines(np.log10(sat_average_aqc), 0, ylim[1], color='black', linestyle='--')
             axs[i+2].vlines(np.log10(unsat_average_aqc), 0, ylim[1], color='black')
@@ -172,14 +176,14 @@ if __name__ == '__main__':
             htot = np.dot(h, db)
             h = (h/htot)
             axs[i+4].bar(b, h, width=db*1.0, alpha=0.75,
-                    color='green', label='unsatisfaiable')
+                    color=blue, label='unsatisfaiable')
             h, b = np.histogram(np.log10(calls_satisfiable), bins=num_bins, density=True)
             db = b[1:]-b[:-1]
             b = (b[1:]+b[:-1])/2
             htot = np.dot(h, db)
             h = (h/htot)
             axs[i+4].bar(b, h, width=db*1.0, alpha=0.75,
-                    color='red', label='satisfiable')
+                    color=orange, label='satisfiable')
             ylim = axs[i+4].get_ylim()
             axs[i+4].vlines(np.log10(sat_average_mixbnb), 0, ylim[1], color='black', linestyle='--')
             axs[i+4].vlines(np.log10(unsat_average_mixbnb), 0, ylim[1], color='black')

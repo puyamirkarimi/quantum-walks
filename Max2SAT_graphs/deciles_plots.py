@@ -19,15 +19,16 @@ line = lambda x, m, c: m*x + c
 deciles = np.arange(10, dtype=int)
 decile_boundaries = np.arange(9, dtype=int)
 
-decile_colors_1 = np.zeros((10, 3))
-for i in range(10):
-    cn1, cn2 = 0.25 + ((i/10)*(0.75)), ((i/10)*(76/255)/1)
-    decile_colors_1[9-i, :] = (0.0, cn1, cn2)
+# decile_colors_1 = np.zeros((10, 3))
+# for i in range(10):
+#     cn1, cn2 = 0.25 + ((i/10)*(0.75)), ((i/10)*(76/255)/1)
+#     decile_colors_1[9-i, :] = (0.0, cn1, cn2)
 
-decile_colors_2 = np.zeros((10, 3))
-for i in range(10):
-    cn1, cn2 = 0.25 + ((i/10)*(0.75)), ((i/10)*(76/255)/1)
-    decile_colors_2[9-i, :] = (cn1, cn2, 0.0)
+decile_colors_1 = ['#99daff', '#88c5ea', '#77b1d5', '#669dc0', '#5689ac', '#467698', '#366485', '#265272', '#14405f', '#00304d']
+
+blue = '#0072B2'
+orange = '#EF6900'
+green = '#009E73'
 
 plt.rc('text', usetex=True)
 plt.rc('font', size=14)
@@ -581,7 +582,7 @@ for decile in decile_boundaries:
     axs[0, 0].scatter(
         n_array_qw, success_probabilities_qw_decile_boundaries[decile, :], color=decile_colors_1[decile], s=10)
     axs[0, 0].plot(n_array_qw, fit, color=decile_colors_1[decile], linewidth=1)
-    axs[0, 0].scatter(20, median_crosson_prob, color='darkorange', s=10)
+    axs[0, 0].scatter(20, median_crosson_prob, color=orange, marker='s', s=10)
 
 y = np.log2(success_probabilities_qw_hardest_fraction_boundary)
 par, cov = optimize.curve_fit(line, n_array_qw, y)
@@ -590,8 +591,8 @@ scaling_hardest = m[0]
 scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_qw])
 axs[0, 0].scatter(
-    n_array_qw, success_probabilities_qw_hardest_fraction_boundary, color='blue', s=10)
-axs[0, 0].plot(n_array_qw, fit, color='blue', linewidth=1)
+    n_array_qw, success_probabilities_qw_hardest_fraction_boundary, color=green, marker='^', s=10)
+axs[0, 0].plot(n_array_qw, fit, color=green, linewidth=1)
 axs[0, 0].set_yscale('log', base=2)
 axs[0, 0].set_ylabel('$\overline{P}(0, 100)$', fontsize=15)
 axs[0, 0].set_xlabel('$n$', fontsize=15)
@@ -599,12 +600,14 @@ axs[0, 0].set_xticks(np.arange(5, 25, 5))
 axs[0, 0].set_yticks([2**(-9), 2**(-6), 2**(-3)])
 axs[0, 0].tick_params(axis='both', labelsize=13)
 
-axs[0, 1].scatter(10 * (decile_boundaries+1), scalings, color='green', s=10)
-axs[0, 1].errorbar(10*(decile_boundaries+1), scalings, yerr=scalings_error, capsize=1.7, fmt='none', ecolor='green')
-axs[0, 1].scatter(10 * 9.99, scaling_hardest, color='blue', s=10)
-axs[0, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', ecolor='blue')
-axs[0, 1].plot(10 * (decile_boundaries+1), scalings,
-               color='green', linestyle='--', linewidth=1)
+for i in range(9):
+    axs[0, 1].scatter(10 * (decile_boundaries[i]+1), scalings[i], color=decile_colors_1[i], s=10)
+    axs[0, 1].errorbar(10*(decile_boundaries[i]+1), scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', color=decile_colors_1[i])
+    if i < 8:
+        axs[0, 1].plot(10 * (decile_boundaries[i:i+2]+1), scalings [i:i+2],
+                    color=decile_colors_1[i], linestyle='--', linewidth=1)
+axs[0, 1].scatter(10 * 9.99, scaling_hardest, color=green, marker='^', s=10)
+axs[0, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', ecolor=green)
 axs[0, 1].set_ylabel(r'$\kappa$', fontsize=15)
 axs[0, 1].set_xlabel('QW hardness percentile', fontsize=14)
 axs[0, 1].set_xticks(np.arange(20, 120, 20))
@@ -640,8 +643,8 @@ scaling_hardest = m[0]
 scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
 axs[1, 0].scatter(n_array_aqc,
-                  durations_aqc_hardest_fraction_boundary, color='blue', s=10)
-axs[1, 0].plot(n_array_aqc, fit, color='blue', linewidth=1)
+                  durations_aqc_hardest_fraction_boundary, color=green, marker='^', s=10)
+axs[1, 0].plot(n_array_aqc, fit, color=green, linewidth=1)
 axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$', fontsize=15)
 axs[1, 0].set_xlabel('$n$', fontsize=15)
@@ -649,12 +652,14 @@ axs[1, 0].set_xticks(np.arange(5, 20, 5))
 axs[1, 0].set_yticks([2**(6), 2**(9), 2**(12)])
 axs[1, 0].tick_params(axis='both', labelsize=13)
 
-axs[1, 1].errorbar(10*(decile_boundaries+1), scalings, yerr=scalings_error, capsize=1.7, fmt='none', ecolor='green')
-axs[1, 1].scatter(10*(decile_boundaries+1), scalings, color='green', s=10)
-axs[1, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', ecolor='blue')
-axs[1, 1].scatter(10*9.99, scaling_hardest, color='blue', s=10)
-axs[1, 1].plot(10*(decile_boundaries+1), scalings,
-               color='green', linestyle='--', linewidth=1)
+for i in range(9):
+    axs[1, 1].scatter(10 * (decile_boundaries[i]+1), scalings[i], color=decile_colors_1[i], s=10)
+    axs[1, 1].errorbar(10*(decile_boundaries[i]+1), scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', color=decile_colors_1[i])
+    if i < 8:
+        axs[1, 1].plot(10 * (decile_boundaries[i:i+2]+1), scalings [i:i+2],
+                    color=decile_colors_1[i], linestyle='--', linewidth=1)
+axs[1, 1].scatter(10 * 9.99, scaling_hardest, color=green, marker='^', s=10)
+axs[1, 1].errorbar(10*9.99, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', ecolor=green)
 axs[1, 1].set_ylabel(r'$\kappa$', fontsize=15)
 axs[1, 1].set_xlabel('AQC hardness percentile', fontsize=14)
 axs[1, 1].set_xticks(np.arange(20, 120, 20))
@@ -702,8 +707,8 @@ scaling_hardest = m[0]
 scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
 axs[0, 0].scatter(n_array_aqc,
-                  median_success_probabilities_aqc_hardest_fraction, color='blue', s=10)
-axs[0, 0].plot(n_array_aqc, fit, color='blue', linewidth=1)
+                  median_success_probabilities_aqc_hardest_fraction, marker='^', color=green, s=10)
+axs[0, 0].plot(n_array_aqc, fit, color=green, linewidth=1)
 axs[0, 0].set_yscale('log', base=2)
 axs[0, 0].set_ylabel('$\overline{P}(0, 100)$', fontsize=15)
 axs[0, 0].set_xlabel('$n$', fontsize=15)
@@ -711,9 +716,11 @@ axs[0, 0].set_xticks(np.arange(5, 20, 5))
 axs[0, 0].set_yticks([2**(-7), 2**(-5), 2**(-3)])
 axs[0, 0].tick_params(axis='both', labelsize=13)
 
-axs[0, 1].errorbar(deciles+1, scalings, yerr=scalings_error, capsize=1.7, fmt='none', ecolor='green')
-axs[0, 1].scatter(deciles+1, scalings, color='green', s=10)
-axs[0, 1].plot(deciles+1, scalings, color='green', linestyle='--', linewidth=1)
+for i in range(10):
+    axs[0, 1].errorbar(deciles[i]+1, scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', ecolor=decile_colors_1[i])
+    axs[0, 1].scatter(deciles[i]+1, scalings[i], color=decile_colors_1[i], s=10)
+    if i < 9:
+        axs[0, 1].plot(deciles[i:i+2]+1, scalings[i:i+2], color=decile_colors_1[i], linestyle='--', linewidth=1)
 axs[0, 1].set_ylabel(r'$\kappa$', fontsize=15)
 axs[0, 1].set_xlabel(r'AQC hardness decile', fontsize=14, loc='left')
 axs[0, 1].set_xticks(range(1, 11, 2))
@@ -725,8 +732,8 @@ axs[0, 1].tick_params(axis='both', labelsize=12)
 divider = make_axes_locatable(axs[0, 1])
 ax2 = divider.append_axes("right", size="10%", pad=0)
 axs[0, 1].figure.add_axes(ax2)
-ax2.scatter(1, scaling_hardest, color='blue', s=10)
-ax2.errorbar(1, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', ecolor='blue')
+ax2.scatter(1, scaling_hardest, marker='^', color=green, s=10)
+ax2.errorbar(1, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', marker='^', ecolor=green)
 ax2.set_ylim(ylims)
 ax2.set_xticks([1])
 ax2.set_xticklabels(['Top 1\%'], rotation=45, fontsize=12)
@@ -761,17 +768,19 @@ scaling_hardest = m[0]
 scaling_hardest_error = m[1]
 fit = 2**np.array([line(x, m[0], c[0]) for x in n_array_aqc])
 axs[1, 0].scatter(n_array_aqc,
-                  median_durations_qw_hardest_fraction, color='blue', s=10)
-axs[1, 0].plot(n_array_aqc, fit, color='blue', linewidth=1)
+                  median_durations_qw_hardest_fraction, marker='^', color=green, s=10)
+axs[1, 0].plot(n_array_aqc, fit, color=green, linewidth=1)
 axs[1, 0].set_yscale('log', base=2)
 axs[1, 0].set_ylabel('$T_{0.99}$', fontsize=15)
 axs[1, 0].set_xlabel('$n$', fontsize=15)
 axs[1, 0].set_yticks([2**6, 2**8, 2**10])
 axs[1, 0].tick_params(axis='both', labelsize=13)
 
-axs[1, 1].errorbar(deciles+1, scalings, yerr=scalings_error, capsize=1.7, fmt='none', ecolor='green')
-axs[1, 1].scatter(deciles+1, scalings, color='green', s=10)
-axs[1, 1].plot(deciles+1, scalings, color='green', linestyle='--', linewidth=1)
+for i in range(10):
+    axs[1, 1].errorbar(deciles[i]+1, scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', ecolor=decile_colors_1[i])
+    axs[1, 1].scatter(deciles[i]+1, scalings[i], color=decile_colors_1[i], s=10)
+    if i < 9:
+        axs[1, 1].plot(deciles[i:i+2]+1, scalings[i:i+2], color=decile_colors_1[i], linestyle='--', linewidth=1)
 axs[1, 1].set_ylabel(r'$\kappa$', fontsize=15)
 axs[1, 1].set_xlabel('QW hardness decile', fontsize=14, loc='left')
 axs[1, 1].set_xticks(range(1, 11, 2))
@@ -784,8 +793,8 @@ axs[1, 1].tick_params(axis='both', labelsize=13)
 divider = make_axes_locatable(axs[1, 1])
 ax2 = divider.append_axes("right", size="10%", pad=0)
 axs[1, 1].figure.add_axes(ax2)
-ax2.scatter(1, scaling_hardest, color='blue', s=10)
-ax2.errorbar(1, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', ecolor='blue')
+ax2.scatter(1, scaling_hardest, marker='^', color=green, s=10)
+ax2.errorbar(1, scaling_hardest, yerr=scaling_hardest_error, capsize=1.7, fmt='none', marker='^', ecolor=green)
 ax2.set_ylim(ylims)
 ax2.set_xticks([1])
 ax2.set_xticklabels(['Top 1\%'], rotation=45, fontsize=12)

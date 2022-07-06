@@ -12,6 +12,10 @@ from scipy.optimize import curve_fit
 plt.rc('text', usetex=True)
 plt.rc('font', size=14)
 
+blue = '#0072B2'
+orange = '#EF6900'
+green = '#009E73'
+
 # %%
 # function definitions
 
@@ -301,7 +305,7 @@ axs.append(plt.subplot(gs1[0]))
 bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
-hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Greens', vmax=77, linewidths=0.05)
+hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Blues', vmax=77, linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
@@ -329,7 +333,7 @@ bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
 hex = plt.hexbin(np.log10(qw), np.log10(
-    bnb), gridsize=50, cmap='Greens', norm=LogNorm(vmax=78), linewidths=0.05)
+    bnb), gridsize=50, cmap='Blues', norm=LogNorm(vmax=78), linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
@@ -357,7 +361,7 @@ aqc = adams_adiabatic_data(n)
 
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Greens', vmax=77, linewidths=0.05)
+hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Blues', vmax=77, linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
@@ -392,7 +396,7 @@ aqc = adams_adiabatic_data(n)
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
 hex = plt.hexbin(np.log10(aqc), np.log10(
-    bnb), gridsize=50, cmap='Greens', norm=LogNorm(vmax=78), linewidths=0.05)
+    bnb), gridsize=50, cmap='Blues', norm=LogNorm(vmax=78), linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
@@ -431,7 +435,7 @@ qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 fig = plt.figure(figsize=(8, 5.5))
 plt.subplot()
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, cmap='Greens')
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, cmap='Blues')
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
@@ -464,7 +468,7 @@ plt.ylim(y_min, y_max)
 # fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(x)])
 
 # plt.figure(figsize=(8, 5))
-# plt.hexbin(np.log2(x), np.log2(y), gridsize=50, cmap='Greens')
+# plt.hexbin(np.log2(x), np.log2(y), gridsize=50, cmap='Blues')
 # cb = plt.colorbar()
 # cb.ax.tick_params(labelsize=13, size=5)
 # plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
@@ -500,7 +504,7 @@ aqc = adams_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens')
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Blues')
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
@@ -540,7 +544,7 @@ aqc = adams_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens')
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Blues')
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
@@ -602,7 +606,7 @@ aqc = adams_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens', linewidths=0.2)
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Blues', linewidths=0.2)
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
@@ -642,7 +646,7 @@ aqc = adams_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Greens', linewidths=0.2)
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Blues', linewidths=0.2)
 vals = hex.get_array()
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
@@ -704,14 +708,14 @@ b = (b[1:]+b[:-1])/2
 htot = np.dot(h, db)
 h = (h/htot)
 plt.bar(b, h, width=db*1.0, alpha=0.75,
-        color='green')
+        color=blue)
 
 h, b = np.histogram(np.log10(bnb_crosson), bins='auto', density=True)
 db = b[1:]-b[:-1]
 b = (b[1:]+b[:-1])/2
 htot = np.dot(h, db)
 h = (h/htot)
-plt.bar(b, h, width=db*1.0, alpha=0.75, color='darkorange')
+plt.bar(b, h, width=db*1.0, alpha=0.75, color=orange)
 
 plt.xlabel('$\log_{10}(N_\mathrm{calls})$', fontsize=15)
 plt.ylabel('$p(\log_{10}(N_\mathrm{calls}))$', fontsize=15)
