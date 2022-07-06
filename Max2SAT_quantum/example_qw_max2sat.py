@@ -13,6 +13,9 @@ import time
 from pathlib import Path
 import pickle as pkl
 
+blue = '#0072B2'
+orange = '#EF6900'
+green = '#009E73'
 
 def get_2sat_formula(instance_name):
     out = np.loadtxt(Path("./../../instances_original/" + instance_name + ".m2s"))
@@ -199,7 +202,7 @@ print("runtime:", time_end - time_start)
 
     
 # %%
-# plot
+# unpickle the data and plot
 
 times_data = list()
 success_probs_data = list()
@@ -227,9 +230,9 @@ for i, instance_num in enumerate(instance_nums_1):
     stop = 100
 
     if i == 0:
-        axs[0].plot(times, success_probs, color='green')
+        axs[0].plot(times, success_probs, color=blue)
     else:
-        axs[0].plot(times, success_probs, color='red', linestyle="--")
+        axs[0].plot(times, success_probs, color=orange, linestyle="--")
 
     axs[0].set_xlim(start, stop)
     # axs[0].set_xticks(range(0, timesteps + 1, 10))
@@ -248,9 +251,9 @@ for i, instance_num in enumerate(instance_nums_2):
     stop = 100
 
     if i == 0:
-        axs[1].plot(times, success_probs, color='green')
+        axs[1].plot(times, success_probs, color=blue)
     else:
-        axs[1].plot(times, success_probs, color='red', linestyle="--")
+        axs[1].plot(times, success_probs, color=orange, linestyle="--")
 
     axs[1].set_xlim(start, stop)
     # axs[1].set_xticks(range(0, timesteps + 1, 10))
