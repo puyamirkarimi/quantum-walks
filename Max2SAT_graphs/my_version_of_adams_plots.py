@@ -4,6 +4,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
+from regex import W
 from scipy.optimize import curve_fit
 
 # %%
@@ -592,7 +593,7 @@ plt.show()
 # plot AQC duration against QW success probability for n = 5, 15
 # vertical
 
-fig = plt.figure(figsize=(7, 11.2))
+fig = plt.figure(figsize=(3.9, 5.9))
 axs = []
 gs1 = gridspec.GridSpec(2, 2, width_ratios=[1, 0.04])
 # gs1.update(wspace=0.25)
@@ -612,16 +613,16 @@ centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-# plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=27)
-plt.ylabel(r'$T_{0.99}$', fontsize=27)
+# plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
+plt.ylabel(r'$T_{0.99}$', fontsize=15)
 xt = np.arange(-0.8, -0.4, 0.1)
 xtl = ['$10^{' + f'{np.round(x,3)}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=23.8)
-axs[0].tick_params(axis='x', which='major', pad=12)
+plt.xticks(xt, xtl, fontsize=13.26)
+axs[0].tick_params(axis='x', which='major', pad=7)
 yt = np.arange(1.2, 2.4, 0.4)
 ytl = ['$10^{' + f'{np.round(y,3)}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=23.8)
-plt.tick_params(direction='in', size=5)
+plt.yticks(yt, ytl, fontsize=13.26)
+plt.tick_params(direction='in', size=3.5)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
@@ -652,23 +653,23 @@ centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=27)
-plt.ylabel(r'$T_{0.99}$', fontsize=27)
+plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
+plt.ylabel(r'$T_{0.99}$', fontsize=15)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
-plt.xticks(xt, xtl, fontsize=23.8)
-axs[1].tick_params(axis='x', which='major', pad=12)
+plt.xticks(xt, xtl, fontsize=13.26)
+axs[1].tick_params(axis='x', which='major', pad=7)
 yt = np.arange(1.5, 4, 0.5)
 ytl = ['$10^{' + f'{y}' + '}$' for y in yt]
-plt.yticks(yt, ytl, fontsize=23.8)
-plt.tick_params(direction='in', size=5)
+plt.yticks(yt, ytl, fontsize=13.26)
+plt.tick_params(direction='in', size=3.5)
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
 ax = fig.add_subplot(gs1[:, 1])
 # plt.axis('off')
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
-cb.ax.tick_params(labelsize=23.8, size=5)
+cb.ax.tick_params(labelsize=13.26, size=3.5)
 # pos = ax.get_position()
 # points = pos.get_points()
 # print(points)
@@ -686,6 +687,13 @@ par, cov = curve_fit(line, np.log2(qw), np.log2(aqc))
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
 fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(qw)])
+
+# w=1.4
+# for ax in axs:
+#     ax.spines['top'].set_linewidth(w)
+#     ax.spines['right'].set_linewidth(w)
+#     ax.spines['bottom'].set_linewidth(w)
+#     ax.spines['left'].set_linewidth(w)
 
 plt.tight_layout()
 # plt.savefig('aqcqw_hexbin_windows.pdf', bbox_inches='tight')

@@ -213,8 +213,8 @@ fig, axs = plt.subplots(1, 2, figsize=(6, 2.7))
 axs[0].tick_params(direction='in', which='both', labelsize=13)
 axs[1].tick_params(direction='in', which='both', labelsize=13)
 axs[0].set_ylabel("$P(t_f)$", fontsize=15)
-axs[0].set_yticks(np.arange(0.2, 0.8, 0.2))
-axs[1].set_yticks(np.arange(0.005, 0.02, 0.005))
+axs[0].set_yticks(np.arange(0, 0.8, 0.2))
+axs[1].set_yticks(np.arange(0, 0.02, 0.005))
 
 timesteps = 50
 instance_names, instance_n_bits = get_instances()
