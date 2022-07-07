@@ -108,3 +108,25 @@ for n in range(5, 16):
     # max_y = np.min(())
     plt.ylim([0, 0.03])
     plt.show()
+
+# %%
+n = 11
+times = adams_adiabatic_data(n)
+sorted_times = np.unique(np.sort(times))
+my_sorted_errors = predict_errors(sorted_times)
+my_rel_errors = my_sorted_errors/sorted_times
+
+# %%
+print(sorted_times[-1])
+# print(my_sorted_errors[-10:])
+
+fig, ax = plt.subplots()
+# plt.scatter(sorted_times, sorted_errors)
+plt.scatter(sorted_times, my_rel_errors)
+# plt.xscale('log')
+# yl = ax.get_ylim()
+# max_y = np.min(())
+plt.ylim([0, 0.03])
+plt.ylabel('0.5 * fractional distance to next higher T')
+plt.xlabel('T')
+plt.show()
