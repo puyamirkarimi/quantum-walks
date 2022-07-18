@@ -97,6 +97,7 @@ for n in range(5, 16):
     print(f'n={n}')
     times = adams_adiabatic_data(n)
     sorted_times = np.unique(np.sort(times))
+    print("min time:", sorted_times[0])
     my_sorted_errors = predict_errors(sorted_times)
     my_rel_errors = my_sorted_errors/sorted_times
 
