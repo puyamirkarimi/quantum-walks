@@ -22,6 +22,22 @@ def adams_adiabatic_data(n):
     return np.array(b)
 
 
+def rerun_adiabatic_data(n):
+    '''returns time required to get 0.99 success probability'''
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/aqc_times_rerun.csv', delimiter=',',
+                      skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str)
+    b = []
+    skipped = 0
+    for i, element in enumerate(a):
+        if element != 'None':
+            b.append(float(element))
+        else:
+            b.append(float('nan'))
+            skipped += 1
+    print("n:", n, " skipped:", skipped)
+    return np.array(b)
+
+
 def zero_to_nan(array):
     """Replace every 0 with 'nan' and return a copy."""
     return [float('nan') if x==0 else x for x in array]
@@ -71,7 +87,7 @@ if __name__ == '__main__':
         aqc_times_list = []
 
         qw_probs = adams_quantum_walk_data(n)
-        aqc_times = adams_adiabatic_data(n)
+        aqc_times = rerun_adiabatic_data(n)
         mixbnb_calls = adams_mixbnb_data(n)
         satisfiable_list = get_satisfiable_list(n).astype(int)
 
@@ -132,7 +148,7 @@ if __name__ == '__main__':
             axs[i+2].vlines(sat_average_aqc, 0, ylim[1], color='black', linestyle='--')
             axs[i+2].vlines(unsat_average_aqc, 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
-            axs[i+2].set_xlabel(r'$T_{0.99}$', fontsize=15)
+            axs[i+2].set_xlabel(r'$t_{0.99}$', fontsize=15)
             axs[i+2].set_xlim((min_time, max_time))
             axs[i+2].tick_params(axis='both', labelsize=13)
             
@@ -166,7 +182,7 @@ if __name__ == '__main__':
             axs[i+2].vlines(np.log10(unsat_average_aqc), 0, ylim[1], color='black')
             axs[i+2].set_ylim(ylim)
             # axs[i+2].set_xscale('log')
-            axs[i+2].set_xlabel(r'$\log_{10}(T_{0.99})$', fontsize=15)
+            axs[i+2].set_xlabel(r'$\log_{10}(t_{0.99})$', fontsize=15)
             axs[i+2].set_xlim((np.log10(min_time), np.log10(max_time)))
             axs[i+2].tick_params(axis='both', labelsize=13)
 

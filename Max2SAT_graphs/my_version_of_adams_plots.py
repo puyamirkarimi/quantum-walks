@@ -120,7 +120,7 @@ def get_hardest_formulae_aqc(n, frac, return_indices=False):
     '''returns the hardest "frac" fraction of instances for AQC at a given n'''
     print(
         f'Getting the hardest {frac} fraction of formulae of size n={n} for AQC')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
     num_instances = int(frac * 10000)
@@ -138,7 +138,7 @@ def get_easiest_formulae_aqc(n, frac, return_indices=False):
     '''returns the easiest "frac" fraction of instances for AQC at a given n'''
     print(
         f'Getting the easiest {frac} fraction of formulae of size n={n} for AQC')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
     num_instances = int(frac * 10000)
@@ -153,7 +153,7 @@ def get_easiest_formulae_aqc(n, frac, return_indices=False):
 
 
 def get_hardest_boundary_formula_aqc(n, frac, return_index=False):
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
     instance = int(frac * 10000 - 1)
@@ -167,7 +167,7 @@ def get_hardest_boundary_formula_aqc(n, frac, return_index=False):
 def get_deciled_formulae_aqc(n, return_indices=False):
     '''returns instances of a given n organised by QW decile'''
     print(f'Getting the formulae of size n={n} organised by QW decile')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
     indices_by_hardness = np.argsort(durations)
@@ -190,7 +190,7 @@ def get_deciled_formulae_aqc(n, return_indices=False):
 def get_decile_boundary_formulae_aqc(n, return_indices=False):
     '''returns the nine formulae on the boundaries of the AQC deciles'''
     print(f'Getting the AQC decile boundary formulae of size n={n}')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = np.nan_to_num(durations, nan=np.max(durations)+1.0)
     instance_names = get_instance_names(n)
     indices_by_hardness = np.argsort(durations)
@@ -262,10 +262,34 @@ def adams_adiabatic_data(n):
     return np.array(b)
 
 
-def get_instance_duration(n, instance):
+def rerun_adiabatic_data(n):
+    '''returns time required to get 0.99 success probability'''
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/aqc_times_rerun.csv', delimiter=',',
+                      skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str)
+    b = []
+    skipped = 0
+    for i, element in enumerate(a):
+        if element != 'None':
+            b.append(float(element))
+        else:
+            b.append(float('nan'))
+            skipped += 1
+    print("n:", n, " skipped:", skipped)
+    return np.array(b)
+
+
+def get_instance_duration_adams(n, instance):
     val = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',',
                         missing_values='', skip_header=1+(n-5)*10000+instance, usecols=10, max_rows=1, dtype=str)
     if val != '':
+        return float(val)
+    return float('nan')
+
+
+def get_instance_duration(n, instance):
+    val = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/aqc_times_rerun.csv', delimiter=',',
+                        skip_header=1+(n-5)*10000+instance, usecols=2, max_rows=1, dtype=str)
+    if val != 'None':
         return float(val)
     return float('nan')
 
@@ -306,7 +330,7 @@ axs.append(plt.subplot(gs1[0]))
 bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
-hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=50, cmap='Blues', vmax=77, linewidths=0.05)
+hex = plt.hexbin(np.log10(qw), np.log10(bnb), gridsize=30, cmap='Blues', vmax=238, linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
@@ -327,6 +351,18 @@ plt.tick_params(direction='in')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 
+xr_tmp, yr_tmp = np.argsort(np.log2(qw)), np.argsort(np.log2(bnb))
+xr, yr = np.empty_like(xr_tmp), np.empty_like(yr_tmp)
+xr[xr_tmp], yr[yr_tmp] = np.arange(len(qw)), np.arange(len(bnb))
+covr = np.cov(xr, yr)
+sr = covr[1, 0]/(np.std(xr)*np.std(yr))
+
+line = lambda x, m, c: (x*m)+c
+par, cov = curve_fit(line, np.log2(qw), np.log2(bnb))
+m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
+fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(qw)])
+
 # plot MIXBnB against QW logarithmic
 axs.append(plt.subplot(gs1[3]))
 
@@ -334,7 +370,7 @@ bnb = adams_mixbnb_data(n)
 qw = adams_quantum_walk_data(n)
 
 hex = plt.hexbin(np.log10(qw), np.log10(
-    bnb), gridsize=50, cmap='Blues', norm=LogNorm(vmax=78), linewidths=0.05)
+    bnb), gridsize=30, cmap='Blues', norm=LogNorm(vmax=239), linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
@@ -358,18 +394,18 @@ plt.ylim(y_min, y_max)
 axs.append(plt.subplot(gs1[6]))
 
 bnb = adams_mixbnb_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=50, cmap='Blues', vmax=77, linewidths=0.05)
+hex = plt.hexbin(np.log10(aqc), np.log10(bnb), gridsize=30, cmap='Blues', vmax=238, linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-plt.xlabel(r'$T_{0.99}$', fontsize=15)
+plt.xlabel(r'$t_{0.99}$', fontsize=15)
 plt.ylabel(r'$N_\mathrm{calls}$', fontsize=15)
 xt = np.arange(1.5, 4.5, 1)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
@@ -381,8 +417,19 @@ plt.tick_params(direction='in')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 x0, x1, y0, y1 = plt.axis()
-print(x0, x1, y0, y1)
 plt.axis((x0,x1,y0,y1))
+
+xr_tmp, yr_tmp = np.argsort(np.log2(aqc)), np.argsort(np.log2(bnb))
+xr, yr = np.empty_like(xr_tmp), np.empty_like(yr_tmp)
+xr[xr_tmp], yr[yr_tmp] = np.arange(len(aqc)), np.arange(len(bnb))
+covr = np.cov(xr, yr)
+sr = covr[1, 0]/(np.std(xr)*np.std(yr))
+
+line = lambda x, m, c: (x*m)+c
+par, cov = curve_fit(line, np.log2(aqc), np.log2(bnb))
+m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
+print(f'n={n}: m={m[0]}pm{m[1]}, c={c[0]}pm{c[1]}, SR={sr}')
+fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(aqc)])
 
 ax = fig.add_subplot(gs1[:, 1])
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
@@ -392,19 +439,19 @@ cb.ax.tick_params(labelsize=13)
 plt.subplot(gs1[9])
 
 bnb = adams_mixbnb_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 bnb, aqc = bnb[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
 hex = plt.hexbin(np.log10(aqc), np.log10(
-    bnb), gridsize=50, cmap='Blues', norm=LogNorm(vmax=78), linewidths=0.05)
+    bnb), gridsize=30, cmap='Blues', norm=LogNorm(vmax=239), linewidths=0.05)
 vals = hex.get_array()
 print('max:', np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
-plt.xlabel(r'$T_{0.99}$', fontsize=15)
+plt.xlabel(r'$t_{0.99}$', fontsize=15)
 # plt.ylabel(r'$N_\mathrm{calls}$', fontsize=15)
 xt = np.arange(1.5, 4.5, 1)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
@@ -429,7 +476,7 @@ plt.show()
 
 n = 15
 qw = adams_quantum_walk_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
@@ -445,7 +492,7 @@ y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 cb = plt.colorbar()
 cb.ax.tick_params(labelsize=13, size=5)
 plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
-plt.ylabel(r'$T_{0.99}$', fontsize=15)
+plt.ylabel(r'$t_{0.99}$', fontsize=15)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=13)
@@ -473,7 +520,7 @@ plt.ylim(y_min, y_max)
 # cb = plt.colorbar()
 # cb.ax.tick_params(labelsize=13, size=5)
 # plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
-# plt.ylabel(r'$T_{0.99}$', fontsize=15)
+# plt.ylabel(r'$t_{0.99}$', fontsize=15)
 # xt = np.arange(-9, -4, 1)
 # xtl = ['$2^{' + f'{x}' + '}$' for x in xt]
 # plt.xticks(xt, xtl, fontsize=13)
@@ -501,7 +548,7 @@ axs.append(plt.subplot(gs1[0]))
 n = 5
 
 qw = adams_quantum_walk_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
@@ -512,7 +559,7 @@ x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=40)
-plt.ylabel(r'$T_{0.99}$', fontsize=40)
+plt.ylabel(r'$t_{0.99}$', fontsize=40)
 xt = np.arange(-0.8, -0.4, 0.1)
 xtl = ['$10^{' + f'{np.round(x,3)}' + '}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=35)
@@ -541,7 +588,7 @@ axs.append(plt.subplot(gs1[1]))
 n = 15
 
 qw = adams_quantum_walk_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
@@ -552,7 +599,7 @@ x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=40)
-plt.ylabel(r'$T_{0.99}$', fontsize=40)
+plt.ylabel(r'$t_{0.99}$', fontsize=40)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=35)
@@ -603,18 +650,19 @@ axs.append(plt.subplot(gs1[0, 0]))
 n = 5
 
 qw = adams_quantum_walk_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Blues', linewidths=0.2)
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=30, vmin=0, vmax=181, cmap='Blues', linewidths=0.2)
 vals = hex.get_array()
+print("max:", np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 # plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
-plt.ylabel(r'$T_{0.99}$', fontsize=15)
+plt.ylabel(r'$t_{0.99}$', fontsize=15)
 xt = np.arange(-0.8, -0.4, 0.1)
 xtl = ['$10^{' + f'{np.round(x,3)}' + '}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=13.26)
@@ -643,18 +691,19 @@ axs.append(plt.subplot(gs1[1, 0]))
 n = 15
 
 qw = adams_quantum_walk_data(n)
-aqc = adams_adiabatic_data(n)
+aqc = rerun_adiabatic_data(n)
 
 qw, aqc = qw[~np.isnan(aqc)], aqc[~np.isnan(aqc)]
 
-hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=50, vmin=0, vmax=60, cmap='Blues', linewidths=0.2)
+hex = plt.hexbin(np.log10(qw), np.log10(aqc), gridsize=30, vmin=0, vmax=181, cmap='Blues', linewidths=0.2)
 vals = hex.get_array()
+print("max:", np.max(vals))
 centres = hex.get_offsets()
 x_min, x_max = np.min(centres[:, 0]), np.max(centres[:, 0])
 y_min, y_max = np.min(centres[:, 1]), np.max(centres[:, 1])
 
 plt.xlabel(r'$\overline{P}(0, 100)$', fontsize=15)
-plt.ylabel(r'$T_{0.99}$', fontsize=15)
+plt.ylabel(r'$t_{0.99}$', fontsize=15)
 xt = np.arange(-2.5, -1, 0.5)
 xtl = ['$10^{' + f'{x}' + '}$' for x in xt]
 plt.xticks(xt, xtl, fontsize=13.26)

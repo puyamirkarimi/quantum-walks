@@ -138,7 +138,7 @@ def get_hardest_formulae_aqc(n, frac, return_indices=False):
     '''returns the hardest "frac" fraction of instances for AQC at a given n'''
     print(
         f'Getting the hardest {frac} fraction of formulae of size n={n} for AQC')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
     instance_names = get_instance_names(n)
     num_instances = int(frac * 10000)
@@ -156,7 +156,7 @@ def get_easiest_formulae_aqc(n, frac, return_indices=False):
     '''returns the easiest "frac" fraction of instances for AQC at a given n'''
     print(
         f'Getting the easiest {frac} fraction of formulae of size n={n} for AQC')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
     instance_names = get_instance_names(n)
     num_instances = int(frac * 10000)
@@ -172,7 +172,7 @@ def get_easiest_formulae_aqc(n, frac, return_indices=False):
 
 def get_hardest_boundary_formula_aqc(n, frac, return_index=False):
     '''returns the instance where exactly "frac" fraction of instances are harder for AQC'''
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
     instance_names = get_instance_names(n)
     instance = int(frac * 10000)
@@ -186,7 +186,7 @@ def get_hardest_boundary_formula_aqc(n, frac, return_index=False):
 def get_deciled_formulae_aqc(n, return_indices=False):
     '''returns instances of a given n organised by QW decile'''
     print(f'Getting the formulae of size n={n} organised by QW decile')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
     instance_names = get_instance_names(n)
     indices_by_hardness = np.argsort(durations)
@@ -210,7 +210,7 @@ def get_decile_boundary_formulae_aqc(n, return_indices=False):
     '''returns the nine formulae just below the boundaries of the AQC deciles
        (i.e. the hardest formula of each decile, other than decile 10)'''
     print(f'Getting the AQC decile boundary formulae of size n={n}')
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     durations = nan_to_largest(durations, addition=1)
     instance_names = get_instance_names(n)
     indices_by_hardness = np.argsort(durations)
@@ -282,10 +282,34 @@ def adams_adiabatic_data(n):
     return np.array(b)
 
 
-def get_instance_duration(n, instance):
+def rerun_adiabatic_data(n):
+    '''returns time required to get 0.99 success probability'''
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/aqc_times_rerun.csv', delimiter=',',
+                      skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str)
+    b = []
+    skipped = 0
+    for i, element in enumerate(a):
+        if element != 'None':
+            b.append(float(element))
+        else:
+            b.append(float('nan'))
+            skipped += 1
+    print("n:", n, " skipped:", skipped)
+    return np.array(b)
+
+
+def get_instance_duration_adams(n, instance):
     val = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',',
                         missing_values='', skip_header=1+(n-5)*10000+instance, usecols=10, max_rows=1, dtype=str)
     if val != '':
+        return float(val)
+    return float('nan')
+
+
+def get_instance_duration(n, instance):
+    val = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/aqc_times_rerun.csv', delimiter=',',
+                        skip_header=1+(n-5)*10000+instance, usecols=2, max_rows=1, dtype=str)
+    if val != 'None':
         return float(val)
     return float('nan')
 
@@ -455,7 +479,7 @@ durations_qw_hardest_fraction = np.zeros((len(n_array_aqc), int(fraction*10000))
 
 for i, n in enumerate(n_array_aqc):
     success_probs = adams_quantum_walk_data(n)
-    durations = adams_adiabatic_data(n)
+    durations = rerun_adiabatic_data(n)
     for decile in deciles:
         aqc_decile_success_probs = success_probs[aqc_deciled_indices[i][decile]]
         mean_success_probabilities_aqc_deciles[decile, i] = np.mean(
@@ -492,6 +516,11 @@ for i, n in enumerate(n_array_aqc):
     median_durations_aqc_hardest_fraction[i] = np.median(nan_to_pos_inf(aqc_hardest_durations))
     if median_durations_aqc_hardest_fraction[i] == float('inf'):
         median_durations_aqc_hardest_fraction[i] = float('nan')
+    
+    if np.isnan(durations_aqc_hardest_fraction_boundary[i]):
+        # cannot calculate the median QW success probabilty for the hardest
+        # instances when more than 100 instances were skipped for AQC
+        median_success_probabilities_aqc_hardest_fraction[i] = float('nan')
 
 # %%
 # pickle the important data
@@ -646,7 +675,7 @@ axs[1, 0].scatter(n_array_aqc,
                   durations_aqc_hardest_fraction_boundary, color=green, marker='^', s=10)
 axs[1, 0].plot(n_array_aqc, fit, color=green, linewidth=1)
 axs[1, 0].set_yscale('log', base=2)
-axs[1, 0].set_ylabel('$T_{0.99}$', fontsize=15)
+axs[1, 0].set_ylabel('$t_{0.99}$', fontsize=15)
 axs[1, 0].set_xlabel('$n$', fontsize=15)
 axs[1, 0].set_xticks(np.arange(5, 20, 5))
 axs[1, 0].set_yticks([2**(6), 2**(9), 2**(12)])
@@ -701,7 +730,8 @@ for decile in deciles:
     axs[0, 0].plot(n_array_aqc, fit, color=decile_colors_1[decile], linewidth=1)
 
 y = np.log2(median_success_probabilities_aqc_hardest_fraction)
-par, cov = optimize.curve_fit(line, n_array_aqc, y)
+num_nans = np.count_nonzero(np.isnan(y))
+par, cov = optimize.curve_fit(line, n_array_aqc[:-num_nans], y[:-num_nans])
 m, c = (par[0], np.sqrt(cov[0, 0])), (par[1], np.sqrt(cov[1, 1]))
 scaling_hardest = m[0]
 scaling_hardest_error = m[1]
@@ -724,7 +754,7 @@ for i in range(10):
 axs[0, 1].set_ylabel(r'$\kappa$', fontsize=15)
 axs[0, 1].set_xlabel(r'AQC hardness decile', fontsize=14, loc='left')
 axs[0, 1].set_xticks(range(1, 11, 2))
-ylims = (-0.6367678176658794, -0.38279156420532306)
+ylims = (-0.627, -0.3709738872006789)
 axs[0, 1].set_ylim(ylims)
 axs[0, 1].tick_params(axis='both', labelsize=12)
 
@@ -771,7 +801,7 @@ axs[1, 0].scatter(n_array_aqc,
                   median_durations_qw_hardest_fraction, marker='^', color=green, s=10)
 axs[1, 0].plot(n_array_aqc, fit, color=green, linewidth=1)
 axs[1, 0].set_yscale('log', base=2)
-axs[1, 0].set_ylabel('$T_{0.99}$', fontsize=15)
+axs[1, 0].set_ylabel('$t_{0.99}$', fontsize=15)
 axs[1, 0].set_xlabel('$n$', fontsize=15)
 axs[1, 0].set_yticks([2**6, 2**8, 2**10])
 axs[1, 0].tick_params(axis='both', labelsize=13)
@@ -784,8 +814,8 @@ for i in range(10):
 axs[1, 1].set_ylabel(r'$\kappa$', fontsize=15)
 axs[1, 1].set_xlabel('QW hardness decile', fontsize=14, loc='left')
 axs[1, 1].set_xticks(range(1, 11, 2))
-axs[1, 1].set_yticks(np.arange(0.1, 0.5, 0.1))
-ylims = (0.04496672626920124, 0.49903791178845647)
+axs[1, 1].set_yticks(np.arange(0.1, 0.6, 0.1))
+ylims = (0.060755245404130416, 0.5)
 axs[1, 1].set_ylim(ylims)
 axs[1, 1].tick_params(axis='both', labelsize=13)
 
@@ -837,7 +867,7 @@ plt.show()
 
 # axs[0, 0].set_yscale('log', base=2)
 
-# axs[0, 0].set_ylabel('$\mathrm{Mean}(T_{0.99})$')
+# axs[0, 0].set_ylabel('$\mathrm{Mean}(t_{0.99})$')
 # axs[0, 0].set_xlabel('$n$')
 
 # # log-log plot using averages
@@ -861,7 +891,7 @@ plt.show()
 # axs[0, 1].set_xticks(x_ticks)
 # axs[0, 1].set_xticklabels(x_tick_labels)
 
-# axs[0, 1].set_ylabel('$\mathrm{Mean}(T_{0.99})$')
+# axs[0, 1].set_ylabel('$\mathrm{Mean}(t_{0.99})$')
 # axs[0, 1].set_xlabel('$n$')
 
 # # log-linear plot using boundary values
@@ -887,7 +917,7 @@ plt.show()
 
 # axs[1, 0].set_yscale('log', base=2)
 
-# axs[1, 0].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+# axs[1, 0].set_ylabel('$\mathrm{DecileBoundary}(t_{0.99})$')
 # axs[1, 0].set_xlabel('$n$')
 
 # # log-log plot using boundary values
@@ -921,7 +951,7 @@ plt.show()
 # axs[1, 1].set_xticks(x_ticks)
 # axs[1, 1].set_xticklabels(x_tick_labels)
 
-# axs[1, 1].set_ylabel('$\mathrm{DecileBoundary}(T_{0.99})$')
+# axs[1, 1].set_ylabel('$\mathrm{DecileBoundary}(t_{0.99})$')
 # axs[1, 1].set_xlabel('$n$')
 
 # # log-linear plot of median
@@ -940,7 +970,7 @@ plt.show()
 
 # axs[2, 0].set_yscale('log', base=2)
 
-# axs[2, 0].set_ylabel('$\mathrm{Median}(T_{0.99})$')
+# axs[2, 0].set_ylabel('$\mathrm{Median}(t_{0.99})$')
 # axs[2, 0].set_xlabel('$n$')
 
 # # log-log plot of median
@@ -963,7 +993,7 @@ plt.show()
 # axs[2, 1].set_xticks(x_ticks)
 # axs[2, 1].set_xticklabels(x_tick_labels)
 
-# axs[2, 1].set_ylabel('$\mathrm{Median}(T_{0.99})$')
+# axs[2, 1].set_ylabel('$\mathrm{Median}(t_{0.99})$')
 # axs[2, 1].set_xlabel('$n$')
 
 # # plt.savefig('aqc_deciles_plots.pdf', dpi=200)

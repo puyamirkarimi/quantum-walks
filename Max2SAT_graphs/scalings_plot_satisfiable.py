@@ -61,6 +61,22 @@ def adams_adiabatic_data(n):
     return np.array(b)
 
 
+def rerun_adiabatic_data(n):
+    '''returns time required to get 0.99 success probability'''
+    a = np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/aqc_times_rerun.csv', delimiter=',',
+                      skip_header=1+(n-5)*10000, usecols=2, max_rows=10000, dtype=str)
+    b = []
+    skipped = 0
+    for i, element in enumerate(a):
+        if element != 'None':
+            b.append(float(element))
+        else:
+            b.append(float('nan'))
+            skipped += 1
+    print("n:", n, " skipped:", skipped)
+    return np.array(b)
+
+
 def total_error(std_errors):
     """ From back page of Hughes and Hase errors book. Calculating error of averaging each instance runtime. """
     error = 0
@@ -246,7 +262,7 @@ for i, n in enumerate(n_array_qw):
     errors_qw_unsatisfiable[i] = np.std(qw_probs_unsatisfiable, ddof=1) / np.sqrt(len(qw_probs_unsatisfiable))
 
 for i, n in enumerate(n_array_aqc):
-    aqc_durations = adams_adiabatic_data(n)
+    aqc_durations = rerun_adiabatic_data(n)
     satisfiable_list = get_satisfiable_list(n).astype(int)
     
     aqc_durations_satisfiable = np.delete(aqc_durations, np.where(satisfiable_list == 0))
@@ -342,10 +358,10 @@ plt.xticks([], [])
 y_ticks = np.arange(5, 7, 1)
 y_tick_labels = ['$2^{'+'{}'.format(y) +'}$' for y in y_ticks]
 plt.yticks(y_ticks, y_tick_labels)
-ax.set_ylabel(r"$\mathrm{median}(T_{0.99})$", fontsize=15)
+ax.set_ylabel(r"$\mathrm{median}(t_{0.99})$", fontsize=15)
 ax.tick_params(axis='both', labelsize=13)
 # plt.xticklabels([])
-ax.set_ylim((4.345, 6.563))
+ax.set_ylim((4.043665838344726, 6.615268795274677))
 ax.tick_params(direction='in', which='both')
 
 # residuals
@@ -353,7 +369,7 @@ divider = make_axes_locatable(ax)
 ax2 = divider.append_axes("bottom", size="40%", pad=0)
 ax.figure.add_axes(ax2)
 x_limits = (4.5, 15.5)
-ax2.hlines(0, x_limits[0], x_limits[1], color='black', linestyle='--')
+ax2.hlines(0, x_limits[0], x_limits[1], color='black', linestyle='--', linewidth=1)
 ax2.set_xlim(x_limits)
 residuals_satisfiable = np.log2(median_aqc_durations_satisfiable) - line(n_array_aqc, m_satisfiable[0], c_satisfiable[0])
 residuals_unsatisfiable = np.log2(median_aqc_durations_unsatisfiable) - line(n_array_aqc, m_unsatisfiable[0], c_unsatisfiable[0])
@@ -368,9 +384,9 @@ ax2.tick_params(axis='both', labelsize=13)
 x_ticks = np.arange(5, 20, 5)
 x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
 plt.xticks(x_ticks, x_tick_labels)
-res_ylim = 0.085
+res_ylim = 0.125
 ax2.set_ylim((-res_ylim, res_ylim))
-ax2.set_yticks([-0.05, 0.05])
+ax2.set_yticks([-0.1, 0, 0.1])
 ax2.tick_params(direction='in', which='both')
 
 # plot AQC scaling log-log
@@ -392,10 +408,10 @@ y_ticks = np.arange(5, 7, 1)
 y_tick_labels = ['' for y in y_ticks]
 plt.yticks(y_ticks, y_tick_labels)
 ax.set_xlabel(r'$n$', fontsize=15)
-# ax.set_ylabel(r"$\mathrm{median}(T_{0.99})$", fontsize=15)
+# ax.set_ylabel(r"$\mathrm{median}(t_{0.99})$", fontsize=15)
 ax.tick_params(axis='both', labelsize=13)
 # plt.xticklabels([])
-ax.set_ylim((4.345, 6.563))
+ax.set_ylim((4.043665838344726, 6.615268795274677))
 ax.tick_params(direction='in', which='both')
 
 # residuals
@@ -403,7 +419,7 @@ divider = make_axes_locatable(ax)
 ax2 = divider.append_axes("bottom", size="40%", pad=0)
 ax.figure.add_axes(ax2)
 x_limits = (0.6751, 1.2)
-ax2.hlines(0, x_limits[0], x_limits[1], color='black', linestyle='--')
+ax2.hlines(0, x_limits[0], x_limits[1], color='black', linestyle='--', linewidth=1)
 ax2.set_xlim(x_limits)
 residuals_satisfiable = np.log2(median_aqc_durations_satisfiable) - line(np.log10(n_array_aqc), m_satisfiable[0], c_satisfiable[0])
 residuals_unsatisfiable = np.log2(median_aqc_durations_unsatisfiable) - line(np.log10(n_array_aqc), m_unsatisfiable[0], c_unsatisfiable[0])
@@ -419,7 +435,7 @@ x_ticks = np.log10(np.arange(5, 20, 5))
 x_tick_labels = ['${}$'.format(n) for n in np.arange(5, 20, 5)]
 plt.xticks(x_ticks, x_tick_labels)
 ax2.set_ylim((-res_ylim, res_ylim))
-plt.yticks([-0.05, 0.05], ['', ''])
+plt.yticks([-0.1, 0, 0.1], ['', '', ''])
 ax2.tick_params(direction='in', which='both')
 
 fig.tight_layout()
