@@ -4,7 +4,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
-from regex import W
 from scipy.optimize import curve_fit
 
 # %%
@@ -640,7 +639,8 @@ plt.show()
 # plot AQC duration against QW success probability for n = 5, 15
 # vertical
 
-fig = plt.figure(figsize=(3.9, 5.9))
+# fig = plt.figure(figsize=(3.9, 5.9))
+fig = plt.figure(figsize=(4.3, 5.9))
 axs = []
 gs1 = gridspec.GridSpec(2, 2, width_ratios=[1, 0.04])
 # gs1.update(wspace=0.25)
@@ -719,6 +719,7 @@ ax = fig.add_subplot(gs1[:, 1])
 # plt.axis('off')
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
 cb.ax.tick_params(labelsize=13.26, size=3.5)
+cb.set_label(r'number of MAX 2-SAT instances', fontsize=15)
 # pos = ax.get_position()
 # points = pos.get_points()
 # print(points)
