@@ -319,7 +319,10 @@ n = 15
 
 fig = plt.figure(figsize=(6, 4.75))
 axs = []
-gs1 = gridspec.GridSpec(2, 6, width_ratios=[1, 0.04, 0.05, 1, 0.04, 0.05])
+# gs1 = gridspec.GridSpec(2, 6, width_ratios=[1, 0.04, 0.05, 1, 0.04, 0.05])
+# gs1.update(wspace=0.25)
+# gs1.update(hspace=0.45)
+gs1 = gridspec.GridSpec(2, 6, width_ratios=[1, 0.04, 0.25, 1, 0.04, 0.0])
 gs1.update(wspace=0.25)
 gs1.update(hspace=0.45)
 
@@ -433,6 +436,7 @@ fy = np.array([line(xval, m[0], c[0]) for xval in np.log2(aqc)])
 ax = fig.add_subplot(gs1[:, 1])
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
 cb.ax.tick_params(labelsize=13)
+cb.set_label(r'Number of MAX 2-SAT instances', fontsize=15)
 
 # plot MIXBnB against AQC
 plt.subplot(gs1[9])
@@ -465,6 +469,7 @@ plt.ylim(y_min, y_max)
 ax = fig.add_subplot(gs1[:, 4])
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
 cb.ax.tick_params(labelsize=13)
+cb.set_label(r'Number of MAX 2-SAT instances', fontsize=15)
 
 # gs1.tight_layout(fig)
 # plt.savefig('aqcqwmixbnb_hexbins_windows.pdf', bbox_inches='tight')
