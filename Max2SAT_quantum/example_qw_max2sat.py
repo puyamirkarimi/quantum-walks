@@ -13,6 +13,8 @@ import time
 from pathlib import Path
 import pickle as pkl
 
+import matplotlib.transforms as mtransforms
+
 blue = '#0072B2'
 orange = '#EF6900'
 green = '#009E73'
@@ -236,7 +238,7 @@ for i, instance_num in enumerate(instance_nums_1):
 
     axs[0].set_xlim(start, stop)
     # axs[0].set_xticks(range(0, timesteps + 1, 10))
-    axs[0].set_ylim(0, 0.62)
+    axs[0].set_ylim(0, 0.67)
     #plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
     axs[0].set_xlabel("$t_f$", fontsize=15)
 
@@ -257,9 +259,15 @@ for i, instance_num in enumerate(instance_nums_2):
 
     axs[1].set_xlim(start, stop)
     # axs[1].set_xticks(range(0, timesteps + 1, 10))
-    axs[1].set_ylim(0, 0.0165)
+    axs[1].set_ylim(0, 0.018)
     #plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
     axs[1].set_xlabel("$t_f$", fontsize=15)
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[0].text(0.0, 0.97, '(a)', transform=axs[0].transAxes + trans, verticalalignment='top', fontsize=15)
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[1].text(0.0, 0.97, '(b)', transform=axs[1].transAxes + trans, verticalalignment='top', fontsize=15)
 
 fig.tight_layout()
 # plt.savefig('inst_success_probs_windows.pdf', dpi=200)

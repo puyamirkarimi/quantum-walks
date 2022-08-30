@@ -6,6 +6,8 @@ import numpy as np
 import scipy.optimize as optimize
 import matplotlib.gridspec as gridspec
 
+import matplotlib.transforms as mtransforms
+
 # %%
 # initialisations
 
@@ -316,6 +318,9 @@ ax.tick_params(axis='both', labelsize=13)
 ax.set_ylim((-9.378, -0.821))
 ax.tick_params(direction='in', which='both')
 
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+ax.text(0.0, 0.21, '(a)', transform=ax.transAxes + trans, verticalalignment='top', fontsize=15)
+
 # plot QW scaling log-log
 ax = plt.subplot(gs1[1])
 par,cov=optimize.curve_fit(line, np.log10(n_array_qw), np.log2(median_qw_probs_satisfiable))
@@ -340,6 +345,9 @@ ax.tick_params(axis='both', labelsize=13)
 ax.set_ylim((-9.378, -0.821))
 ax.tick_params(direction='in', which='both')
 
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+ax.text(0.0, 0.21, '(b)', transform=ax.transAxes + trans, verticalalignment='top', fontsize=15)
+
 # plot AQC scaling log-linear
 ax = plt.subplot(gs1[2])
 par,cov=optimize.curve_fit(line, n_array_aqc, np.log2(median_aqc_durations_satisfiable))
@@ -363,6 +371,9 @@ ax.tick_params(axis='both', labelsize=13)
 # plt.xticklabels([])
 ax.set_ylim((4.043665838344726, 6.615268795274677))
 ax.tick_params(direction='in', which='both')
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+ax.text(0.0, 0.96, '(c)', transform=ax.transAxes + trans, verticalalignment='top', fontsize=15)
 
 # residuals
 divider = make_axes_locatable(ax)
@@ -413,6 +424,9 @@ ax.tick_params(axis='both', labelsize=13)
 # plt.xticklabels([])
 ax.set_ylim((4.043665838344726, 6.615268795274677))
 ax.tick_params(direction='in', which='both')
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+ax.text(0.0, 0.96, '(d)', transform=ax.transAxes + trans, verticalalignment='top', fontsize=15)
 
 # residuals
 divider = make_axes_locatable(ax)

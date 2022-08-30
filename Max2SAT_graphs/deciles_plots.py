@@ -7,6 +7,8 @@ import numpy as np
 import pickle as pkl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import matplotlib.transforms as mtransforms
+
 # %%
 # initialisations
 
@@ -629,6 +631,9 @@ axs[0, 0].set_xticks(np.arange(5, 25, 5))
 axs[0, 0].set_yticks([2**(-9), 2**(-6), 2**(-3)])
 axs[0, 0].tick_params(axis='both', labelsize=13)
 
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[0, 0].text(0, 0.3, '(a)', transform=axs[0, 0].transAxes + trans, verticalalignment='top', fontsize=15)
+
 for i in range(9):
     axs[0, 1].scatter(10 * (decile_boundaries[i]+1), scalings[i], color=decile_colors_1[i], s=10)
     axs[0, 1].errorbar(10*(decile_boundaries[i]+1), scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', color=decile_colors_1[i])
@@ -642,6 +647,9 @@ axs[0, 1].set_xlabel('QW hardness percentile', fontsize=14)
 axs[0, 1].set_xticks(np.arange(20, 120, 20))
 axs[0, 1].set_yticks([-0.55, -0.5, -0.45, -0.4])
 axs[0, 1].tick_params(axis='both', labelsize=13)
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[0, 1].text(0, 0.3, '(b)', transform=axs[0, 1].transAxes + trans, verticalalignment='top', fontsize=15)
 
 print('Scaling exponents for QW deciles:')
 for i in range(len(deciles)-1):
@@ -681,6 +689,9 @@ axs[1, 0].set_xticks(np.arange(5, 20, 5))
 axs[1, 0].set_yticks([2**(6), 2**(9), 2**(12)])
 axs[1, 0].tick_params(axis='both', labelsize=13)
 
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[1, 0].text(0, 0.96, '(c)', transform=axs[1, 0].transAxes + trans, verticalalignment='top', fontsize=15)
+
 for i in range(9):
     axs[1, 1].scatter(10 * (decile_boundaries[i]+1), scalings[i], color=decile_colors_1[i], s=10)
     axs[1, 1].errorbar(10*(decile_boundaries[i]+1), scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', color=decile_colors_1[i])
@@ -694,6 +705,9 @@ axs[1, 1].set_xlabel('AQC hardness percentile', fontsize=14)
 axs[1, 1].set_xticks(np.arange(20, 120, 20))
 axs[1, 1].set_yticks([0.2, 0.4, 0.6])
 axs[1, 1].tick_params(axis='both', labelsize=13)
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[1, 1].text(0, 0.96, '(d)', transform=axs[1, 1].transAxes + trans, verticalalignment='top', fontsize=15)
 
 print('\nScaling exponents for AQC deciles:')
 for i in range(len(deciles)-1):
@@ -746,6 +760,9 @@ axs[0, 0].set_xticks(np.arange(5, 20, 5))
 axs[0, 0].set_yticks([2**(-7), 2**(-5), 2**(-3)])
 axs[0, 0].tick_params(axis='both', labelsize=13)
 
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[0, 0].text(0, 0.3, '(a)', transform=axs[0, 0].transAxes + trans, verticalalignment='top', fontsize=15)
+
 for i in range(10):
     axs[0, 1].errorbar(deciles[i]+1, scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', ecolor=decile_colors_1[i])
     axs[0, 1].scatter(deciles[i]+1, scalings[i], color=decile_colors_1[i], s=10)
@@ -757,6 +774,9 @@ axs[0, 1].set_xticks(range(1, 11, 2))
 ylims = (-0.627, -0.3709738872006789)
 axs[0, 1].set_ylim(ylims)
 axs[0, 1].tick_params(axis='both', labelsize=12)
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[0, 1].text(0, 0.3, '(b)', transform=axs[0, 1].transAxes + trans, verticalalignment='top', fontsize=15)
 
 # divider for hardest 1%
 divider = make_axes_locatable(axs[0, 1])
@@ -806,6 +826,9 @@ axs[1, 0].set_xlabel('$n$', fontsize=15)
 axs[1, 0].set_yticks([2**6, 2**8, 2**10])
 axs[1, 0].tick_params(axis='both', labelsize=13)
 
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[1, 0].text(0, 0.96, '(c)', transform=axs[1, 0].transAxes + trans, verticalalignment='top', fontsize=15)
+
 for i in range(10):
     axs[1, 1].errorbar(deciles[i]+1, scalings[i], yerr=scalings_error[i], capsize=1.7, fmt='none', ecolor=decile_colors_1[i])
     axs[1, 1].scatter(deciles[i]+1, scalings[i], color=decile_colors_1[i], s=10)
@@ -818,6 +841,9 @@ axs[1, 1].set_yticks(np.arange(0.1, 0.6, 0.1))
 ylims = (0.060755245404130416, 0.5)
 axs[1, 1].set_ylim(ylims)
 axs[1, 1].tick_params(axis='both', labelsize=13)
+
+trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+axs[1, 1].text(0, 0.96, '(d)', transform=axs[1, 1].transAxes + trans, verticalalignment='top', fontsize=15)
 
 # divider for hardest 1%
 divider = make_axes_locatable(axs[1, 1])

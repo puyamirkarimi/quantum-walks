@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
+import matplotlib.transforms as mtransforms
+
 
 def adams_quantum_walk_data(n):
     return np.genfromtxt('./../Max2SAT_quantum/qw_and_aqc_data/heug.csv', delimiter=',', skip_header=1, dtype=str)[(n-5)*10000:(n-4)*10000, 2].astype(float)
@@ -223,6 +225,14 @@ if __name__ == '__main__':
 
     for ax in axs:
         ax.tick_params(direction='in', which='both')
+
+    trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+    axs[0].text(0.0, 0.97, '(a)', transform=axs[0].transAxes + trans, verticalalignment='top', fontsize=15)
+    axs[1].text(0.0, 0.97, '(b)', transform=axs[1].transAxes + trans, verticalalignment='top', fontsize=15)
+    axs[2].text(0.73, 0.97, '(c)', transform=axs[2].transAxes + trans, verticalalignment='top', fontsize=15)
+    axs[3].text(0.73, 0.97, '(d)', transform=axs[3].transAxes + trans, verticalalignment='top', fontsize=15)
+    axs[4].text(0.73, 0.97, '(e)', transform=axs[4].transAxes + trans, verticalalignment='top', fontsize=15)
+    axs[5].text(0.73, 0.97, '(f)', transform=axs[5].transAxes + trans, verticalalignment='top', fontsize=15)
 
     fig.tight_layout()
     # plt.savefig('hardness_histograms_satisfiable_vs_unsatisfiable_windows.pdf', dpi=200)
