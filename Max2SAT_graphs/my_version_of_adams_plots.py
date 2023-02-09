@@ -483,7 +483,7 @@ axs[-1].text(0.0, 0.97, '(d)', transform=axs[-1].transAxes + trans, verticalalig
 ax = fig.add_subplot(gs1[:, 4])
 cb = plt.colorbar(hex, cax=ax, use_gridspec=True)
 cb.ax.tick_params(labelsize=13)
-cb.set_label(r'Number of MAX 2-SAT instances', fontsize=15)
+cb.set_label(r'Number of MAX 2-SAT instances $+1$', fontsize=15)
 
 # gs1.tight_layout(fig)
 # plt.savefig('aqcqwmixbnb_hexbins_windows.pdf', bbox_inches='tight')
